@@ -2,15 +2,15 @@
 
 DataTableModel::DataTableModel(QObject* parent) : QAbstractTableModel(parent) {
 
-    _rowCount = 10;
-    _columnCount = 14;
+    _rowCount = 5;
+    _columnCount = 6;
 
     // _data init
     for (int i = 0; i < _rowCount; i++) // righe vettori grandi n colonne
     {
         QVector<qreal> *dataVector = new QVector<qreal>(_columnCount); // vettore grande x colonne
         for (int k = 0; k < dataVector->size(); k++) {
-            dataVector->replace(k, k*i);
+            dataVector->replace(k, (k+1)*i);
         }
         _data.append(dataVector); // appendi alla lista di vettori
     }
@@ -39,10 +39,10 @@ QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, in
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    if (orientation == Qt::Horizontal) {
-        return QString("col%1").arg(section + 1);
-    } else { // Qt::Vertical
-        return QString("row%1").arg(section + 1);
+    if (orientation == Qt::Horizontal) { // column headers
+        return QString("%1").arg(section + 1);
+    } else { // Qt::Vertical -- rows headers
+        return QString("%1").arg(section + 1);
     }
 }
 

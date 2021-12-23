@@ -5,6 +5,8 @@
 #include <QtCharts/QChartView>
 #include <QTableView>
 #include <QMenuBar>
+#include "model.h"
+
 using namespace QtCharts;
 
 class View : public QWidget
@@ -14,5 +16,6 @@ class View : public QWidget
 public:
     View(QWidget *parent = nullptr);
     ~View();
+    QChart *createLineChart(DataTableModel *model);
 };
 #endif // VIEW_H

@@ -2,8 +2,34 @@
 #include "model.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
+#include <QLineSeries>
 #include <QGridLayout>
+#include <QVXYModelMapper>
 #include <QHeaderView>
+
+QChart * View::createLineChart(DataTableModel *model)
+{
+    QChart *lineChart = new QChart();
+    //lineChart->legend()->hide(); LEGENDA
+    lineChart->setTitle("Title");
+    lineChart->setAnimationOptions(QChart::AllAnimations);
+
+    // mapper table->chart
+    for (int i = 1; i < model->columnCount(); i++) {
+        QLineSeries *series = new QLineSeries;
+        QVXYModelMapper *mapper = new QVXYModelMapper(this);
+        series->setName(QString("%1").arg(i));
+        mapper->setXColumn(0);
+        mapper->setYColumn(i);
+        mapper->setSeries(series);
+        mapper->setModel(model);
+        lineChart->addSeries(series);
+    }
+
+    lineChart->createDefaultAxes();
+
+    return lineChart;
+}
 
 View::View(QWidget *parent)
     : QWidget(parent)
@@ -18,26 +44,20 @@ View::View(QWidget *parent)
     tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
-    // CHART
-    QChart *chart = new QChart;
-    chart->setAnimationOptions(QChart::AllAnimations);
+    // IMPLEMENTAZIONE LINE CHART
+    QChart *lineChart = createLineChart(model);
 
-    // SERIES
 
-    //chart->createDefaultAxes();
-
-    QChartView *chartView = new QChartView(chart);
+    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+    QChartView *chartView = new QChartView(lineChart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setMinimumSize(640, 480);
 
-    /* TODO:
-     * INCLUDE CHARTS
-     * (READ EVERY CHART DOCUMENTATION)
 
 
 
 
-    ************/
     // MAIN LAYOUT + ADJUST LAYOUT AUTOMATICALLY
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(tableView, 1, 0);
@@ -45,9 +65,6 @@ View::View(QWidget *parent)
     mainLayout->setColumnStretch(0, 2);
     mainLayout->setColumnStretch(1, 3);
     setLayout(mainLayout);
-
-
-
 }
 
 View::~View()
