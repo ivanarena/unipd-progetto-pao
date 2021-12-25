@@ -10,6 +10,7 @@
 #include <QToolButton>
 #include <QToolBar>
 #include <QMenuBar>
+#include <QMenu>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -36,56 +37,11 @@ QChart * View::createLineChart(DataTableModel *model)
     return lineChart;
 }
 
-View::View(QWidget *parent)
-    : QWidget(parent)
+// TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
+QToolBar * View::createToolBar()
 {
-
-
-    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
-    DataTableModel *model = new DataTableModel;
-    QTableView *tableView = new QTableView;
-    tableView->setModel(model);
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-
-    // IMPLEMENTAZIONE LINE CHART
-    QChart *lineChart = createLineChart(model);
-
-
-    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
-    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
-    QChartView *chartView = new QChartView(lineChart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(640, 480);
-
-
-
-
-
-    // MAIN LAYOUT + ADJUST LAYOUT AUTOMATICALLY
-    QTabWidget *tabView= new QTabWidget;
-
-    QWidget *mainWindow = new QWidget;
-
-    QGridLayout *sceneLayout = new QGridLayout(mainWindow);
-    sceneLayout->addWidget(tableView, 1, 0);
-    sceneLayout->addWidget(chartView, 1, 1);
-    sceneLayout->setColumnStretch(0, 2);
-    sceneLayout->setColumnStretch(1, 3);
-
-    mainWindow->setLayout(sceneLayout);
-
-    tabView->addTab(mainWindow, "Model");
-    //tabView->show(); // PROBABILMENTE NON SERVE PERCHÉ HO FIXATO
-
-
-    QGridLayout *mainLayout = new QGridLayout;
-
     QToolBar *toolBar = new QToolBar;
     toolBar->setOrientation(Qt::Vertical);
-
-    // TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
     toolBar->addAction("New");
     toolBar->addAction("Open");
     toolBar->addAction("Save");
@@ -96,14 +52,62 @@ View::View(QWidget *parent)
     toolBar->addAction("+col");
     toolBar->addAction("-col");
 
-    mainLayout->addWidget(toolBar, 1, 0);
-    mainLayout->addWidget(tabView, 1, 1);
+    return toolBar;
+}
+
+QTableView * View::createTableView(DataTableModel *model)
+{
+    QTableView *tableView = new QTableView;
+    tableView->setModel(model);
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    return tableView;
+}
+
+View::View(QWidget *parent)
+    : QWidget(parent)
+{
+
+    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
+    DataTableModel *model = new DataTableModel;
+    // DataTableModel *defaultModel = new DataTableModel(0, true); // DEF MODEL JUST 4 FUTURE REFERENCE
+
+    //QTableView *tableView = createTableView(model); // FATTO DIRETTAMENTE GIÙ
+
+
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+
+    // IMPLEMENTAZIONE LINE CHART
+    QChartView *chartView = new QChartView(createLineChart(model));
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(640, 480);
+
+
+    // MAIN LAYOUT + ADJUST LAYOUT AUTOMATICALLY
+    QTabWidget *tabView = new QTabWidget;
+
+    QWidget *mainTab = new QWidget;
+
+    QGridLayout *sceneLayout = new QGridLayout(mainTab);
+    sceneLayout->addWidget(createTableView(model), 1, 0);
+    sceneLayout->addWidget(chartView, 1, 1);
+    sceneLayout->setColumnStretch(0, 2);
+    sceneLayout->setColumnStretch(1, 3);
+
+    mainTab->setLayout(sceneLayout);
+
+    // TODO: IMPLEMENTARE NEW TAB WITH DEFAULT MODEL -- DOVE?????
+    tabView->addTab(mainTab, "Model");
+    //tabView->show(); // PROBABILMENTE NON SERVE PERCHÉ HO FIXATO
+
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(createToolBar(), 0, 0);
+    mainLayout->addWidget(tabView, 0, 1);
     setLayout(mainLayout);
 
+
     // ! TUTTO QUELLO QUA SOPRA FUNZIONA
-
-
-
 
 }
 

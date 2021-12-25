@@ -16,6 +16,32 @@ DataTableModel::DataTableModel(QObject* parent) : QAbstractTableModel(parent) {
     }
 }
 
+DataTableModel::DataTableModel(QObject* parent, bool blank) : QAbstractTableModel(parent) {
+
+    if (blank)
+    {
+        _rowCount = 3;
+        _columnCount = 3;
+
+        // _data init
+        for (int i = 0; i < _rowCount; i++) // righe vettori grandi n colonne
+        {
+            QVector<qreal> *dataVector = new QVector<qreal>(_columnCount); // vettore grande x colonne
+            for (int k = 0; k < dataVector->size(); k++) {
+                dataVector->replace(k, 0);
+            }
+            _data.append(dataVector); // appendi alla lista di vettori
+        }
+
+    }
+    else
+    {
+        DataTableModel(parent);
+    }
+
+
+}
+
 int DataTableModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent) // parent non è usato -- evita compilazioni inutili
     return _rowCount;
@@ -59,6 +85,11 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
         return true;
     }
     return false;
+}
+
+bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
+{
+
 }
 
 
