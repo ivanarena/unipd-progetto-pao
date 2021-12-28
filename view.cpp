@@ -10,6 +10,9 @@
 #include <QToolButton>
 #include <QToolBar>
 #include <QMenuBar>
+#include <QVPieModelMapper>
+#include <QtCharts/QPieSlice>
+#include <QtCharts/QPieSeries>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -36,6 +39,29 @@ QChart * View::createLineChart(DataTableModel *model)
     return lineChart;
 }
 
+QChart * View::createPieChart(DataTableModel *model)
+{
+    QChart *PieChart = new QChart();
+    QVPieModelMapper *piemapper = new QVPieModelMapper();
+    PieChart->setTitle("Pie chart");
+    QPieSeries *series = new QPieSeries(PieChart);
+
+    piemapper->setSeries(series);
+    piemapper->setModel(model); //TODO: capire come implementare il piechart con questo set di dati
+    piemapper->setLabelsColumn(0); // a quale colonna associare  label
+    piemapper->setValuesColumn(1); // a quale colonna associare valore
+    piemapper->setFirstRow(0); //da che riga del model inizio
+    piemapper->setRowCount(model->rowCount()); //una riga -> una slice
+
+    PieChart->addSeries(series);
+    series->setPieSize(5);
+    series->setHoleSize(0.5);
+
+
+    return PieChart;
+}
+
+
 View::View(QWidget *parent)
     : QWidget(parent)
 {
@@ -49,17 +75,17 @@ View::View(QWidget *parent)
     tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
-    // IMPLEMENTAZIONE LINE CHART
+    // IMPLEMENTAZIONE CHARTS
     QChart *lineChart = createLineChart(model);
+    QChart *piechart = createPieChart(model);
 
 
     // VISUALIZER E SELETTORE GRAFICI (DA FARE)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
     QChartView *chartView = new QChartView(lineChart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(640, 480);
-
-
+    QChartView *chart1View = new QChartView(piechart);
+    chartView->setMinimumSize(320, 240);
+    chart1View->setMinimumSize(320, 240);
 
 
 
@@ -69,8 +95,10 @@ View::View(QWidget *parent)
     QWidget *mainWindow = new QWidget;
 
     QGridLayout *sceneLayout = new QGridLayout(mainWindow);
+
     sceneLayout->addWidget(tableView, 1, 0);
     sceneLayout->addWidget(chartView, 1, 1);
+    sceneLayout->addWidget(chart1View,1,2);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
@@ -96,6 +124,17 @@ View::View(QWidget *parent)
     toolBar->addAction("+col");
     toolBar->addAction("-col");
 
+
+    // Sezione relativa ai progetti, TODO:  pulsante per crearne uno nuovo dovrebbe stare da un altra parte
+
+    QToolBar *Projects = new QToolBar;
+    Projects ->setOrientation(Qt::Horizontal);
+
+    Projects->addAction("Project1");  // Il nome del progetto dovrebbe essere scelto dall'utente tramite pulsante new
+    Projects->addAction("Project2");
+    Projects->addAction("+");
+
+    mainLayout->addWidget(Projects,0,1);
     mainLayout->addWidget(toolBar, 1, 0);
     mainLayout->addWidget(tabView, 1, 1);
     setLayout(mainLayout);

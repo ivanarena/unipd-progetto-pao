@@ -17,5 +17,6 @@ public:
     View(QWidget *parent = nullptr);
     ~View();
     QChart *createLineChart(DataTableModel *model);
+    QChart *createPieChart(DataTableModel *model);
 };
 #endif // VIEW_H
