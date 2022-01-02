@@ -13,6 +13,7 @@
 #include <QVPieModelMapper>
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QPieSeries>
+#include <QMenu>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -64,49 +65,81 @@ QChart * View::createPieChart(DataTableModel *model)
 
 View::View(QWidget *parent)
     : QWidget(parent)
+// TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
+QToolBar * View::createToolBar()
 {
+    QToolBar *toolBar = new QToolBar;
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->addAction("New");
+    toolBar->addAction("Open");
+    toolBar->addAction("Save");
+    toolBar->addAction("+Tab");
+    toolBar->addAction("-Tab");
+    toolBar->addAction("+row");
+    toolBar->addAction("-row");
+    toolBar->addAction("+col");
+    toolBar->addAction("-col");
 
+    return toolBar;
+}
 
-    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
-    DataTableModel *model = new DataTableModel;
+QTableView * View::createTableView(DataTableModel *model)
+{
     QTableView *tableView = new QTableView;
     tableView->setModel(model);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    return tableView;
+}
 
     // IMPLEMENTAZIONE CHARTS
     QChart *lineChart = createLineChart(model);
     QChart *piechart = createPieChart(model);
+View::View(QWidget *parent)
+    : QWidget(parent)
+{
 
-
+    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
+    DataTableModel *model = new DataTableModel;
+    // DataTableModel *defaultModel = new DataTableModel(0, true); // DEF MODEL JUST 4 FUTURE REFERENCE
     // VISUALIZER E SELETTORE GRAFICI (DA FARE)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
     QChartView *chartView = new QChartView(lineChart);
     QChartView *chart1View = new QChartView(piechart);
     chartView->setMinimumSize(320, 240);
     chart1View->setMinimumSize(320, 240);
+    //QTableView *tableView = createTableView(model); // FATTO DIRETTAMENTE GIÙ
 
+
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+
+    // IMPLEMENTAZIONE LINE CHART
+    QChartView *chartView = new QChartView(createLineChart(model));
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(640, 480);
 
 
     // MAIN LAYOUT + ADJUST LAYOUT AUTOMATICALLY
-    QTabWidget *tabView= new QTabWidget;
+    QTabWidget *tabView = new QTabWidget;
 
-    QWidget *mainWindow = new QWidget;
+    QWidget *mainTab = new QWidget;
 
     QGridLayout *sceneLayout = new QGridLayout(mainWindow);
 
     sceneLayout->addWidget(tableView, 1, 0);
+    QGridLayout *sceneLayout = new QGridLayout(mainTab);
+    sceneLayout->addWidget(createTableView(model), 1, 0);
     sceneLayout->addWidget(chartView, 1, 1);
     sceneLayout->addWidget(chart1View,1,2);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
-    mainWindow->setLayout(sceneLayout);
+    mainTab->setLayout(sceneLayout);
 
-    tabView->addTab(mainWindow, "Model");
+    // TODO: IMPLEMENTARE NEW TAB WITH DEFAULT MODEL -- DOVE?????
+    tabView->addTab(mainTab, "Model");
     //tabView->show(); // PROBABILMENTE NON SERVE PERCHÉ HO FIXATO
-
 
     QGridLayout *mainLayout = new QGridLayout;
 
@@ -137,12 +170,12 @@ View::View(QWidget *parent)
     mainLayout->addWidget(Projects,0,1);
     mainLayout->addWidget(toolBar, 1, 0);
     mainLayout->addWidget(tabView, 1, 1);
+    mainLayout->addWidget(createToolBar(), 0, 0);
+    mainLayout->addWidget(tabView, 0, 1);
     setLayout(mainLayout);
 
+
     // ! TUTTO QUELLO QUA SOPRA FUNZIONA
-
-
-
 
 }
 
