@@ -18,6 +18,7 @@ public:
     View(QWidget *parent = nullptr);
     ~View();
     QChart *createLineChart(DataTableModel *model);
+    QChart *createPieChart(DataTableModel *model);
     QToolBar *createToolBar();
     void createTableView();
     QTableView * createTableView(DataTableModel *model);

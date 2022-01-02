@@ -10,6 +10,9 @@
 #include <QToolButton>
 #include <QToolBar>
 #include <QMenuBar>
+#include <QVPieModelMapper>
+#include <QtCharts/QPieSlice>
+#include <QtCharts/QPieSeries>
 #include <QMenu>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
@@ -37,6 +40,31 @@ QChart * View::createLineChart(DataTableModel *model)
     return lineChart;
 }
 
+QChart * View::createPieChart(DataTableModel *model)
+{
+    QChart *PieChart = new QChart();
+    QVPieModelMapper *piemapper = new QVPieModelMapper();
+    PieChart->setTitle("Pie chart");
+    QPieSeries *series = new QPieSeries(PieChart);
+
+    piemapper->setSeries(series);
+    piemapper->setModel(model); //TODO: capire come implementare il piechart con questo set di dati
+    piemapper->setLabelsColumn(0); // a quale colonna associare  label
+    piemapper->setValuesColumn(1); // a quale colonna associare valore
+    piemapper->setFirstRow(0); //da che riga del model inizio
+    piemapper->setRowCount(model->rowCount()); //una riga -> una slice
+
+    PieChart->addSeries(series);
+    series->setPieSize(5);
+    series->setHoleSize(0.5);
+
+
+    return PieChart;
+}
+
+
+View::View(QWidget *parent)
+    : QWidget(parent)
 // TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
 QToolBar * View::createToolBar()
 {
@@ -65,6 +93,9 @@ QTableView * View::createTableView(DataTableModel *model)
     return tableView;
 }
 
+    // IMPLEMENTAZIONE CHARTS
+    QChart *lineChart = createLineChart(model);
+    QChart *piechart = createPieChart(model);
 View::View(QWidget *parent)
     : QWidget(parent)
 {
@@ -72,7 +103,12 @@ View::View(QWidget *parent)
     // LOAD (CREATE ACTUALLY) MODEL AND TABLE
     DataTableModel *model = new DataTableModel;
     // DataTableModel *defaultModel = new DataTableModel(0, true); // DEF MODEL JUST 4 FUTURE REFERENCE
-
+    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+    QChartView *chartView = new QChartView(lineChart);
+    QChartView *chart1View = new QChartView(piechart);
+    chartView->setMinimumSize(320, 240);
+    chart1View->setMinimumSize(320, 240);
     //QTableView *tableView = createTableView(model); // FATTO DIRETTAMENTE GIÙ
 
 
@@ -89,9 +125,13 @@ View::View(QWidget *parent)
 
     QWidget *mainTab = new QWidget;
 
+    QGridLayout *sceneLayout = new QGridLayout(mainWindow);
+
+    sceneLayout->addWidget(tableView, 1, 0);
     QGridLayout *sceneLayout = new QGridLayout(mainTab);
     sceneLayout->addWidget(createTableView(model), 1, 0);
     sceneLayout->addWidget(chartView, 1, 1);
+    sceneLayout->addWidget(chart1View,1,2);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
@@ -102,6 +142,34 @@ View::View(QWidget *parent)
     //tabView->show(); // PROBABILMENTE NON SERVE PERCHÉ HO FIXATO
 
     QGridLayout *mainLayout = new QGridLayout;
+
+    QToolBar *toolBar = new QToolBar;
+    toolBar->setOrientation(Qt::Vertical);
+
+    // TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
+    toolBar->addAction("New");
+    toolBar->addAction("Open");
+    toolBar->addAction("Save");
+    toolBar->addAction("+Tab");
+    toolBar->addAction("-Tab");
+    toolBar->addAction("+row");
+    toolBar->addAction("-row");
+    toolBar->addAction("+col");
+    toolBar->addAction("-col");
+
+
+    // Sezione relativa ai progetti, TODO:  pulsante per crearne uno nuovo dovrebbe stare da un altra parte
+
+    QToolBar *Projects = new QToolBar;
+    Projects ->setOrientation(Qt::Horizontal);
+
+    Projects->addAction("Project1");  // Il nome del progetto dovrebbe essere scelto dall'utente tramite pulsante new
+    Projects->addAction("Project2");
+    Projects->addAction("+");
+
+    mainLayout->addWidget(Projects,0,1);
+    mainLayout->addWidget(toolBar, 1, 0);
+    mainLayout->addWidget(tabView, 1, 1);
     mainLayout->addWidget(createToolBar(), 0, 0);
     mainLayout->addWidget(tabView, 0, 1);
     setLayout(mainLayout);
