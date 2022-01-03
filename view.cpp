@@ -45,6 +45,7 @@ QChart * View::createPieChart(DataTableModel *model)
     QChart *pieChart = new QChart();
     QVPieModelMapper *pieMapper = new QVPieModelMapper();
     pieChart->setTitle("Pie chart");
+    pieChart->setAnimationOptions(QChart::AllAnimations);
     QPieSeries *series = new QPieSeries(pieChart);
 
     pieMapper->setSeries(series);
@@ -62,13 +63,18 @@ QChart * View::createPieChart(DataTableModel *model)
     return pieChart;
 }
 
-
-// TODO: LE AZIONI DOVREBBERO ESSERE CREATE ALTROVE ED ESSERE USATE UGUALI ANCHE NEL MENU
 QToolBar * View::createToolBar()
 {
     QToolBar *toolBar = new QToolBar;
+
+    QAction *newTab = new QAction("New", this);
+    newTab->setShortcuts(QKeySequence::New);
+    connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
+
+
+
     toolBar->setOrientation(Qt::Vertical);
-    toolBar->addAction("New");
+    toolBar->addAction(newTab);
     toolBar->addAction("Open");
     toolBar->addAction("Save");
     toolBar->addAction("+Tab");
@@ -77,6 +83,7 @@ QToolBar * View::createToolBar()
     toolBar->addAction("-row");
     toolBar->addAction("+col");
     toolBar->addAction("-col");
+    toolBar->addAction("Line");
 
     return toolBar;
 }
@@ -91,73 +98,47 @@ QTableView * View::createTableView(DataTableModel *model)
     return tableView;
 }
 
-
-
-
-View::View(QWidget *parent)
-    : QWidget(parent)
+// DA SPOSTARE NEL CONTROLLER PROBABILMENTE
+QWidget * View::createNewTab(DataTableModel *model)
 {
-    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
-    DataTableModel *model = new DataTableModel;
-    // DataTableModel *defaultModel = new DataTableModel(0, true); // DEF MODEL JUST 4 FUTURE REFERENCE
-    //QTableView *tableView = createTableView(model); // FATTO DIRETTAMENTE GIÙ
+    QWidget *newTab = new QWidget;
 
+    QGridLayout *sceneLayout = new QGridLayout(newTab);
 
-    // non servono (?)
-    //QChart *lineChart = createLineChart(model);
-    //QChart *pieChart = createPieChart(model);
-
-
-    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
-    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+    // SOLUZIONE TEMPORANEA (poi si dovrà implementare quella che scorre e sceglie il grafico voluto)
     QChartView *chartView = new QChartView(createLineChart(model));
-    QChartView *chart1View = new QChartView(createPieChart(model));
+    chartView->setMinimumSize(640, 480);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chart1View->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(320, 240);
-    chart1View->setMinimumSize(320, 240);
 
-
-    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
-
-    //chartView->setMinimumSize(640, 480);
-
-
-    // MAIN LAYOUT + ADJUST LAYOUT AUTOMATICALLY
-    QTabWidget *tabView = new QTabWidget;
-
-    QWidget *mainTab = new QWidget;
-
-    QGridLayout *sceneLayout = new QGridLayout(mainTab);
 
     sceneLayout->addWidget(createTableView(model), 1, 0);
     sceneLayout->addWidget(chartView, 1, 1);
-    sceneLayout->addWidget(chart1View,1,2);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
-    mainTab->setLayout(sceneLayout);
+    newTab->setLayout(sceneLayout);
+    tabView->addTab(newTab, "test");
+    tabView->setCurrentIndex(tabView->currentIndex() + 1);
+
+    return newTab;
+}
+
+View::View(QWidget *parent)
+    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout)
+{
+    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
+    DataTableModel *model = new DataTableModel;
+
+    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+
 
     // TODO: IMPLEMENTARE NEW TAB WITH DEFAULT MODEL -- DOVE?????
-    tabView->addTab(mainTab, "Model");
-    //tabView->show(); // PROBABILMENTE NON SERVE PERCHÉ HO FIXATO
+    QWidget *defaultTab = createNewTab(model);
+    tabView->addTab(defaultTab, "Model");
 
-    QGridLayout *mainLayout = new QGridLayout;
-
-
-    // Sezione relativa ai progetti, TODO:  pulsante per crearne uno nuovo dovrebbe stare da un altra parte
-    // A CHE SERVE LORE??? C'È GIÀ L'ALTRA TOOLBAR
-    QToolBar *Projects = new QToolBar;
-    Projects ->setOrientation(Qt::Horizontal);
-
-    Projects->addAction("Project1");  // Il nome del progetto dovrebbe essere scelto dall'utente tramite pulsante new
-    Projects->addAction("Project2");
-    Projects->addAction("+");
-
-    mainLayout->addWidget(Projects,0,1);
-    mainLayout->addWidget(tabView, 1, 1);
-    mainLayout->addWidget(createToolBar(), 0, 0);
     mainLayout->addWidget(tabView, 0, 1);
+    mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);
 
 

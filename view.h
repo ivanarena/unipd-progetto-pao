@@ -5,6 +5,7 @@
 #include <QtCharts/QChartView>
 #include <QTableView>
 #include <QMenuBar>
+#include <QGridLayout>
 #include <QToolBar>
 #include "model.h"
 
@@ -14,6 +15,9 @@ class View : public QWidget
 {
     Q_OBJECT
 
+private:
+    QTabWidget *tabView;
+    QGridLayout *mainLayout;
 public:
     View(QWidget *parent = nullptr);
     ~View();
@@ -22,5 +26,7 @@ public:
     QToolBar *createToolBar();
     void createTableView();
     QTableView * createTableView(DataTableModel *model);
+public slots:
+    QWidget * createNewTab(DataTableModel *model = new DataTableModel(0, true));
 };
 #endif // VIEW_H

@@ -89,7 +89,7 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
 
 bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
 {
-
+    return false;
 }
 
 

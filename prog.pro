@@ -9,20 +9,22 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Graph.cpp \
-    GraphContainer.cpp \
-    PieChart.cpp \
+    chart.cpp \
+    chart_container.cpp \
+    controller.cpp \
     main.cpp \
     model.cpp \
-    parsing.cpp \
+    parser.cpp \
+    pie_chart.cpp \
     view.cpp
 
 HEADERS += \
-    Graph.h \
-    GraphContainer.h \
-    PieChart.h \
+    chart.h \
+    chart_container.h \
+    controller.h \
     model.h \
-    parsing.h \
+    parser.h \
+    pie_chart.h \
     view.h
 
 # Default rules for deployment.
