@@ -1,4 +1,4 @@
-#include "parsing.h"
+/*#include "parsing.h"
 
 DataTableModel* loadjson(QString &filename){
 
@@ -15,4 +15,4 @@ DataTableModel* loadjson(QString &filename){
         }
     }
     return model;
-}
+}*/
