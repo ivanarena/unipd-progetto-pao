@@ -24,10 +24,11 @@ public:
     bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
 
 private:
-    QVector<QVector<qreal> *> _data; //  vettori di vettori (?)
-
-    int _rowCount;
-    int _columnCount;
+    // Da sostituire con std::vector
+    QVector<QVector<qreal> *> m_data; //  vettori di vettori (?)
+    QVector<QVector<qreal> *> m_headerData;
+    int m_rowCount;
+    int m_columnCount;
 };
 
 #endif // MODEL_H
