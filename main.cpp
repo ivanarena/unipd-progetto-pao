@@ -14,8 +14,10 @@ int main(int argc, char *argv[])
     gui.show();
 
 
-    /*
+
     //TEST PARSER:
+
+        //SAVING PART:
 
     pair<vector<string>,vector<vector<int>>> test;
 
@@ -31,8 +33,13 @@ int main(int argc, char *argv[])
 
     savejson(test,"test");
 
-    //
-    */
+
+        //LOADING PART:
+
+    pair<vector<string>,vector<vector<int>>> data = loadjson("test.json");
+
+    //END OF TEST
+
 
     return app.exec();
 }
