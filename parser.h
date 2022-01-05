@@ -14,8 +14,8 @@ using std::vector;
 using std::string;
 using std::pair;
 
-pair<vector<string>,vector<vector<int>>> loadjson(string &filename); //DOING
-void savejson(pair<vector<string>,vector<vector<int>>>); //DOING
+pair<vector<string>,vector<vector<int>>> loadjson(const string &filename); //ALMOST DONE
+void savejson(const pair<vector<string>,vector<vector<int>>> &data); //DOING
 
 void loadxml(); //TODO
 void savexml(); //TODO

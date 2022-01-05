@@ -1,6 +1,7 @@
 #include "controller.h"
 
-controller::controller()
+controller::controller(QObject *parent)
+    : QObject{parent}
 {
 
 }

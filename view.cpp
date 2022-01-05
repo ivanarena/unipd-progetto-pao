@@ -1,5 +1,7 @@
 #include "view.h"
 #include "model.h"
+#include "toolbar.h"
+#include "parser.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QLineSeries>
@@ -10,10 +12,12 @@
 #include <QToolButton>
 #include <QToolBar>
 #include <QMenuBar>
+#include <QList>
 #include <QVPieModelMapper>
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QPieSeries>
 #include <QMenu>
+#include <QKeySequence>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -63,27 +67,37 @@ QChart * View::createPieChart(DataTableModel *model)
     return pieChart;
 }
 
+// TODO: SPOSTARE IN UN ALTRO FILE PER USARLO CON CONTROLLER
 QToolBar * View::createToolBar()
 {
-    QToolBar *toolBar = new QToolBar;
-
     QAction *newTab = new QAction("New", this);
-    newTab->setShortcuts(QKeySequence::New);
+    QList<QKeySequence> newTabShortcuts;
+    newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
+    newTab->setShortcuts(newTabShortcuts);
+
+    QAction *openModel = new QAction("Open", this);
+    openModel->setShortcuts(QKeySequence::Open);
+
+    QAction *saveModel = new QAction("Save", this);
+    saveModel->setShortcuts(QKeySequence::SaveAs);
+
+    QAction *addRow = new QAction("+row", this);
+    QAction *removeRow = new QAction("-row", this);
+    QAction *addColumn = new QAction("+col", this);
+    QAction *removeColumn = new QAction("-col", this);
+
+    // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
-
-
 
     toolBar->setOrientation(Qt::Vertical);
     toolBar->addAction(newTab);
-    toolBar->addAction("Open");
-    toolBar->addAction("Save");
-    toolBar->addAction("+Tab");
-    toolBar->addAction("-Tab");
-    toolBar->addAction("+row");
-    toolBar->addAction("-row");
-    toolBar->addAction("+col");
-    toolBar->addAction("-col");
-    toolBar->addAction("Line");
+    toolBar->addAction(openModel);
+    toolBar->addAction(saveModel);
+    toolBar->addAction(addRow);
+    toolBar->addAction(removeRow);
+    toolBar->addAction(addColumn);
+    toolBar->addAction(removeColumn);
+    toolBar->addAction("chart_sel");
 
     return toolBar;
 }
@@ -98,7 +112,6 @@ QTableView * View::createTableView(DataTableModel *model)
     return tableView;
 }
 
-// DA SPOSTARE NEL CONTROLLER PROBABILMENTE
 QWidget * View::createNewTab(DataTableModel *model)
 {
     QWidget *newTab = new QWidget;
@@ -124,27 +137,28 @@ QWidget * View::createNewTab(DataTableModel *model)
 }
 
 View::View(QWidget *parent)
-    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout)
+    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar)
 {
-    // LOAD (CREATE ACTUALLY) MODEL AND TABLE
-    DataTableModel *model = new DataTableModel;
+    tabView->setTabsClosable(true);
+
+    // DA METTERE NEL CONTROLLERE E CREARE LA FUNZIONE CLOSETAB QUA DENTRO (se no le tab non si chiudono)
+    // FOR REF: https://stackoverflow.com/questions/459372/putting-a-close-button-on-qtabwidget
+    //connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+
+    //DataTableModel *model = new DataTableModel;
 
     // VISUALIZER E SELETTORE GRAFICI (DA FARE)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
 
-
-    // TODO: IMPLEMENTARE NEW TAB WITH DEFAULT MODEL -- DOVE?????
-    QWidget *defaultTab = createNewTab(model);
+    QWidget *defaultTab = createNewTab(new DataTableModel);
     tabView->addTab(defaultTab, "Model");
 
     mainLayout->addWidget(tabView, 0, 1);
     mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);
 
-
-    // ! TUTTO QUELLO QUA SOPRA FUNZIONA
-
 }
+
 
 View::~View()
 {
