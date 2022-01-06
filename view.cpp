@@ -1,6 +1,7 @@
 #include "view.h"
 #include "model.h"
 #include "toolbar.h"
+#include "parser.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QLineSeries>
@@ -157,6 +158,7 @@ View::View(QWidget *parent)
     setLayout(mainLayout);
 
 }
+
 
 View::~View()
 {

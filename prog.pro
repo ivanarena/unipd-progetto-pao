@@ -16,6 +16,7 @@ SOURCES += \
     model.cpp \
     parser.cpp \
     pie_chart.cpp \
+ #   toolbar.cpp \
     view.cpp
 
 HEADERS += \
@@ -25,6 +26,7 @@ HEADERS += \
     model.h \
     parser.h \
     pie_chart.h \
+ #   toolbar.h \
     view.h
 
 # Default rules for deployment.
