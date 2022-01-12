@@ -32,6 +32,7 @@ public:
 
 public slots:
     QWidget * createNewTab(DataTableModel *model = new DataTableModel(0, true));
+    void closeTab(const int& index);
 };
 
 #endif // VIEW_H

@@ -6,6 +6,8 @@
 #include <QtCharts/QChartView>
 #include <QLineSeries>
 #include <QGridLayout>
+#include <QApplication>
+#include <QStyle>
 #include <QVXYModelMapper>
 #include <QHeaderView>
 #include <QTabWidget>
@@ -70,26 +72,27 @@ QChart * View::createPieChart(DataTableModel *model)
 // TODO: SPOSTARE IN UN ALTRO FILE PER USARLO CON CONTROLLER
 QToolBar * View::createToolBar()
 {
-    QAction *newTab = new QAction("New", this);
+    toolBar->setIconSize(QSize(36, 36));
+    QAction *newTab = new QAction(QIcon(":/res/new-file.png"), "New", this);
     QList<QKeySequence> newTabShortcuts;
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
 
-    QAction *openModel = new QAction("Open", this);
+    QAction *openModel = new QAction(QIcon(":/res/open-file.png"), "Open", this);
     openModel->setShortcuts(QKeySequence::Open);
 
-    QAction *saveModel = new QAction("Save", this);
+    QAction *saveModel = new QAction(QIcon(":/res/save-file.png"), "Save", this);
     saveModel->setShortcuts(QKeySequence::SaveAs);
 
-    QAction *addRow = new QAction("+row", this);
-    QAction *removeRow = new QAction("-row", this);
-    QAction *addColumn = new QAction("+col", this);
-    QAction *removeColumn = new QAction("-col", this);
+    QAction *addRow = new QAction(QIcon(":/res/insert-row.png"), "+row", this);
+    QAction *removeRow = new QAction(QIcon(":/res/remove-row.png"), "-row", this);
+    QAction *addColumn = new QAction(QIcon(":/res/insert-column.png"), "+col", this);
+    QAction *removeColumn = new QAction(QIcon(":/res/remove-column.png"), "-col", this);
 
     // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
 
-    toolBar->setOrientation(Qt::Vertical);
+    //toolBar->setOrientation(Qt::Vertical);
     toolBar->addAction(newTab);
     toolBar->addAction(openModel);
     toolBar->addAction(saveModel);
@@ -136,24 +139,37 @@ QWidget * View::createNewTab(DataTableModel *model)
     return newTab;
 }
 
+void View::closeTab(const int& index)
+{
+    if (index == -1) {
+        return;
+    }
+
+    QWidget* tabItem = tabView->widget(index);
+    // Removes the tab at position index from this stack of widgets.
+    // The page widget itself is not deleted.
+    tabView->removeTab(index);
+
+    delete(tabItem);
+    tabItem = nullptr;
+}
+
 View::View(QWidget *parent)
     : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar)
 {
+    connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     tabView->setTabsClosable(true);
-
-    // DA METTERE NEL CONTROLLERE E CREARE LA FUNZIONE CLOSETAB QUA DENTRO (se no le tab non si chiudono)
-    // FOR REF: https://stackoverflow.com/questions/459372/putting-a-close-button-on-qtabwidget
-    //connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
 
     //DataTableModel *model = new DataTableModel;
 
     // VISUALIZER E SELETTORE GRAFICI (DA FARE)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
 
+    // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     QWidget *defaultTab = createNewTab(new DataTableModel);
     tabView->addTab(defaultTab, "Model");
 
-    mainLayout->addWidget(tabView, 0, 1);
+    mainLayout->addWidget(tabView, 1, 0);
     mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);
 
