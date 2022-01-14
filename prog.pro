@@ -12,6 +12,7 @@ SOURCES += \
     chart.cpp \
     chart_container.cpp \
     controller.cpp \
+    data.cpp \
     main.cpp \
     model.cpp \
     parser.cpp \
@@ -23,11 +24,14 @@ HEADERS += \
     chart.h \
     chart_container.h \
     controller.h \
+    data.h \
     model.h \
     parser.h \
     pie_chart.h \
  #   toolbar.h \
     view.h
+
+RESOURCES = res.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

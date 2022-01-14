@@ -25,7 +25,7 @@ pair<vector<string>,vector<vector<int>>> loadjson(const string &filename){
 
     //Values:
 
-    for(vector<string>::const_iterator it = data.first.begin(); it!= data.first.end(); ++it){
+    for(vector<string>::const_iterator it = data.first.cbegin(); it!= data.first.cend(); ++it){
         if(jsonobj[QString::fromStdString(*it)].isArray()){ //trovo array associato a key
             QJsonArray qArray = jsonobj[QString::fromStdString(*it)].toArray();
             vector<int> values;
