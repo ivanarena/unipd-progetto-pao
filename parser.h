@@ -14,10 +14,10 @@ using std::vector;
 using std::string;
 using std::pair;
 
-pair<vector<string>,vector<vector<int>>> loadjson(const string &filename); //ALMOST DONE
-void savejson(const pair<vector<string>,vector<vector<int>>> &data, const string &filename); //DOING
+pair<vector<string>,vector<vector<int>>> loadJson(const string &fileName); //ALMOST DONE
+void saveJson(const pair<vector<string>,vector<vector<int>>> &data, const string &fileName); //DOING
 
-void loadxml(); //TODO
-void savexml(); //TODO
+void loadXml(); //TODO
+void saveXml(); //TODO
 
 #endif

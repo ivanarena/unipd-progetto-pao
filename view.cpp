@@ -19,6 +19,7 @@
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QPieSeries>
 #include <QMenu>
+#include <QComboBox>
 #include <QKeySequence>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
@@ -100,7 +101,12 @@ QToolBar * View::createToolBar()
     toolBar->addAction(removeRow);
     toolBar->addAction(addColumn);
     toolBar->addAction(removeColumn);
-    toolBar->addAction("chart_sel");
+
+    QComboBox *chartSelectionBox = new QComboBox;
+    chartSelectionBox->addItem("Line Chart");
+    chartSelectionBox->addItem("Pie Chart");
+
+    toolBar->addWidget(chartSelectionBox);
 
     return toolBar;
 }

@@ -31,12 +31,12 @@ int main(int argc, char *argv[])
     test.second.push_back(testin);
     test.second.push_back(testin);
 
-    savejson(test,"test");
+    saveJson(test,"test");
 
 
         //LOADING PART:
 
-    pair<vector<string>,vector<vector<int>>> data = loadjson("test.json");
+    pair<vector<string>,vector<vector<int>>> data = loadJson("test.json");
 
     //END OF TEST
 
