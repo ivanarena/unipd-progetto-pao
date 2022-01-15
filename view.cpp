@@ -139,7 +139,7 @@ QWidget * View::createNewTab(DataTableModel *model)
     sceneLayout->setColumnStretch(1, 3);
 
     newTab->setLayout(sceneLayout);
-    tabView->addTab(newTab, "test");
+    tabView->addTab(newTab, QString("%i").arg(tabView->currentIndex() + 1)); // !!!TOFIX
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
 
     return newTab;

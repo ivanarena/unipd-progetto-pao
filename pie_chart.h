@@ -11,7 +11,7 @@
 #include <QtCharts/QPieSeries>
 
 
-class PieChart : public Graph
+class PieChart : public Chart
 {
 public:
     PieChart();
