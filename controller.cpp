@@ -1,7 +1,13 @@
 #include "controller.h"
+#include "model.h"
 
-controller::controller(QObject *parent)
+Controller::Controller(QObject *parent)
     : QObject{parent}
 {
 
+}
+
+void Controller::addRowPressed(DataTableModel *modelPtr)
+{
+    modelPtr->addRow();
 }

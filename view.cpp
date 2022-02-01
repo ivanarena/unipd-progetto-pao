@@ -1,7 +1,7 @@
 #include "view.h"
 #include "model.h"
-#include "toolbar.h"
 #include "parser.h"
+#include "controller.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QLineSeries>
@@ -86,12 +86,14 @@ QToolBar * View::createToolBar()
     saveModel->setShortcuts(QKeySequence::SaveAs);
 
     QAction *addRow = new QAction(QIcon(":/res/insert-row.png"), "+row", this);
+
     QAction *removeRow = new QAction(QIcon(":/res/remove-row.png"), "-row", this);
     QAction *addColumn = new QAction(QIcon(":/res/insert-column.png"), "+col", this);
     QAction *removeColumn = new QAction(QIcon(":/res/remove-column.png"), "-col", this);
 
     // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
+    // connect(addRow, SIGNAL(triggered()), this, &Controller::addRowPressed(tabModels.at(tabView->currentIndex()))
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addAction(newTab);
@@ -124,9 +126,9 @@ QTableView * View::createTableView(DataTableModel *model)
 QWidget * View::createNewTab(DataTableModel *model)
 {
     QWidget *newTab = new QWidget;
+    tabModels.push_back(model);
 
     QGridLayout *sceneLayout = new QGridLayout(newTab);
-
     // SOLUZIONE TEMPORANEA (poi si dovrà implementare quella che scorre e sceglie il grafico voluto)
     QChartView *chartView = new QChartView(createLineChart(model));
     chartView->setMinimumSize(640, 480);
@@ -160,6 +162,7 @@ void View::closeTab(const int& index)
     tabItem = nullptr;
 }
 
+// IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
 View::View(QWidget *parent)
     : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar)
 {
@@ -174,7 +177,6 @@ View::View(QWidget *parent)
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     QWidget *defaultTab = createNewTab(new DataTableModel);
     tabView->addTab(defaultTab, "Model");
-
     mainLayout->addWidget(tabView, 1, 0);
     mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);

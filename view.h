@@ -8,9 +8,10 @@
 #include <QGridLayout>
 #include <QToolBar>
 #include "model.h"
-#include "toolbar.h"
+#include "controller.h"
 
 using namespace QtCharts;
+using namespace std;
 
 class View : public QWidget
 {
@@ -20,6 +21,8 @@ private:
     QTabWidget *tabView;
     QGridLayout *mainLayout;
     QToolBar *toolBar;
+    vector<DataTableModel *> tabModels;
+//    Controller c;
 
 public:
     View(QWidget *parent = nullptr);
