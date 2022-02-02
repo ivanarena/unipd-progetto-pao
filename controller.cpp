@@ -9,5 +9,5 @@ Controller::Controller(QObject *parent)
 
 void Controller::addRowPressed(DataTableModel *modelPtr)
 {
-    modelPtr->addRow();
+    modelPtr->insertRows(modelPtr->rowCount(), 2);
 }

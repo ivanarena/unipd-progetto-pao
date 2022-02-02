@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
 
 
 
-    //TEST PARSER:
+    //TEST PARSER: /*
 
         //SAVING PART:
-
+/*
     pair<vector<string>,vector<vector<int>>> test;
 
     test.first.push_back("Lunedi");
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     //LOADING PART:
 
     pair<vector<string>,vector<vector<int>>> data = loadJson("test.json");
-
+    */
     //END OF TEST
 
 

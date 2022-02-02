@@ -97,7 +97,7 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
     }
     return false;
 }
-MI SA CHE NON SERVE A NIENTE */
+MI SA CHE NON SERVE A NIENTE
 
 void DataTableModel::addRow()
 {
@@ -127,7 +127,15 @@ void DataTableModel::removeColumn()
     for (int i = 0; i < m_rowCount; i++)
             m_data.at(i).pop_back();
 }
+*/
 
+bool DataTableModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+   beginInsertRows(parent, row, row + 1);
+   m_rowCount += count;
+   endInsertRows();
+   emit dataChanged(index(row, 0), index(row + count, columnCount()));
+   return true;
+}
 /******** CONTINUA A BUILDARE *********/
-
 

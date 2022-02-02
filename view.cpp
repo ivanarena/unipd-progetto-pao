@@ -21,6 +21,7 @@
 #include <QMenu>
 #include <QComboBox>
 #include <QKeySequence>
+#include <iostream>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -93,7 +94,9 @@ QToolBar * View::createToolBar()
 
     // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
-    // connect(addRow, SIGNAL(triggered()), this, &Controller::addRowPressed(tabModels.at(tabView->currentIndex()))
+    // non funzia dc
+    connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
+
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addAction(newTab);
@@ -119,23 +122,24 @@ QTableView * View::createTableView(DataTableModel *model)
     tableView->setModel(model);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
+    tables.push_back(tableView);
     return tableView;
 }
 
 QWidget * View::createNewTab(DataTableModel *model)
 {
     QWidget *newTab = new QWidget;
-    tabModels.push_back(model);
-
     QGridLayout *sceneLayout = new QGridLayout(newTab);
+
+    QTableView *tableView = createTableView(model);
+    tables.push_back(tableView);
+
     // SOLUZIONE TEMPORANEA (poi si dovrà implementare quella che scorre e sceglie il grafico voluto)
     QChartView *chartView = new QChartView(createLineChart(model));
     chartView->setMinimumSize(640, 480);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-
-    sceneLayout->addWidget(createTableView(model), 1, 0);
+    sceneLayout->addWidget(tableView, 1, 0);
     sceneLayout->addWidget(chartView, 1, 1);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
@@ -158,6 +162,7 @@ void View::closeTab(const int& index)
     // The page widget itself is not deleted.
     tabView->removeTab(index);
 
+    tables.erase(tables.begin()+index);
     delete(tabItem);
     tabItem = nullptr;
 }

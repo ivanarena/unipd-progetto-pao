@@ -10,10 +10,10 @@ class Controller : public QObject
 public:
     explicit Controller(QObject *parent = nullptr);
 
-    static void addRowPressed(DataTableModel *modelPtr);
 signals:
 
 public slots:
+    void addRowPressed(DataTableModel *modelPtr);
 };
 
 #endif // CONTROLLER_H

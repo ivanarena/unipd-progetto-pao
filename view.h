@@ -19,10 +19,11 @@ class View : public QWidget
 
 private:
     QTabWidget *tabView;
+    vector<QTableView *> tables;
     QGridLayout *mainLayout;
     QToolBar *toolBar;
     vector<DataTableModel *> tabModels;
-//    Controller c;
+    Controller controller;
 
 public:
     View(QWidget *parent = nullptr);

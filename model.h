@@ -23,10 +23,12 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     // NON SERVE A NULLA CREDO bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
 
-    void addRow(); // FUNZIONA QUI MA NON SU VIEW (IL CONNECT NON VA)
-    void addColumn(); // same per tutte ^^
-    void removeRow();
-    void removeColumn();
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+
+//    void addRow(); // FUNZIONA QUI MA NON SU VIEW (IL CONNECT NON VA)
+//    void addColumn(); // same per tutte ^^
+//    void removeRow();
+//    void removeColumn();
 
 private:
     // Da sostituire con std::vector
