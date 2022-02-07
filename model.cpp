@@ -36,6 +36,10 @@ DataTableModel::DataTableModel(QObject* parent, bool blank) : QAbstractTableMode
 
 }
 
+DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers):
+    QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}
+
+
 int DataTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent) // parent non è usato -- evita compilazioni inutili

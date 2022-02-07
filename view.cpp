@@ -1,6 +1,7 @@
 #include "view.h"
 #include "model.h"
 #include "parser.h"
+#include "jsonparser.h"
 #include "controller.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
@@ -22,6 +23,7 @@
 #include <QComboBox>
 #include <QKeySequence>
 #include <iostream>
+#include <QFileDialog>
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -96,6 +98,10 @@ QToolBar * View::createToolBar()
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
     // non funzia dc
     connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
+
+    connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
+
+    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
 
 
     //toolBar->setOrientation(Qt::Vertical);
@@ -186,6 +192,23 @@ View::View(QWidget *parent)
     mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);
 
+}
+
+void View::importFile(){
+    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a JSON Document"),"/home", tr("Json document(*.json)"));
+    //if(import == "") throw Error;              ===>   ECCEZIONE, TODO
+    Parser* parser = new JsonParser();
+    createNewTab(parser->load(import));
+}
+
+void View::saveFile(){
+    QString filename = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
+    QFile f(filename);
+    f.open( QIODevice::WriteOnly );
+    Parser* parser = new JsonParser();
+    parser->save(new DataTableModel, f);
+    //TODO
+    f.close();
 }
 
 

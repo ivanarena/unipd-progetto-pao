@@ -13,6 +13,7 @@ class DataTableModel : public QAbstractTableModel
     Q_OBJECT
 public:
     DataTableModel(QObject *parent = 0, bool blank = 0); // overwrite necessario per definizione
+    explicit DataTableModel(QObject *parent, int, int,const vector<vector<double>>&, const vector<vector<string>>&);
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
     int columnCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
 
@@ -33,7 +34,7 @@ public:
 private:
     // Da sostituire con std::vector
     vector<vector<double>> m_data; //  vettori di vettori (?)
-    vector<vector<double>> m_headerData;
+    vector<vector<string>> m_headerData;
     int m_rowCount;
     int m_columnCount;
 };

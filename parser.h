@@ -2,22 +2,22 @@
 #define PARSER_H
 
 #include "model.h"
+#include "controller.h"
 
-#include <utility>
-
-#include <QJsonObject>
 #include <QFile>
-#include <QJsonDocument>
+#include <QString>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonObject>
 
-using std::vector;
-using std::string;
-using std::pair;
+class Parser{
+private:
 
-pair<vector<string>,vector<vector<int>>> loadJson(const string &fileName); //ALMOST DONE
-void saveJson(const pair<vector<string>,vector<vector<int>>> &data, const string &fileName); //DOING
-
-void loadXml(); //TODO
-void saveXml(); //TODO
+public:
+    virtual DataTableModel* load(const QString&) const = 0;
+    virtual void save(DataTableModel*, QFile&) const = 0;
+    virtual ~Parser() = default;
+};
 
 #endif

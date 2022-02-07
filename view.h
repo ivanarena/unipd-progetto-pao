@@ -9,6 +9,8 @@
 #include <QToolBar>
 #include "model.h"
 #include "controller.h"
+#include "parser.h"
+#include "jsonparser.h"
 
 using namespace QtCharts;
 using namespace std;
@@ -37,6 +39,8 @@ public:
 public slots:
     QWidget * createNewTab(DataTableModel *model = new DataTableModel(0, true));
     void closeTab(const int& index);
+    void importFile();
+    void saveFile();
 };
 
 #endif // VIEW_H
