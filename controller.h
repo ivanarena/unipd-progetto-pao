@@ -2,15 +2,18 @@
 #define CONTROLLER_H
 
 #include <QObject>
+#include "model.h"
 
-class controller : public QObject
+class Controller : public QObject
 {
     Q_OBJECT
 public:
-    explicit controller(QObject *parent = nullptr);
+    explicit Controller(QObject *parent = nullptr);
 
 signals:
 
+public slots:
+    void addRowPressed(DataTableModel *modelPtr);
 };
 
 #endif // CONTROLLER_H
