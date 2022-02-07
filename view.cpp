@@ -97,7 +97,7 @@ QToolBar * View::createToolBar()
     // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
     connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
     // non funzia dc
-    connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
+    // connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
 
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
 
@@ -151,7 +151,7 @@ QWidget * View::createNewTab(DataTableModel *model)
     sceneLayout->setColumnStretch(1, 3);
 
     newTab->setLayout(sceneLayout);
-    tabView->addTab(newTab, QString("%i").arg(tabView->currentIndex() + 1)); // !!!TOFIX
+    tabView->addTab(newTab, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
 
     return newTab;
@@ -187,7 +187,7 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     QWidget *defaultTab = createNewTab(new DataTableModel);
-    tabView->addTab(defaultTab, "Model");
+    tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(tabView, 1, 0);
     mainLayout->addWidget(createToolBar(), 0, 0);
     setLayout(mainLayout);

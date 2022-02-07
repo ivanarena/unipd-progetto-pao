@@ -22,7 +22,7 @@ DataTableModel* JsonParser::load(const QString& path) const {
     //if(!rows_headers.isArray()) throw errore
     const QJsonArray columns_head = columns_headers.toArray();
     int col_Count=0;
-    for(auto it = columns_head.cbegin(); it!=columns_head.cend(); ++it){
+    for(auto it = columns_head.begin(); it!=columns_head.end(); ++it){
         col_Count++;
         headers[0].push_back(((*it).toString()).toStdString());
     }
@@ -44,7 +44,7 @@ DataTableModel* JsonParser::load(const QString& path) const {
         const QJsonArray row_Array = it.value().toJsonArray();
         vector<double> v;
         values.push_back(v);
-        for(auto vit = row_Array.cbegin(); vit!= row_Array.cend(); vit++){
+        for(auto vit = row_Array.begin(); vit!= row_Array.end(); vit++){
             values[row_Count].push_back((*vit).toDouble());
         }
         //if(checkcol!=col_Count) throw Erroe;
