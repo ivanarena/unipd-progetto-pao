@@ -5,6 +5,8 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
+//#include "parser.h"
+//#include "jsonparser.h"
 
 using namespace std;
 
@@ -12,6 +14,9 @@ class DataTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+
+    //friend void JsonParser::save(DataTableModel*, QFile&) const;
+
     DataTableModel(QObject *parent = 0, bool blank = 0); // overwrite necessario per definizione
     explicit DataTableModel(QObject *parent, int, int,const vector<vector<double>>&, const vector<vector<string>>&);
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
@@ -30,6 +35,8 @@ public:
 //    void addColumn(); // same per tutte ^^
 //    void removeRow();
 //    void removeColumn();
+    vector<vector<double>> getValues();
+    vector<vector<string>> getHeaders();
 
 private:
     // Da sostituire con std::vector

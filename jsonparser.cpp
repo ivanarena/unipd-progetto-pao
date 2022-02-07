@@ -56,5 +56,24 @@ DataTableModel* JsonParser::load(const QString& path) const {
 }
 
 void JsonParser::save(DataTableModel * model, QFile& file) const{
-
+    vector<vector<string>> headers = model->getHeaders();
+    vector<vector<double>> values = model->getValues();
+    QJsonObject finalObj;
+    QJsonArray columns;
+    for(vector<string>::iterator it = (headers.front()).begin(); it!= (headers.front()).end(); ++it){
+        columns.push_back(QJsonValue(QString::fromStdString(*it)));
+    }
+    finalObj.insert(QString("Columns"),columns);
+    QJsonObject row_obj;
+    for(std::pair<vector<vector<double>>::iterator,vector<string>::iterator> it(values.begin(),headers.back().begin()); it.first!=values.end() && it.second!=headers.back().end(); ++it.first, ++it.second ){
+        QJsonArray r_values;
+        for(vector<double>::iterator rv_it = (*it.first).begin(); rv_it!= (*it.first).end(); ++rv_it){
+            r_values.push_back(*rv_it);
+        }
+    row_obj.insert(QString::fromStdString(*it.second),r_values);
+    }
+    finalObj.insert("Rows",row_obj);
+    QJsonDocument doc(finalObj);
+    QByteArray saving =doc.toJson();
+    file.write(saving);
 }

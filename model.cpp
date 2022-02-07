@@ -1,5 +1,4 @@
 #include "model.h"
-
 using namespace std;
 
 DataTableModel::DataTableModel(QObject* parent, bool blank) : QAbstractTableModel(parent)
@@ -143,3 +142,9 @@ bool DataTableModel::insertRows(int row, int count, const QModelIndex &parent)
 }
 /******** CONTINUA A BUILDARE *********/
 
+vector<vector<double>> DataTableModel::getValues(){
+    return m_data;
+}
+vector<vector<string>> DataTableModel::getHeaders(){
+    return m_headerData;
+}
