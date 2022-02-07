@@ -1,5 +1,9 @@
 {
-    "Lunedi": [122, 223, 233],
-    "Martedi" : [14, 3, 4],
-    "Mercoledi" : [2, 6, 2]
+    "Columns": ["Sabato","Domenica"],
+    "Rows" :{
+        "Giacomo" : [23.4,34.2],
+        "Giulio" : [233.0,45.23],
+        "Flavio" : [3.34,34.3444],
+        "Vanessa" : [12,234]
+    }
 }

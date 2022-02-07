@@ -1,8 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "model.h"
 #include "controller.h"
+
 
 #include <QFile>
 #include <QString>
@@ -10,6 +10,8 @@
 #include <QJsonDocument>
 #include <QJsonValue>
 #include <QJsonObject>
+
+class DataTableModel;
 
 class Parser{
 private:
