@@ -37,6 +37,7 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
+    void newTabDialog();
     QWidget * createNewTab(DataTableModel *model = new DataTableModel(0, true));
     void closeTab(const int& index);
     void importFile();

@@ -1,38 +1,14 @@
 #include "model.h"
 using namespace std;
 
-DataTableModel::DataTableModel(QObject* parent, bool blank) : QAbstractTableModel(parent)
+DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstractTableModel(parent)
 {
 
-    if (blank)
-    {
-        m_rowCount = 0;
-        m_columnCount = 0;
-    }
-    else
-    {
-        m_rowCount = 5;
-        m_columnCount = 6;
+    m_rowCount = c_rows;
+    m_columnCount = c_cols;
 
-//        vector<vector<double> *> dataVector(m_rowCount, new vector<double>(m_columnCount, 0));
-        for (int i = 0; i < m_rowCount; i++)
-            m_data.push_back(vector<double>(m_columnCount, 0));
-
-        /*
-        // m_data init
-        for (int i = 0; i < m_rowCount; i++) // righe vettori grandi n colonne
-        {
-            vector<double> *dataVector = new vector<double>(m_columnCount, 0); // vettore grande x colonne che punta a valori
-            for (vector<double>::iterator k = dataVector->begin(); k < dataVector->end(); k++) {
-                *k = (i+1)*i;
-            }
-//            m_data.insert(m_data.end(), dataVector->begin(), dataVector->end()); // appendi alla lista di vettori
-            m_data.at(i) = dataVector; // appendi alla lista di vettori
-        }*/
-
-    }
-
-
+    for (int i = 0; i < m_rowCount; i++)
+        m_data.push_back(vector<double>(m_columnCount, 0));
 }
 
 DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers):

@@ -16,6 +16,8 @@
 #include <QToolBar>
 #include <QMenuBar>
 #include <QList>
+#include <QAbstractButton>
+#include <QPushButton>
 #include <QVPieModelMapper>
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QPieSeries>
@@ -24,6 +26,13 @@
 #include <QKeySequence>
 #include <iostream>
 #include <QFileDialog>
+#include <QInputDialog>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLabel>
+
+using namespace std;
 
 // TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
 QChart * View::createLineChart(DataTableModel *model)
@@ -69,7 +78,6 @@ QChart * View::createPieChart(DataTableModel *model)
     series->setPieSize(5);
     series->setHoleSize(0.5);
 
-
     return pieChart;
 }
 
@@ -95,7 +103,7 @@ QToolBar * View::createToolBar()
     QAction *removeColumn = new QAction(QIcon(":/res/remove-column.png"), "-col", this);
 
     // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
-    connect(newTab, SIGNAL(triggered()), this, SLOT(createNewTab()));
+    connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
     // non funzia dc
     // connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
 
@@ -120,6 +128,82 @@ QToolBar * View::createToolBar()
     toolBar->addWidget(chartSelectionBox);
 
     return toolBar;
+}
+
+void View::newTabDialog()
+{
+    /*
+    QDialog *modal = new QDialog();
+    modal->setModal(false);
+    QGridLayout *layout = new QGridLayout;
+//    modal->setFixedSize(300,280);
+
+    QLabel *rowsLabel = new QLabel("Insert number of rows:");
+    QLineEdit *rowsInput = new QLineEdit();
+
+    QLabel *colsLabel = new QLabel("Insert number of cols:");
+    QLineEdit *colsInput = new QLineEdit();
+
+    QAbstractButton *cancelBtn = new QPushButton("Cancel");
+    QAbstractButton *okBtn = new QPushButton("Ok");
+
+    int rows = rowsInput->text().toInt();
+    int cols = colsInput->text().toInt();
+
+    if (rows && cols)
+    {
+        DataTableModel *model = new DataTableModel(rows, cols);
+    }
+
+    modal->connect(cancelBtn, SIGNAL(clicked()), modal, SLOT(close()));
+    modal->connect(okBtn, SIGNAL(clicked()), this, SLOT(createNewTab(model)));
+//    modal->connect(okBtn, SIGNAL(clicked()), this, SLOT(accepted()));
+
+    layout->addWidget(rowsLabel, 0, 0);
+    layout->addWidget(rowsInput, 0, 1);
+    layout->addWidget(colsLabel, 1, 0);
+    layout->addWidget(colsInput, 1, 1);
+
+    layout->addWidget(cancelBtn, 4, 0);
+    layout->addWidget(okBtn, 4, 1);
+    modal->setLayout(layout);
+    modal->exec();*/
+
+    QDialog dialog(this);
+    // Use a layout allowing to have a label next to each field
+    QFormLayout form(&dialog);
+
+    // Add some text above the fields
+    form.addRow(new QLabel("New Table"));
+
+    // Add the lineEdits with their respective labels
+
+    QString rowsLabel = QString("Rows number");
+    QLineEdit *rowsInput = new QLineEdit(&dialog);
+
+    QString colsLabel = QString("Columns number");
+    QLineEdit *colsInput = new QLineEdit(&dialog);
+
+    form.addRow(rowsLabel, rowsInput);
+    form.addRow(colsLabel, colsInput);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    int rows, cols;
+    bool safe;
+
+    // Show the dialog as modal
+    if (dialog.exec() == QDialog::Accepted) {
+        rows = rowsInput->text().toInt(&safe, 10); // gestire eccezioni di tutto sto ambaradam
+        cols = colsInput->text().toInt(&safe, 10); // gestire eccezioni di tutto sto ambaradam
+        if (rows && cols)
+            createNewTab(new DataTableModel(rows, cols));
+        else dialog.reject();
+    }
 }
 
 QTableView * View::createTableView(DataTableModel *model)
@@ -201,9 +285,9 @@ void View::importFile(){
     createNewTab(parser->load(import));
 }
 
-void View::saveFile(){
-    QString filename = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
-    QFile f(filename);
+void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
+    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
+    QFile f(fileName);
     f.open( QIODevice::WriteOnly );
     Parser* parser = new JsonParser();
 
