@@ -172,7 +172,6 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel();
-    model->insertRow();
     QWidget *defaultTab = createNewTab(model);
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
