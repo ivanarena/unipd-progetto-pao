@@ -81,7 +81,6 @@ QChart * View::createPieChart(DataTableModel *model)
     return pieChart;
 }
 
-// TODO: SPOSTARE IN UN ALTRO FILE PER USARLO CON CONTROLLER
 void View::setToolBar()
 {
     QComboBox *chartSelectionBox = new QComboBox;
@@ -94,10 +93,10 @@ void View::setToolBar()
     toolBar->addAction(openModel);
     toolBar->addAction(saveModel);
     toolBar->addSeparator();
-    toolBar->addAction(addRow);
+    toolBar->addAction(insertRow);
     toolBar->addAction(removeRow);
     toolBar->addSeparator();
-    toolBar->addAction(addColumn);
+    toolBar->addAction(insertColumn);
     toolBar->addAction(removeColumn);
     toolBar->addSeparator();
     toolBar->addWidget(chartSelectionBox);
@@ -117,15 +116,13 @@ void View::setMenus()
     fileMenu->addAction(exitApp);
 
     editMenu = menuBar->addMenu(tr("&Edit"));
-    editMenu->addAction(addRow);
+    editMenu->addAction(insertRow);
     editMenu->addAction(removeRow);
     editMenu->addSeparator();
-    editMenu->addAction(addColumn);
+    editMenu->addAction(insertColumn);
     editMenu->addAction(removeColumn);
     editMenu->addSeparator();
 }
-
-
 
 QTableView * View::createTableView(DataTableModel *model)
 {
@@ -136,17 +133,16 @@ QTableView * View::createTableView(DataTableModel *model)
     return tableView;
 }
 
-
 // IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
 View::View(QWidget *parent)
-    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar),
+    : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu),
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
       saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
-      addRow(new QAction(QIcon(":/res/insert-row.png"), "Add row", this)),
+      insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
-      addColumn(new QAction(QIcon(":/res/insert-column.png"), "Add column", this)),
+      insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
       removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
       exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this))
 {
@@ -167,6 +163,7 @@ View::View(QWidget *parent)
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
     connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
     connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
+
     setToolBar();
     setMenus();
 
@@ -174,7 +171,9 @@ View::View(QWidget *parent)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    QWidget *defaultTab = createNewTab(new DataTableModel);
+    DataTableModel *model = new DataTableModel();
+    model->insertRow();
+    QWidget *defaultTab = createNewTab(model);
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);

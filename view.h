@@ -22,8 +22,9 @@ class View : public QWidget
     Q_OBJECT
 
 private:
-    QTabWidget *tabView;
     QGridLayout *mainLayout;
+    QTabWidget *tabView;
+
     QToolBar *toolBar;
     QMenuBar *menuBar;
     QMenu *fileMenu;
@@ -34,9 +35,9 @@ private:
     QAction *newTab;
     QAction *openModel;
     QAction *saveModel;
-    QAction *addRow;
+    QAction *insertRow;
     QAction *removeRow;
-    QAction *addColumn;
+    QAction *insertColumn;
     QAction *removeColumn;
     QAction *exitApp;
 public:
