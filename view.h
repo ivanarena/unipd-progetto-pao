@@ -7,6 +7,8 @@
 #include <QMenuBar>
 #include <QGridLayout>
 #include <QToolBar>
+#include <QMenu>
+#include <QMenuBar>
 #include "model.h"
 #include "controller.h"
 #include "parser.h"
@@ -21,25 +23,40 @@ class View : public QWidget
 
 private:
     QTabWidget *tabView;
-    vector<QTableView *> tables;
     QGridLayout *mainLayout;
     QToolBar *toolBar;
-    vector<DataTableModel *> tabModels;
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+    QMenu *editMenu;
+
     Controller controller;
 
+    QAction *newTab;
+    QAction *openModel;
+    QAction *saveModel;
+    QAction *addRow;
+    QAction *removeRow;
+    QAction *addColumn;
+    QAction *removeColumn;
+    QAction *exitApp;
 public:
     View(QWidget *parent = nullptr);
     ~View();
     QChart *createLineChart(DataTableModel *model);
     QChart *createPieChart(DataTableModel *model);
-    QToolBar *createToolBar();
+
+    void setToolBar();
+    void setMenus();
+
     void createTableView();
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    void newTabDialog();
-    QWidget * createNewTab(DataTableModel *model = new DataTableModel(0, true));
+    QWidget *createNewTab(DataTableModel *model = new DataTableModel);
     void closeTab(const int& index);
+
+    // QActions
+    void newTabDialog();
     void importFile();
     void saveFile();
 };

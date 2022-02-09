@@ -7,5 +7,6 @@
         <file>res/remove-row.png</file>
         <file>res/insert-column.png</file>
         <file>res/remove-column.png</file>
+        <file>res/exit-app.png</file>
     </qresource>
 </RCC>

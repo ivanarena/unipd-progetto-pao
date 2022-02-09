@@ -82,129 +82,50 @@ QChart * View::createPieChart(DataTableModel *model)
 }
 
 // TODO: SPOSTARE IN UN ALTRO FILE PER USARLO CON CONTROLLER
-QToolBar * View::createToolBar()
+void View::setToolBar()
 {
-    toolBar->setIconSize(QSize(36, 36));
-    QAction *newTab = new QAction(QIcon(":/res/new-file.png"), "New", this);
-    QList<QKeySequence> newTabShortcuts;
-    newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
-    newTab->setShortcuts(newTabShortcuts);
-
-    QAction *openModel = new QAction(QIcon(":/res/open-file.png"), "Open", this);
-    openModel->setShortcuts(QKeySequence::Open);
-
-    QAction *saveModel = new QAction(QIcon(":/res/save-file.png"), "Save", this);
-    saveModel->setShortcuts(QKeySequence::SaveAs);
-
-    QAction *addRow = new QAction(QIcon(":/res/insert-row.png"), "+row", this);
-
-    QAction *removeRow = new QAction(QIcon(":/res/remove-row.png"), "-row", this);
-    QAction *addColumn = new QAction(QIcon(":/res/insert-column.png"), "+col", this);
-    QAction *removeColumn = new QAction(QIcon(":/res/remove-column.png"), "-col", this);
-
-    // DA SPOSTARE NEL CONTROLLER PROBABILMENTE
-    connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
-    // non funzia dc
-    // connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
-
-    connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
-
-    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
-
-
-    //toolBar->setOrientation(Qt::Vertical);
-    toolBar->addAction(newTab);
-    toolBar->addAction(openModel);
-    toolBar->addAction(saveModel);
-    toolBar->addAction(addRow);
-    toolBar->addAction(removeRow);
-    toolBar->addAction(addColumn);
-    toolBar->addAction(removeColumn);
-
     QComboBox *chartSelectionBox = new QComboBox;
     chartSelectionBox->addItem("Line Chart");
     chartSelectionBox->addItem("Pie Chart");
 
+    //toolBar->setOrientation(Qt::Vertical);
+    toolBar->addSeparator();
+    toolBar->addAction(newTab);
+    toolBar->addAction(openModel);
+    toolBar->addAction(saveModel);
+    toolBar->addSeparator();
+    toolBar->addAction(addRow);
+    toolBar->addAction(removeRow);
+    toolBar->addSeparator();
+    toolBar->addAction(addColumn);
+    toolBar->addAction(removeColumn);
+    toolBar->addSeparator();
     toolBar->addWidget(chartSelectionBox);
+    toolBar->addSeparator();
 
-    return toolBar;
+    toolBar->setIconSize(QSize(36, 36));
+
 }
 
-void View::newTabDialog()
+void View::setMenus()
 {
-    /*
-    QDialog *modal = new QDialog();
-    modal->setModal(false);
-    QGridLayout *layout = new QGridLayout;
-//    modal->setFixedSize(300,280);
+    fileMenu = menuBar->addMenu(tr("&File"));
+    fileMenu->addAction(newTab);
+    fileMenu->addAction(openModel);
+    fileMenu->addAction(saveModel);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitApp);
 
-    QLabel *rowsLabel = new QLabel("Insert number of rows:");
-    QLineEdit *rowsInput = new QLineEdit();
-
-    QLabel *colsLabel = new QLabel("Insert number of cols:");
-    QLineEdit *colsInput = new QLineEdit();
-
-    QAbstractButton *cancelBtn = new QPushButton("Cancel");
-    QAbstractButton *okBtn = new QPushButton("Ok");
-
-    int rows = rowsInput->text().toInt();
-    int cols = colsInput->text().toInt();
-
-    if (rows && cols)
-    {
-        DataTableModel *model = new DataTableModel(rows, cols);
-    }
-
-    modal->connect(cancelBtn, SIGNAL(clicked()), modal, SLOT(close()));
-    modal->connect(okBtn, SIGNAL(clicked()), this, SLOT(createNewTab(model)));
-//    modal->connect(okBtn, SIGNAL(clicked()), this, SLOT(accepted()));
-
-    layout->addWidget(rowsLabel, 0, 0);
-    layout->addWidget(rowsInput, 0, 1);
-    layout->addWidget(colsLabel, 1, 0);
-    layout->addWidget(colsInput, 1, 1);
-
-    layout->addWidget(cancelBtn, 4, 0);
-    layout->addWidget(okBtn, 4, 1);
-    modal->setLayout(layout);
-    modal->exec();*/
-
-    QDialog dialog(this);
-    // Use a layout allowing to have a label next to each field
-    QFormLayout form(&dialog);
-
-    // Add some text above the fields
-    form.addRow(new QLabel("New Table"));
-
-    // Add the lineEdits with their respective labels
-
-    QString rowsLabel = QString("Rows number");
-    QLineEdit *rowsInput = new QLineEdit(&dialog);
-
-    QString colsLabel = QString("Columns number");
-    QLineEdit *colsInput = new QLineEdit(&dialog);
-
-    form.addRow(rowsLabel, rowsInput);
-    form.addRow(colsLabel, colsInput);
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                               Qt::Horizontal, &dialog);
-    form.addRow(&buttonBox);
-    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-
-    int rows, cols;
-    bool safe;
-
-    // Show the dialog as modal
-    if (dialog.exec() == QDialog::Accepted) {
-        rows = rowsInput->text().toInt(&safe, 10); // gestire eccezioni di tutto sto ambaradam
-        cols = colsInput->text().toInt(&safe, 10); // gestire eccezioni di tutto sto ambaradam
-        if (rows && cols)
-            createNewTab(new DataTableModel(rows, cols));
-        else dialog.reject();
-    }
+    editMenu = menuBar->addMenu(tr("&Edit"));
+    editMenu->addAction(addRow);
+    editMenu->addAction(removeRow);
+    editMenu->addSeparator();
+    editMenu->addAction(addColumn);
+    editMenu->addAction(removeColumn);
+    editMenu->addSeparator();
 }
+
+
 
 QTableView * View::createTableView(DataTableModel *model)
 {
@@ -212,9 +133,59 @@ QTableView * View::createTableView(DataTableModel *model)
     tableView->setModel(model);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tables.push_back(tableView);
     return tableView;
 }
+
+
+// IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
+View::View(QWidget *parent)
+    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar),
+      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu),
+      newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
+      openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
+      saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
+      addRow(new QAction(QIcon(":/res/insert-row.png"), "Add row", this)),
+      removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
+      addColumn(new QAction(QIcon(":/res/insert-column.png"), "Add column", this)),
+      removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
+      exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this))
+{
+    connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    tabView->setTabsClosable(true);
+
+    // QActions shortcuts
+    // TODO ADD MORE SHORTCUTS
+    QList<QKeySequence> newTabShortcuts;
+    newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
+    newTab->setShortcuts(newTabShortcuts);
+    openModel->setShortcuts(QKeySequence::Open);
+    saveModel->setShortcuts(QKeySequence::SaveAs);
+
+    connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
+    // non funzia dc
+    // connect(addRow, SIGNAL(triggered()), &controller, SLOT(addRowPressed(tabModels.at(tabView->currentIndex()))));
+    connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
+    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
+    setToolBar();
+    setMenus();
+
+    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
+    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+
+    // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
+    QWidget *defaultTab = createNewTab(new DataTableModel);
+    tabView->addTab(defaultTab, "Table 1");
+    mainLayout->addWidget(menuBar, 0, 0);
+    mainLayout->addWidget(toolBar, 1, 0);
+    mainLayout->addWidget(tabView, 2, 0);
+    setLayout(mainLayout);
+
+}
+
+
+//======================== PUBLIC SLOTS =========================================
+
 
 QWidget * View::createNewTab(DataTableModel *model)
 {
@@ -222,7 +193,6 @@ QWidget * View::createNewTab(DataTableModel *model)
     QGridLayout *sceneLayout = new QGridLayout(newTab);
 
     QTableView *tableView = createTableView(model);
-    tables.push_back(tableView);
 
     // SOLUZIONE TEMPORANEA (poi si dovrà implementare quella che scorre e sceglie il grafico voluto)
     QChartView *chartView = new QChartView(createLineChart(model));
@@ -252,30 +222,43 @@ void View::closeTab(const int& index)
     // The page widget itself is not deleted.
     tabView->removeTab(index);
 
-    tables.erase(tables.begin()+index);
     delete(tabItem);
     tabItem = nullptr;
 }
 
-// IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
-View::View(QWidget *parent)
-    : QWidget(parent), tabView(new QTabWidget), mainLayout(new QGridLayout), toolBar(new QToolBar)
+void View::newTabDialog()
 {
-    connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-    tabView->setTabsClosable(true);
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
 
-    //DataTableModel *model = new DataTableModel;
+    QString rowsLabel = QString("Rows number");
+    QLineEdit *rowsInput = new QLineEdit(&dialog);
+    QString colsLabel = QString("Columns number");
+    QLineEdit *colsInput = new QLineEdit(&dialog);
 
-    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
-    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
 
-    // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    QWidget *defaultTab = createNewTab(new DataTableModel);
-    tabView->addTab(defaultTab, "Table 1");
-    mainLayout->addWidget(tabView, 1, 0);
-    mainLayout->addWidget(createToolBar(), 0, 0);
-    setLayout(mainLayout);
+    form.addRow(new QLabel("Create new table:"));
+    form.addRow(new QLabel());
+    form.addRow(rowsLabel, rowsInput);
+    form.addRow(colsLabel, colsInput);
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
 
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    int rows, cols;
+    bool safe;
+
+    if (dialog.exec() == QDialog::Accepted) {
+        rows = rowsInput->text().toInt(&safe, 10);
+        cols = colsInput->text().toInt(&safe, 10);
+        if (rows && cols)
+            createNewTab(new DataTableModel(rows, cols));
+        else dialog.reject();
+    }
 }
 
 void View::importFile(){
