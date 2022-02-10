@@ -98,29 +98,33 @@ void DataTableModel::insertRow()
     endResetModel();
 }
 
-/*
-void DataTableModel::addColumn()
+void DataTableModel::removeRow()
 {
+    beginResetModel();
+    m_rowCount--;
+    m_data.pop_back();
+    endResetModel();
+}
+
+
+void DataTableModel::insertColumn()
+{
+    beginResetModel();
     m_columnCount++;
     for (int i = 0; i < m_rowCount; i++)
             m_data.at(i).push_back(0);
-
+    endResetModel();
 }
-
-void DataTableModel::removeRow()
-{
-    m_rowCount--;
-    m_data.pop_back();
-}
-
 
 void DataTableModel::removeColumn()
 {
+    beginResetModel();
     m_columnCount--;
     for (int i = 0; i < m_rowCount; i++)
             m_data.at(i).pop_back();
+    endResetModel();
 }
-*/
+
 
 /******** CONTINUA A BUILDARE *********/
 

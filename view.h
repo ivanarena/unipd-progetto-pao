@@ -26,7 +26,6 @@ class View : public QWidget
 private:
     QGridLayout *mainLayout;
     QTabWidget *tabView;
-    Scene *scene;
 
     QToolBar *toolBar;
     QMenuBar *menuBar;
@@ -56,13 +55,17 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    QWidget *createNewTab(DataTableModel *model = new DataTableModel);
+    Scene *createNewTab(DataTableModel *model = new DataTableModel);
     void closeTab(const int& index);
 
     // QActions methods
     void newTabDialog();
     void importFile();
     void saveFile();
+    void insertRowTriggered();
+    void removeRowTriggered();
+    void insertColumnTriggered();
+    void removeColumnTriggered();
 };
 
 #endif // VIEW_H

@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QWidget>
+#include <QWidget>
 #include <QTableView>
+#include <QGridLayout>
 #include <QtCharts>
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
@@ -13,16 +15,16 @@
 class Scene : public QWidget
 {
     Q_OBJECT
+
 private:
-
-
-public:
-    explicit Scene(DataTableModel *c_model = new DataTableModel, QWidget *parent = nullptr);
-
+    QGridLayout *sceneLayout;
     DataTableModel *model;
     QTableView *table;
     QChartView *chart;
 
+public:
+    explicit Scene(DataTableModel *c_model = new DataTableModel, QWidget *parent = nullptr);
+    DataTableModel *getModel();
 signals:
 
 };

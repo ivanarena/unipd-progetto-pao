@@ -7,7 +7,22 @@ Controller::Controller(QObject *parent)
 
 }
 
-void Controller::insertRowPressed()
+void Controller::insertRowReceived(DataTableModel *model)
 {
-    //modelPtr->insertRow();
+    model->insertRow();
+}
+
+void Controller::removeRowReceived(DataTableModel *model)
+{
+    model->removeRow();
+}
+
+void Controller::insertColumnReceived(DataTableModel *model)
+{
+    model->insertColumn();
+}
+
+void Controller::removeColumnReceived(DataTableModel *model)
+{
+    model->removeColumn();
 }

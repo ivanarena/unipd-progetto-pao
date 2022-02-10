@@ -13,7 +13,10 @@ public:
 signals:
 
 public slots:
-    void insertRowPressed();
+    void insertRowReceived(DataTableModel *model);
+    void removeRowReceived(DataTableModel *model);
+    void insertColumnReceived(DataTableModel *model);
+    void removeColumnReceived(DataTableModel *model);
 };
 
 #endif // CONTROLLER_H

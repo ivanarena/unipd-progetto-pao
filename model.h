@@ -34,15 +34,14 @@ public:
 //    bool insertRows(int row, int count, const QModelIndex& parent);
 
     void insertRow(); // FUNZIONA!!!!!!!!!
-//    void insertColumn(); // same per tutte ^^
-//    void removeRow();
-//    void removeColumn();
+    void removeRow();
+    void insertColumn(); // same per tutte ^^
+    void removeColumn();
     vector<vector<double>> getValues();
     vector<vector<string>> getHeaders();
 
 private:
-    // Da sostituire con std::vector
-    vector<vector<double>> m_data; //  vettori di vettori (?)
+    vector<vector<double>> m_data; //
     vector<vector<string>> m_headerData;
     int m_rowCount;
     int m_columnCount;

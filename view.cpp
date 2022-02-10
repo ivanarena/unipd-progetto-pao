@@ -138,7 +138,7 @@ QTableView * View::createTableView(DataTableModel *model)
 
 // IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
 View::View(QWidget *parent)
-    : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), scene(new Scene), toolBar(new QToolBar),
+    : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu),
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
@@ -161,10 +161,12 @@ View::View(QWidget *parent)
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
-    // non funzia dc
-    connect(insertRow, SIGNAL(triggered()), &controller, SLOT(insertRowPressed()));
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
     connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
+    connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
+    connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
+    connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -175,7 +177,7 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel();
-    QWidget *defaultTab = createNewTab(model);
+    Scene *defaultTab = createNewTab(model);
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -188,11 +190,12 @@ View::View(QWidget *parent)
 //======================== PUBLIC SLOTS =========================================
 
 
-QWidget * View::createNewTab(DataTableModel *model)
+Scene * View::createNewTab(DataTableModel *model)
 {
+    /*
     QWidget *newTab = new QWidget;
     QGridLayout *sceneLayout = new QGridLayout(newTab);
-
+    */
     /*
     QTableView *tableView = createTableView(model);
     model->insertRow();
@@ -205,17 +208,22 @@ QWidget * View::createNewTab(DataTableModel *model)
     chartView->setRenderHint(QPainter::Antialiasing);
     */
 
-    scene = new Scene(model);
+
+    /*
     sceneLayout->addWidget(scene->table, 1, 0);
     sceneLayout->addWidget(scene->chart, 1, 1);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
     newTab->setLayout(sceneLayout);
-    tabView->addTab(newTab, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
+    */
+    //tabView->addTab(newTab, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
+
+    Scene *scene = new Scene(model);
+    tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
 
-    return newTab;
+    return scene;
 }
 
 void View::closeTab(const int& index)
@@ -231,6 +239,30 @@ void View::closeTab(const int& index)
 
     delete(tabItem);
     tabItem = nullptr;
+}
+
+void View::insertRowTriggered()
+{
+    controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+
+}
+
+void View::removeRowTriggered()
+{
+    controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+
+}
+
+void View::insertColumnTriggered()
+{
+    controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+
+}
+
+void View::removeColumnTriggered()
+{
+    controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+
 }
 
 void View::newTabDialog()
