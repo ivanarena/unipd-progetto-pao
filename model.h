@@ -19,6 +19,8 @@ public:
 
     DataTableModel(int c_rows = 5, int c_cols = 6, QObject *parent = 0); // overwrite necessario per definizione
     explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<vector<string>>&);
+    DataTableModel(const DataTableModel& model);
+
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
     int columnCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
 
@@ -29,10 +31,10 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     // NON SERVE A NULLA CREDO bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
 
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+//    bool insertRows(int row, int count, const QModelIndex& parent);
 
-//    void addRow(); // FUNZIONA QUI MA NON SU VIEW (IL CONNECT NON VA)
-//    void addColumn(); // same per tutte ^^
+    void insertRow(); // FUNZIONA!!!!!!!!!
+//    void insertColumn(); // same per tutte ^^
 //    void removeRow();
 //    void removeColumn();
     vector<vector<double>> getValues();

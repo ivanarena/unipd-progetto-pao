@@ -13,6 +13,8 @@
 #include "controller.h"
 #include "parser.h"
 #include "jsonparser.h"
+#include "scene.h"
+
 
 using namespace QtCharts;
 using namespace std;
@@ -24,6 +26,7 @@ class View : public QWidget
 private:
     QGridLayout *mainLayout;
     QTabWidget *tabView;
+    Scene *scene;
 
     QToolBar *toolBar;
     QMenuBar *menuBar;
@@ -56,7 +59,7 @@ public slots:
     QWidget *createNewTab(DataTableModel *model = new DataTableModel);
     void closeTab(const int& index);
 
-    // QActions
+    // QActions methods
     void newTabDialog();
     void importFile();
     void saveFile();

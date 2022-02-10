@@ -7,7 +7,7 @@ Controller::Controller(QObject *parent)
 
 }
 
-void Controller::addRowPressed(DataTableModel *modelPtr)
+void Controller::insertRowPressed()
 {
-    modelPtr->insertRows(modelPtr->rowCount(), 2);
+    //modelPtr->insertRow();
 }

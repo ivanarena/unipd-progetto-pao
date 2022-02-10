@@ -13,7 +13,7 @@ public:
 signals:
 
 public slots:
-    void addRowPressed(DataTableModel *modelPtr);
+    void insertRowPressed();
 };
 
 #endif // CONTROLLER_H

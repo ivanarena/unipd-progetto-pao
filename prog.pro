@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     model.cpp \
     parser.cpp \
+    scene.cpp \
     view.cpp
 
 HEADERS += \
@@ -21,6 +22,7 @@ HEADERS += \
     jsonparser.h \
     model.h \
     parser.h \
+    scene.h \
     view.h
 
 RESOURCES = res.qrc

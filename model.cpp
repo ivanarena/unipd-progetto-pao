@@ -11,9 +11,11 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
         m_data.push_back(vector<double>(m_columnCount, 0));
 }
 
-DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers):
-    QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}
+DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
+    : QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}
 
+DataTableModel::DataTableModel(const DataTableModel& model)
+    : m_data(model.m_data), m_headerData(model.m_headerData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount) {}
 
 int DataTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -67,7 +69,8 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
     return false;
 }
 
-/*bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
+/* FORSE FORSE SI PUÒ FARE
+bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
 {
     if (role == Qt::EditRole)
     {
@@ -75,16 +78,27 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
         return true;
     }
     return false;
-}
-MI SA CHE NON SERVE A NIENTE
+}*/
 
-void DataTableModel::addRow()
+/*
+bool DataTableModel::insertRows(int row, int count, const QModelIndex& parent) {
+    beginInsertRows(parent, row, row + count - 1);
+    m_rowCount += row;
+    m_data.push_back(vector<double>(m_columnCount, 0));
+    endInsertRows();
+    emit dataChanged(index(row, 0), index(row + count, columnCount()));
+    return true;
+}*/
+
+void DataTableModel::insertRow()
 {
+    beginResetModel();
     m_rowCount++;
     m_data.push_back(vector<double>(m_columnCount, 0));
+    endResetModel();
 }
 
-
+/*
 void DataTableModel::addColumn()
 {
     m_columnCount++;
@@ -108,14 +122,6 @@ void DataTableModel::removeColumn()
 }
 */
 
-bool DataTableModel::insertRows(int row, int count, const QModelIndex &parent)
-{
-   beginInsertRows(parent, row, row + 1);
-   m_rowCount += count;
-   endInsertRows();
-   emit dataChanged(index(row, 0), index(row + count, columnCount()));
-   return true;
-}
 /******** CONTINUA A BUILDARE *********/
 
 vector<vector<double>> DataTableModel::getValues(){
