@@ -40,7 +40,8 @@ QChart * View::createLineChart(DataTableModel *model)
 {
     QChart *lineChart = new QChart();
     //lineChart->legend()->hide(); LEGENDA
-    lineChart->setTitle("Title");
+    lineChart->setTitle(tabView->tabText(tabView->currentIndex()));
+    //lineChart->setTitle("name");
     lineChart->setAnimationOptions(QChart::AllAnimations);
 
     // mapper table->chart
@@ -172,7 +173,8 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel();
-    Scene *defaultTab = createNewTab(model);
+    QChartView *chartView = new QChartView(createLineChart(model));
+    Scene *defaultTab = createNewTab(model, chartView);
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -185,64 +187,12 @@ View::View(QWidget *parent)
 //======================== PUBLIC SLOTS =========================================
 
 
-Scene * View::createNewTab(DataTableModel *model)
+Scene *View::createNewTab(DataTableModel *model, QChartView *chart)
 {
-    Scene *scene = new Scene(model);
+    Scene *scene = new Scene(model, chart);
     tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // possible conflicts with openfile
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
     return scene;
-}
-
-void View::closeTab(const int& index)
-{
-    if (index == -1) {
-        return;
-    }
-
-    QWidget* tabItem = tabView->widget(index);
-    // Removes the tab at position index from this stack of widgets.
-    // The page widget itself is not deleted.
-    tabView->removeTab(index);
-
-    delete(tabItem);
-    tabItem = nullptr;
-}
-
-void View::insertRowTriggered()
-{
-    controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-
-}
-
-void View::removeRowTriggered()
-{
-    try
-    {
-        controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    }
-    catch (const QString &errorMessage)
-    {
-        QMessageBox::critical(this, "Error", errorMessage);
-    }
-
-}
-
-void View::insertColumnTriggered()
-{
-    controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-
-}
-
-void View::removeColumnTriggered()
-{
-    try
-    {
-        controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    }
-    catch (const QString &errorMessage)
-    {
-        QMessageBox::critical(this, "Error", errorMessage);
-    }
 }
 
 void View::newTabDialog()
@@ -275,8 +225,64 @@ void View::newTabDialog()
         rows = rowsInput->text().toInt(&safe, 10);
         cols = colsInput->text().toInt(&safe, 10);
         if (rows && cols)
-            createNewTab(new DataTableModel(rows, cols));
+        {
+            DataTableModel *model = new DataTableModel(rows, cols);
+            createNewTab(model, new QChartView(createLineChart(model)));
+        }
         else dialog.reject();
+    }
+}
+
+
+void View::closeTab(const int& index)
+{
+    if (index == -1) {
+        return;
+    }
+
+    QWidget* tabItem = tabView->widget(index);
+    // Removes the tab at position index from this stack of widgets.
+    // The page widget itself is not deleted.
+    tabView->removeTab(index);
+
+    delete(tabItem);
+    tabItem = nullptr;
+}
+
+void View::insertRowTriggered()
+{
+    controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart()->repaint(); // NOT WORKING
+}
+
+void View::removeRowTriggered()
+{
+    try
+    {
+        controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    }
+    catch (const QString &errorMessage)
+    {
+        QMessageBox::critical(this, "Error", errorMessage);
+    }
+
+}
+
+void View::insertColumnTriggered()
+{
+    controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+
+}
+
+void View::removeColumnTriggered()
+{
+    try
+    {
+        controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    }
+    catch (const QString &errorMessage)
+    {
+        QMessageBox::critical(this, "Error", errorMessage);
     }
 }
 

@@ -23,8 +23,10 @@ private:
     QChartView *chart;
 
 public:
-    explicit Scene(DataTableModel *c_model = new DataTableModel, QWidget *parent = nullptr);
+    explicit Scene(DataTableModel *c_model = new DataTableModel, QChartView *c_chart = new QChartView, QWidget *parent = nullptr);
     DataTableModel *getModel() const;
+    QChartView *getChart() const;
+
 signals:
 
 };

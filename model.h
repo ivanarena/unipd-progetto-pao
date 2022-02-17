@@ -17,7 +17,7 @@ public:
 
     //friend void JsonParser::save(DataTableModel*, QFile&) const;
 
-    DataTableModel(int c_rows = 5, int c_cols = 6, QObject *parent = 0); // overwrite necessario per definizione
+    DataTableModel(int c_rows = 4, int c_cols = 2, QObject *parent = 0); // overwrite necessario per definizione
     explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<vector<string>>&);
     DataTableModel(const DataTableModel& model);
 

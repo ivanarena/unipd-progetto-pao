@@ -8,8 +8,21 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
     m_rowCount = c_rows;
     m_columnCount = c_cols;
 
+    vector<double> v1{10, 0};
+    vector<double> v2{20, 30};
+    vector<double> v3{30, 10};
+    vector<double> v4{40, 20};
+
+    m_data.push_back(v1);
+    m_data.push_back(v2);
+    m_data.push_back(v3);
+    m_data.push_back(v4);
+
+
+    /* ORIGINAL
     for (int i = 0; i < m_rowCount; i++)
         m_data.push_back(vector<double>(m_columnCount, i+1));
+    */
 }
 
 DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)

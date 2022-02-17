@@ -6,6 +6,8 @@
 #include <QTableView>
 #include <QMenuBar>
 #include <QGridLayout>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
 #include <QToolBar>
 #include <QMenu>
 #include <QMenuBar>
@@ -55,7 +57,7 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    Scene *createNewTab(DataTableModel *model = new DataTableModel);
+    Scene *createNewTab(DataTableModel *model = new DataTableModel, QChartView *chart = new QChartView);
     void closeTab(const int& index);
 
     // QActions methods
