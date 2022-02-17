@@ -125,15 +125,6 @@ void View::setMenus()
     editMenu->addSeparator();
 }
 
-QTableView * View::createTableView(DataTableModel *model)
-{
-    QTableView *tableView = new QTableView;
-    tableView->setModel(model);
-    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    return tableView;
-}
-
 //============================== COSTRUTTORE ===========================================
 
 // IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
@@ -158,6 +149,10 @@ View::View(QWidget *parent)
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
     saveModel->setShortcuts(QKeySequence::SaveAs);
+    insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));
+    removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
+    insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
+    removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
@@ -192,37 +187,9 @@ View::View(QWidget *parent)
 
 Scene * View::createNewTab(DataTableModel *model)
 {
-    /*
-    QWidget *newTab = new QWidget;
-    QGridLayout *sceneLayout = new QGridLayout(newTab);
-    */
-    /*
-    QTableView *tableView = createTableView(model);
-    model->insertRow();
-    DataTableModel *newmodel(model);
-    tableView->setModel(newmodel);
-
-    // SOLUZIONE TEMPORANEA (poi si dovrà implementare quella che scorre e sceglie il grafico voluto)
-    QChartView *chartView = new QChartView(createLineChart(model));
-    chartView->setMinimumSize(640, 480);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    */
-
-
-    /*
-    sceneLayout->addWidget(scene->table, 1, 0);
-    sceneLayout->addWidget(scene->chart, 1, 1);
-    sceneLayout->setColumnStretch(0, 2);
-    sceneLayout->setColumnStretch(1, 3);
-
-    newTab->setLayout(sceneLayout);
-    */
-    //tabView->addTab(newTab, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
-
     Scene *scene = new Scene(model);
-    tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // !!!TOFIX
+    tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // possible conflicts with openfile
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
-
     return scene;
 }
 
@@ -249,7 +216,14 @@ void View::insertRowTriggered()
 
 void View::removeRowTriggered()
 {
-    controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    try
+    {
+        controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    }
+    catch (const QString &errorMessage)
+    {
+        QMessageBox::critical(this, "Error", errorMessage);
+    }
 
 }
 
@@ -261,8 +235,14 @@ void View::insertColumnTriggered()
 
 void View::removeColumnTriggered()
 {
-    controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-
+    try
+    {
+        controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    }
+    catch (const QString &errorMessage)
+    {
+        QMessageBox::critical(this, "Error", errorMessage);
+    }
 }
 
 void View::newTabDialog()

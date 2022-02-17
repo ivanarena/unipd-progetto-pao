@@ -19,7 +19,7 @@ Scene::Scene(DataTableModel *c_model, QWidget *parent)
     setLayout(sceneLayout);
 }
 
-DataTableModel *Scene::getModel()
+DataTableModel *Scene::getModel() const
 {
     return model;
 }

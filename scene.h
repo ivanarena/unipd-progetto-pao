@@ -24,7 +24,7 @@ private:
 
 public:
     explicit Scene(DataTableModel *c_model = new DataTableModel, QWidget *parent = nullptr);
-    DataTableModel *getModel();
+    DataTableModel *getModel() const;
 signals:
 
 };

@@ -3,12 +3,13 @@ using namespace std;
 
 DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstractTableModel(parent)
 {
+    Q_UNUSED(parent)
 
     m_rowCount = c_rows;
     m_columnCount = c_cols;
 
     for (int i = 0; i < m_rowCount; i++)
-        m_data.push_back(vector<double>(m_columnCount, 0));
+        m_data.push_back(vector<double>(m_columnCount, i+1));
 }
 
 DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
@@ -100,10 +101,14 @@ void DataTableModel::insertRow()
 
 void DataTableModel::removeRow()
 {
-    beginResetModel();
-    m_rowCount--;
-    m_data.pop_back();
-    endResetModel();
+    if (m_rowCount)
+    {
+        beginResetModel();
+        m_rowCount--;
+        m_data.pop_back();
+        endResetModel();
+    }
+    else throw QString("There are no more rows to remove.");
 }
 
 
@@ -118,11 +123,15 @@ void DataTableModel::insertColumn()
 
 void DataTableModel::removeColumn()
 {
-    beginResetModel();
-    m_columnCount--;
-    for (int i = 0; i < m_rowCount; i++)
-            m_data.at(i).pop_back();
-    endResetModel();
+    if (m_columnCount)
+    {
+        beginResetModel();
+        m_columnCount--;
+        for (int i = 0; i < m_rowCount; i++)
+                m_data.at(i).pop_back();
+        endResetModel();
+    }
+    else throw QString("There are no more columns to remove.");
 }
 
 
