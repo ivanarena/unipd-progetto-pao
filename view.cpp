@@ -32,34 +32,10 @@
 #include <QFormLayout>
 #include <QLabel>
 #include "scene.h"
+#include "chart.h"
+#include "linechart.h"
 
 using namespace std;
-
-// TODO: FARE UNA CLASSE PER OGNI CHART ED IMPLEMENTARE QUESTO METODO COME UNICO createChart POLIMORFO
-QChart * View::createLineChart(DataTableModel *model)
-{
-    QChart *lineChart = new QChart();
-    //lineChart->legend()->hide(); LEGENDA
-    lineChart->setTitle(tabView->tabText(tabView->currentIndex()));
-    //lineChart->setTitle("name");
-    lineChart->setAnimationOptions(QChart::AllAnimations);
-
-    // mapper table->chart
-    for (int i = 1; i < model->columnCount(); i++) {
-        QLineSeries *series = new QLineSeries;
-        QVXYModelMapper *mapper = new QVXYModelMapper(this);
-        series->setName(QString("%1").arg(i));
-        mapper->setXColumn(0);
-        mapper->setYColumn(i);
-        mapper->setSeries(series);
-        mapper->setModel(model);
-        lineChart->addSeries(series);
-    }
-
-    lineChart->createDefaultAxes();
-
-    return lineChart;
-}
 
 QChart * View::createPieChart(DataTableModel *model)
 {
@@ -173,8 +149,8 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel();
-    QChartView *chartView = new QChartView(createLineChart(model));
-    Scene *defaultTab = createNewTab(model, chartView);
+    LineChart *chart = new LineChart(model);
+    Scene *defaultTab = createNewTab(model, chart->getChart());
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -187,7 +163,7 @@ View::View(QWidget *parent)
 //======================== PUBLIC SLOTS =========================================
 
 
-Scene *View::createNewTab(DataTableModel *model, QChartView *chart)
+Scene *View::createNewTab(DataTableModel *model, QChart *chart)
 {
     Scene *scene = new Scene(model, chart);
     tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // possible conflicts with openfile
@@ -227,12 +203,12 @@ void View::newTabDialog()
         if (rows && cols)
         {
             DataTableModel *model = new DataTableModel(rows, cols);
-            createNewTab(model, new QChartView(createLineChart(model)));
+            LineChart *chart = new LineChart(model);
+            createNewTab(model, chart->getChart());
         }
         else dialog.reject();
     }
 }
-
 
 void View::closeTab(const int& index)
 {
@@ -252,7 +228,8 @@ void View::closeTab(const int& index)
 void View::insertRowTriggered()
 {
     controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart()->repaint(); // NOT WORKING
+    //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->chart()->update(); // NOT WORKING
+    //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->repaint(); // NOT WORKING
 }
 
 void View::removeRowTriggered()
@@ -271,7 +248,6 @@ void View::removeRowTriggered()
 void View::insertColumnTriggered()
 {
     controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-
 }
 
 void View::removeColumnTriggered()
@@ -321,7 +297,6 @@ void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
     //TODO
     f.close();
 }
-
 
 View::~View()
 {

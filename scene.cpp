@@ -1,18 +1,18 @@
 #include "scene.h"
 
-Scene::Scene(DataTableModel *c_model, QChartView *c_chart, QWidget *parent)
+Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)
     : QWidget{parent}, sceneLayout(new QGridLayout(this)),
-      model(c_model), table(new QTableView), chart(c_chart)
+      model(c_model), table(new QTableView), chart(c_chart), chartView(new QChartView(c_chart))
 {
     table->setModel(model);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    chart->setMinimumSize(640, 480);
-    chart->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(640, 480);
+    chartView->setRenderHint(QPainter::Antialiasing);
 
     sceneLayout->addWidget(table, 1, 0);
-    sceneLayout->addWidget(chart, 1, 1);
+    sceneLayout->addWidget(chartView, 1, 1);
     sceneLayout->setColumnStretch(0, 2);
     sceneLayout->setColumnStretch(1, 3);
 
@@ -24,7 +24,7 @@ DataTableModel *Scene::getModel() const
     return model;
 }
 
-QChartView *Scene::getChart() const
+QChartView *Scene::getChartView() const
 {
-    return chart;
+    return chartView;
 }

@@ -20,12 +20,13 @@ private:
     QGridLayout *sceneLayout;
     DataTableModel *model;
     QTableView *table;
-    QChartView *chart;
+    QChart *chart;
+    QChartView *chartView;
 
 public:
-    explicit Scene(DataTableModel *c_model = new DataTableModel, QChartView *c_chart = new QChartView, QWidget *parent = nullptr);
+    explicit Scene(DataTableModel *c_model = new DataTableModel, QChart *c_chart = new QChart, QWidget *parent = nullptr);
     DataTableModel *getModel() const;
-    QChartView *getChart() const;
+    QChartView *getChartView() const;
 
 signals:
 

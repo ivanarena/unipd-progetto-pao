@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QGridLayout>
 #include <QtCharts/QChart>
+#include <QChart>
 #include <QtCharts/QChartView>
 #include <QToolBar>
 #include <QMenu>
@@ -34,8 +35,6 @@ private:
     QMenu *fileMenu;
     QMenu *editMenu;
 
-    Controller controller;
-
     QAction *newTab;
     QAction *openModel;
     QAction *saveModel;
@@ -44,6 +43,8 @@ private:
     QAction *insertColumn;
     QAction *removeColumn;
     QAction *exitApp;
+
+    Controller controller;
 public:
     View(QWidget *parent = nullptr);
     ~View();
@@ -57,7 +58,7 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    Scene *createNewTab(DataTableModel *model = new DataTableModel, QChartView *chart = new QChartView);
+    Scene *createNewTab(DataTableModel *model = new DataTableModel, QChart *chart = new QtCharts::QChart);
     void closeTab(const int& index);
 
     // QActions methods
