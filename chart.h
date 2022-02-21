@@ -4,12 +4,15 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 
-class Chart
+using namespace QtCharts;
+
+class Chart : public QChart
 {
 public:
     Chart();
 
-    // VIRTUAL INSERTROW E ROBE VARIE
+    virtual void insertSeries();
+    virtual void removeSeries();
 
     virtual ~Chart();
 

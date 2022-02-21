@@ -148,9 +148,9 @@ View::View(QWidget *parent)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    DataTableModel *model = new DataTableModel();
+    DataTableModel *model = new DataTableModel(4,4);
     LineChart *chart = new LineChart(model);
-    Scene *defaultTab = createNewTab(model, chart->getChart());
+    Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -204,7 +204,7 @@ void View::newTabDialog()
         {
             DataTableModel *model = new DataTableModel(rows, cols);
             LineChart *chart = new LineChart(model);
-            createNewTab(model, chart->getChart());
+            createNewTab(model, chart);
         }
         else dialog.reject();
     }
@@ -248,6 +248,7 @@ void View::removeRowTriggered()
 void View::insertColumnTriggered()
 {
     controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
 }
 
 void View::removeColumnTriggered()
@@ -255,6 +256,7 @@ void View::removeColumnTriggered()
     try
     {
         controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
     }
     catch (const QString &errorMessage)
     {

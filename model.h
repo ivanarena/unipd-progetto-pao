@@ -31,11 +31,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     // NON SERVE A NULLA CREDO bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
 
-//    bool insertRows(int row, int count, const QModelIndex& parent);
-
-    void insertRow(); // FUNZIONA!!!!!!!!!
+    void insertRow();
     void removeRow();
-    void insertColumn(); // same per tutte ^^
+    void insertColumn();
     void removeColumn();
     vector<vector<double>> getValues();
     vector<vector<string>> getHeaders();

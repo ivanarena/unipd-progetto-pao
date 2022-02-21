@@ -14,18 +14,18 @@
 
 using namespace std;
 
-
 class LineChart : public Chart
 {
 private:
-    QChart *chart;
     DataTableModel *model;
 
     vector<QLineSeries *> m_series;
     vector<QVXYModelMapper *> m_mappers;
 public:
     LineChart(DataTableModel *c_model);
-    QChart *getChart() const;
+
+    virtual void insertSeries() override;
+    virtual void removeSeries() override;
 };
 
 #endif // LINECHART_H

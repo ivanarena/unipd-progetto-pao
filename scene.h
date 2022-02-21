@@ -26,6 +26,7 @@ private:
 public:
     explicit Scene(DataTableModel *c_model = new DataTableModel, QChart *c_chart = new QChart, QWidget *parent = nullptr);
     DataTableModel *getModel() const;
+    QChart *getChart() const;
     QChartView *getChartView() const;
 
 signals:

@@ -24,6 +24,11 @@ DataTableModel *Scene::getModel() const
     return model;
 }
 
+QChart *Scene::getChart() const
+{
+    return chart;
+}
+
 QChartView *Scene::getChartView() const
 {
     return chartView;
