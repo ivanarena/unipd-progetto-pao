@@ -6,8 +6,9 @@
 #include <QtCharts>
 #include <QLineSeries>
 #include <QValueAxis>
-#include <QVXYModelMapper>
+#include <QHXYModelMapper>
 #include <iostream>
+
 using namespace std;
 using namespace QtCharts;
 
@@ -21,12 +22,12 @@ LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QValue
     addAxis(YAxis, Qt::AlignLeft);
 
     // mapper table->chart
-    for (int i = 1; i < model->columnCount(); i++) {
+    for (int i = 1; i < model->rowCount(); i++) {
         QLineSeries *series = new QLineSeries;
-        QVXYModelMapper *mapper = new QVXYModelMapper;
+        QHXYModelMapper *mapper = new QHXYModelMapper;
         //series->setName(QString("%1").arg(i)); SET NAME AS HEADERS
-        mapper->setXColumn(0);
-        mapper->setYColumn(i);
+        mapper->setXRow(0);
+        mapper->setYRow(i);
         mapper->setSeries(series);
         mapper->setModel(model);
         addSeries(series);
@@ -38,22 +39,26 @@ LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QValue
         m_mappers.push_back(mapper);
     }
 
-
-    //createDefaultAxes(); // usalo anche quando fai update ez
+    LineChart::updateAxis();
 }
 
 void LineChart::insertSeries()
 {
     QLineSeries *series = new QLineSeries;
-    QVXYModelMapper *mapper = new QVXYModelMapper;
-    mapper->setXColumn(0);
-    mapper->setYColumn(model->columnCount() - 1);
+    QHXYModelMapper *mapper = new QHXYModelMapper;
+    mapper->setXRow(0);
+    mapper->setYRow(model->rowCount() - 1);
     mapper->setSeries(series);
     mapper->setModel(model);
     addSeries(series);
 
+    series->attachAxis(XAxis);
+    series->attachAxis(YAxis);
+
     m_series.push_back(series);
     m_mappers.push_back(mapper);
+
+    updateAxis();
 }
 
 void LineChart::removeSeries() // it gives some error but it works perfectly
@@ -66,11 +71,12 @@ void LineChart::removeSeries() // it gives some error but it works perfectly
     m_series.pop_back();
     m_mappers.pop_back();
 
+    updateAxis();
 }
 
 void LineChart::updateAxis()
 {
-    XAxis->setRange(0,30); // set max and min
-    YAxis->setRange(0,50); // set max and min
+    XAxis->setRange(0,10); // set max and min
+    YAxis->setRange(0,10); // set max and min
 }
 

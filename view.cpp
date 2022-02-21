@@ -228,6 +228,7 @@ void View::closeTab(const int& index)
 void View::insertRowTriggered()
 {
     controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+    dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
     //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->chart()->update(); // NOT WORKING
     //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->repaint(); // NOT WORKING
 }
@@ -237,6 +238,7 @@ void View::removeRowTriggered()
     try
     {
         controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
     }
     catch (const QString &errorMessage)
     {
@@ -248,7 +250,6 @@ void View::removeRowTriggered()
 void View::insertColumnTriggered()
 {
     controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
 }
 
 void View::removeColumnTriggered()
@@ -256,7 +257,6 @@ void View::removeColumnTriggered()
     try
     {
         controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
     }
     catch (const QString &errorMessage)
     {

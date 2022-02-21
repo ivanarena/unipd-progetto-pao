@@ -10,7 +10,7 @@
 #include <QChart>
 #include <QtCharts>
 #include <QLineSeries>
-#include <QVXYModelMapper>
+#include <QHXYModelMapper>
 
 using namespace std;
 
@@ -22,7 +22,7 @@ private:
     QValueAxis *YAxis;
 
     vector<QLineSeries *> m_series;
-    vector<QVXYModelMapper *> m_mappers;
+    vector<QHXYModelMapper *> m_mappers;
 public:
     LineChart(DataTableModel *c_model);
 
