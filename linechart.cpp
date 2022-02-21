@@ -5,13 +5,20 @@
 #include <QChart>
 #include <QtCharts>
 #include <QLineSeries>
+#include <QValueAxis>
 #include <QVXYModelMapper>
+#include <iostream>
+using namespace std;
+using namespace QtCharts;
 
-LineChart::LineChart(DataTableModel *c_model) : model(c_model)
+LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QValueAxis), YAxis(new QValueAxis)
 {
     //legend()->hide(); LEGENDA
     setTitle("Line Chart");
     setAnimationOptions(QChart::AllAnimations);
+
+    addAxis(XAxis, Qt::AlignBottom);
+    addAxis(YAxis, Qt::AlignLeft);
 
     // mapper table->chart
     for (int i = 1; i < model->columnCount(); i++) {
@@ -24,11 +31,15 @@ LineChart::LineChart(DataTableModel *c_model) : model(c_model)
         mapper->setModel(model);
         addSeries(series);
 
+        series->attachAxis(XAxis);
+        series->attachAxis(YAxis);
+
         m_series.push_back(series);
         m_mappers.push_back(mapper);
     }
 
-    createDefaultAxes(); // usalo anche quando fai update ez
+
+    //createDefaultAxes(); // usalo anche quando fai update ez
 }
 
 void LineChart::insertSeries()
@@ -43,8 +54,6 @@ void LineChart::insertSeries()
 
     m_series.push_back(series);
     m_mappers.push_back(mapper);
-
-    createDefaultAxes();
 }
 
 void LineChart::removeSeries() // it gives some error but it works perfectly
@@ -57,6 +66,11 @@ void LineChart::removeSeries() // it gives some error but it works perfectly
     m_series.pop_back();
     m_mappers.pop_back();
 
-    createDefaultAxes();
+}
+
+void LineChart::updateAxis()
+{
+    XAxis->setRange(0,30); // set max and min
+    YAxis->setRange(0,50); // set max and min
 }
 

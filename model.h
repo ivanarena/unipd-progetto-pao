@@ -35,6 +35,11 @@ public:
     void removeRow();
     void insertColumn();
     void removeColumn();
+
+    //double getXMax();
+    //double getYMax();
+
+
     vector<vector<double>> getValues();
     vector<vector<string>> getHeaders();
 

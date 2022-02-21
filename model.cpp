@@ -146,6 +146,18 @@ void DataTableModel::removeColumn()
     else throw QString("There are no more columns to remove.");
 }
 
+/*
+double DataTableModel::getXMax()
+{
+    auto it = max_element(begin(m_data), end(m_data));
+    return 0;
+}
+
+double DataTableModel::getYMax()
+{
+    return 0;
+}*/
+
 
 /******** CONTINUA A BUILDARE *********/
 

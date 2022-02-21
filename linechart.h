@@ -18,6 +18,8 @@ class LineChart : public Chart
 {
 private:
     DataTableModel *model;
+    QValueAxis *XAxis;
+    QValueAxis *YAxis;
 
     vector<QLineSeries *> m_series;
     vector<QVXYModelMapper *> m_mappers;
@@ -26,6 +28,7 @@ public:
 
     virtual void insertSeries() override;
     virtual void removeSeries() override;
+    virtual void updateAxis() override;
 };
 
 #endif // LINECHART_H

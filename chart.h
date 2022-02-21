@@ -13,6 +13,7 @@ public:
 
     virtual void insertSeries();
     virtual void removeSeries();
+    virtual void updateAxis();
 
     virtual ~Chart();
 
