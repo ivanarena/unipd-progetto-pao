@@ -82,13 +82,13 @@ bool DataTableModel::setHeaderData(int section, Qt::Orientation orientation, con
 {
     if (role == Qt::EditRole)
     {
-        if (orientation == Qt::Horizontal)
+        if (orientation == Qt::Vertical)
         {
-            m_columnsHeaderData.at(section) = value.toString();
+            m_rowsHeaderData.at(section) = value.toString();
         }
         else
         {
-            m_rowsHeaderData.at(section) = value.toString();
+            m_columnsHeaderData.at(section) = value.toString();
         }
         emit headerDataChanged(orientation, section, section);
         return true;

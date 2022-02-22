@@ -11,6 +11,7 @@
 #include <QtCharts>
 #include <QLineSeries>
 #include <QHXYModelMapper>
+#include <QCategoryAxis>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ class LineChart : public Chart
     Q_OBJECT
 private:
     DataTableModel *model;
-    QValueAxis *XAxis;
+    QCategoryAxis *XAxis;
     QValueAxis *YAxis;
 
     vector<QLineSeries *> m_series;

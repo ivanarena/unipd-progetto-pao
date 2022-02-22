@@ -8,6 +8,7 @@
 #include <QModelIndex>
 #include <QValueAxis>
 #include <QHXYModelMapper>
+#include <QCategoryAxis>
 #include <iostream>
 
 using namespace std;
@@ -20,7 +21,7 @@ void LineChart::mapData()
     {
         QLineSeries *series = new QLineSeries;
         series->setName(model->getRowsHeaders().at(i).toString());
-        int k = 0;
+        double k = 0.5;
         for (int j = 0; j < model->columnCount(); j++)
         {
             series->append(QPointF(k, data[i].at(j)));
@@ -37,11 +38,17 @@ void LineChart::mapData()
     LineChart::updateAxis();
 }
 
-LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QValueAxis), YAxis(new QValueAxis)
+LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
 {
     //legend()->hide(); LEGENDA
     setTitle("Line Chart");
     setAnimationOptions(QChart::AllAnimations);
+
+
+    for (int i = 0; i < model->columnCount(); i++)
+    {
+        XAxis->append(model->getColumnsHeaders().at(i).toString(), i+1);
+    }
 
     addAxis(XAxis, Qt::AlignBottom);
     addAxis(YAxis, Qt::AlignLeft);
@@ -87,8 +94,8 @@ void LineChart::removeSeries()
 
 void LineChart::updateAxis()
 {
-    XAxis->setRange(0,3); // set max and min
-    YAxis->setRange(0,10); // set max and min
+    XAxis->setRange(0, model->columnCount()); // set max and min
+    YAxis->applyNiceNumbers();
 }
 
 void LineChart::replaceValue(QModelIndex i, QModelIndex j)
@@ -97,12 +104,14 @@ void LineChart::replaceValue(QModelIndex i, QModelIndex j)
     const QPointF oldPoint = m_series[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
     m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
+    updateAxis();
 }
 
 void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
 {
-    if (orientation == Qt::Vertical)
+    if (orientation == Qt::Horizontal)
     {
-        m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
+        XAxis->replaceLabel(m_series.at(first)->name(), model->getColumnsHeaders().at(last).toString());
+        m_series.at(first)->setName(model->getColumnsHeaders().at(last).toString());
     }
 }
