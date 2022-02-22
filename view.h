@@ -38,6 +38,7 @@ private:
     QAction *newTab;
     QAction *openModel;
     QAction *saveModel;
+    QAction *renameHeaders;
     QAction *insertRow;
     QAction *removeRow;
     QAction *insertColumn;
@@ -65,6 +66,7 @@ public slots:
     void newTabDialog();
     //void importFile();
     //void saveFile();
+    void renameHeadersDialog();
     void insertRowTriggered();
     void removeRowTriggered();
     void insertColumnTriggered();

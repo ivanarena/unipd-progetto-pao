@@ -68,8 +68,11 @@ void View::setToolBar()
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
     toolBar->addAction(newTab);
+    toolBar->addSeparator();
     toolBar->addAction(openModel);
     toolBar->addAction(saveModel);
+    toolBar->addSeparator();
+    toolBar->addAction(renameHeaders);
     toolBar->addSeparator();
     toolBar->addAction(insertRow);
     toolBar->addAction(removeRow);
@@ -88,12 +91,15 @@ void View::setMenus()
 {
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
+    fileMenu->addSeparator();
     fileMenu->addAction(openModel);
     fileMenu->addAction(saveModel);
     fileMenu->addSeparator();
     fileMenu->addAction(exitApp);
 
     editMenu = menuBar->addMenu(tr("&Edit"));
+    editMenu->addAction(renameHeaders);
+    editMenu->addSeparator();
     editMenu->addAction(insertRow);
     editMenu->addAction(removeRow);
     editMenu->addSeparator();
@@ -111,6 +117,7 @@ View::View(QWidget *parent)
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
       saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
+      renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
       insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
       insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
@@ -126,6 +133,7 @@ View::View(QWidget *parent)
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
     saveModel->setShortcuts(QKeySequence::SaveAs);
+    renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
@@ -133,8 +141,9 @@ View::View(QWidget *parent)
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
-    connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
-    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    //connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
+    //connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(renameHeaders, SIGNAL(triggered()), this, SLOT(renameHeadersDialog()));
     connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
     connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
@@ -209,6 +218,7 @@ void View::newTabDialog()
             DataTableModel *model = new DataTableModel(rows, cols);
             LineChart *chart = new LineChart(model);
             createNewTab(model, chart);
+            renameHeadersDialog();
         }
         else dialog.reject();
     }
@@ -227,6 +237,70 @@ void View::closeTab(const int& index)
 
     delete(tabItem);
     tabItem = nullptr;
+}
+
+void View::renameHeadersDialog()
+{
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+
+    vector<QVariant> rowsHeaders = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getRowsHeaders();
+    vector<QVariant> columnsHeaders = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getColumnsHeaders();
+
+    vector<QLineEdit *> rowsHeadersInputs;
+    vector<QLineEdit *> columnsHeadersInputs;
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+
+    form.addRow(new QLabel("Rename table headers:"));
+    form.addRow(new QLabel());
+    form.addRow(new QLabel("Rows headers:"));
+
+    int i = 0;
+    for (auto it = rowsHeaders.begin(); it != rowsHeaders.end(); it++)
+    {
+        QString label = QString("%1").arg(i);
+        QLineEdit *rowInput = new QLineEdit(&dialog);
+        rowInput->setPlaceholderText(QString(it->toString()));
+        rowsHeadersInputs.push_back(rowInput);
+        form.insertRow(i+3, new QLabel(label), rowInput);
+        i++;
+    }
+
+    form.addRow(new QLabel());
+    form.addRow(new QLabel("Columns headers:"));
+
+    int j = 0;
+    for (auto it = columnsHeaders.begin(); it != columnsHeaders.end(); it++)
+    {
+        QString label = QString("%1").arg(j);
+        QLineEdit *colInput = new QLineEdit(&dialog);
+        colInput->setPlaceholderText(QString(it->toString()));
+        columnsHeadersInputs.push_back(colInput);
+        form.insertRow(j+i+5, new QLabel(label), colInput);
+        j++;
+    }
+
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
+
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    if (dialog.exec() == QDialog::Accepted) {
+        for (unsigned int i = 0; i < rowsHeadersInputs.size(); i++)
+        {
+            QVariant newHeader = rowsHeadersInputs[i]->text();
+            if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Vertical, newHeader);
+        }
+        for (unsigned int i = 0; i < columnsHeadersInputs.size(); i++)
+        {
+            QVariant newHeader = columnsHeadersInputs[i]->text();
+            if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, newHeader);
+        }
+    }
+    else dialog.reject();
 }
 
 void View::insertRowTriggered()

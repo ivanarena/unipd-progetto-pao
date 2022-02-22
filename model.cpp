@@ -8,23 +8,16 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
     m_rowCount = c_rows;
     m_columnCount = c_cols;
 
-    for (int i = 0; i < /* SOLUZIONE TEMPORANEA */m_rowCount; i++)
-        m_columnsHeaderData.push_back(QVariant(i));
 
-    for (int i = 0; i < /* SOLUZIONE TEMPORANEA */m_columnCount; i++)
-        m_rowsHeaderData.push_back(QVariant(i));
-
+    for (int i = 0; i < m_rowCount; i++) m_rowsHeaderData.push_back(QVariant(i));
+    for (int i = 0; i < m_columnCount; i++) m_columnsHeaderData.push_back(QVariant(i));
 
 
     vector<double> firstRow;
-
-    for (int i = 0; i < m_columnCount; i++)
-        firstRow.push_back(i);
-
+    for (int i = 0; i < m_columnCount; i++) firstRow.push_back(i);
     m_data.push_back(firstRow);
 
-    for (int i = 1; i < m_rowCount; i++)
-        m_data.push_back(vector<double>(m_columnCount, i+1));
+    for (int i = 1; i < m_rowCount; i++) m_data.push_back(vector<double>(m_columnCount, i+1));
 }
 
 /*DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
@@ -166,7 +159,12 @@ double DataTableModel::getYMax()
 vector<vector<double>> DataTableModel::getValues(){
     return m_data;
 }
-vector<vector<string>> DataTableModel::getHeaders(){
-    return m_headerData;
-}
 */
+
+vector<QVariant> DataTableModel::getRowsHeaders(){
+    return m_rowsHeaderData;
+}
+
+vector<QVariant> DataTableModel::getColumnsHeaders(){
+    return m_columnsHeaderData;
+}

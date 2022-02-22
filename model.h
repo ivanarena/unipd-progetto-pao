@@ -41,7 +41,8 @@ public:
 
 
     //vector<vector<double>> getValues();
-    //vector<vector<string>> getHeaders();
+    vector<QVariant> getRowsHeaders();
+    vector<QVariant> getColumnsHeaders();
 
 private:
     vector<vector<double>> m_data;

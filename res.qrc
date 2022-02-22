@@ -8,5 +8,6 @@
         <file>res/insert-column.png</file>
         <file>res/remove-column.png</file>
         <file>res/exit-app.png</file>
+        <file>res/rename-headers.png</file>
     </qresource>
 </RCC>
