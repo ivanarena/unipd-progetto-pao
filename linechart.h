@@ -16,19 +16,26 @@ using namespace std;
 
 class LineChart : public Chart
 {
+    Q_OBJECT
 private:
     DataTableModel *model;
     QValueAxis *XAxis;
     QValueAxis *YAxis;
 
     vector<QLineSeries *> m_series;
-    vector<QHXYModelMapper *> m_mappers;
 public:
     LineChart(DataTableModel *c_model);
 
+    // TODO: BIND MODEL SIGNALS TO LINECHART SLOTS TO UPDATE SERIES with replace
+
+    virtual void mapData() override;
     virtual void insertSeries() override;
     virtual void removeSeries() override;
     virtual void updateAxis() override;
+
+public slots:
+    virtual void replaceValue(QModelIndex, QModelIndex) override;
+    virtual void updateSeriesName(Qt::Orientation, int, int) override;
 };
 
 #endif // LINECHART_H

@@ -163,8 +163,6 @@ View::View(QWidget *parent)
     Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
 
-    model->setHeaderData(1, Qt::Vertical, QObject::tr("nome headerrrrr")); //FARE COSÌ PER MODIFICARE HEADER
-
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
     mainLayout->addWidget(tabView, 2, 0);
@@ -307,8 +305,6 @@ void View::insertRowTriggered()
 {
     controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
     dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
-    //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->chart()->update(); // NOT WORKING
-    //static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->repaint(); // NOT WORKING
 }
 
 void View::removeRowTriggered()
@@ -316,12 +312,13 @@ void View::removeRowTriggered()
     try
     {
         controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries(); // TOFIX: ERRORE QUANDO SI PROVA A RIMUOVERE ULTIMA RIGA RIMASTA
     }
     catch (const QString &errorMessage)
     {
         QMessageBox::critical(this, "Error", errorMessage);
     }
+
 
 }
 

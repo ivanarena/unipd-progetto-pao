@@ -40,7 +40,7 @@ public:
     //double getYMax();
 
 
-    //vector<vector<double>> getValues();
+    vector<vector<double>> getData();
     vector<QVariant> getRowsHeaders();
     vector<QVariant> getColumnsHeaders();
 

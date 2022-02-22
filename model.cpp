@@ -1,5 +1,7 @@
 #include "model.h"
 using namespace std;
+#include <iostream>
+
 
 DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstractTableModel(parent)
 {
@@ -53,12 +55,10 @@ QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, in
         return QVariant();
 
     if (orientation == Qt::Horizontal)
-    { // column headers
+    {
         return m_columnsHeaderData[section];
-        //return QString("%1").arg(section + 1);
-    } else { // Qt::Vertical -- rows headers
+    } else {
         return m_rowsHeaderData[section];
-        //return QString("%1").arg(section + 1);
     }
 }
 
@@ -155,16 +155,19 @@ double DataTableModel::getYMax()
 
 
 /******** CONTINUA A BUILDARE *********/
-/*
-vector<vector<double>> DataTableModel::getValues(){
+
+vector<vector<double>> DataTableModel::getData()
+{
     return m_data;
 }
-*/
 
-vector<QVariant> DataTableModel::getRowsHeaders(){
+
+vector<QVariant> DataTableModel::getRowsHeaders()
+{
     return m_rowsHeaderData;
 }
 
-vector<QVariant> DataTableModel::getColumnsHeaders(){
+vector<QVariant> DataTableModel::getColumnsHeaders()
+{
     return m_columnsHeaderData;
 }
