@@ -63,7 +63,10 @@ void LineChart::insertSeries()
 
 void LineChart::removeSeries() // it gives some error but it works perfectly
 {
-    QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
+    if (m_series.back())
+        QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
+    else throw QString("No more series to remove."); // non va
+
 
     delete m_series.back();
     delete m_mappers.back();

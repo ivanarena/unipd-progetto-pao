@@ -149,9 +149,13 @@ View::View(QWidget *parent)
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel(4,4);
+
     LineChart *chart = new LineChart(model);
     Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
+
+    model->setHeaderData(1, Qt::Vertical, QObject::tr("nome headerrrrr")); //FARE COSÌ PER MODIFICARE HEADER
+
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
     mainLayout->addWidget(tabView, 2, 0);
@@ -264,6 +268,8 @@ void View::removeColumnTriggered()
     }
 }
 
+/*
+
 void View::importFile(){
     QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a JSON Document"),"/home", tr("Json document(*.json)"));
     //if(import == "") throw Error;              ===>   ECCEZIONE, TODO
@@ -299,7 +305,7 @@ void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
     //TODO
     f.close();
 }
-
+*/
 View::~View()
 {
 }

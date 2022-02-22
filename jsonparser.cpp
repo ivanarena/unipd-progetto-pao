@@ -3,6 +3,8 @@
 #include <QList>
 #include <QVariant>
 
+/*
+
 DataTableModel* JsonParser::load(const QString& path) const {
     QFile file(path);
     file.open(QIODevice::ReadOnly);
@@ -77,3 +79,4 @@ void JsonParser::save(DataTableModel * model, QFile& file) const{
     QByteArray saving =doc.toJson();
     file.write(saving);
 }
+*/

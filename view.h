@@ -63,8 +63,8 @@ public slots:
 
     // QActions methods
     void newTabDialog();
-    void importFile();
-    void saveFile();
+    //void importFile();
+    //void saveFile();
     void insertRowTriggered();
     void removeRowTriggered();
     void insertColumnTriggered();

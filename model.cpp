@@ -8,6 +8,14 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
     m_rowCount = c_rows;
     m_columnCount = c_cols;
 
+    for (int i = 0; i < /* SOLUZIONE TEMPORANEA */m_rowCount; i++)
+        m_columnsHeaderData.push_back(QVariant(i));
+
+    for (int i = 0; i < /* SOLUZIONE TEMPORANEA */m_columnCount; i++)
+        m_rowsHeaderData.push_back(QVariant(i));
+
+
+
     vector<double> firstRow;
 
     for (int i = 0; i < m_columnCount; i++)
@@ -19,11 +27,11 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
         m_data.push_back(vector<double>(m_columnCount, i+1));
 }
 
-DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
-    : QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}
+/*DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
+    : QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}*/
 
 DataTableModel::DataTableModel(const DataTableModel& model)
-    : m_data(model.m_data), m_headerData(model.m_headerData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount) {}
+    : m_data(model.m_data), m_columnsHeaderData(model.m_columnsHeaderData), m_rowsHeaderData(model.m_rowsHeaderData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount) {}
 
 int DataTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -53,11 +61,11 @@ QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, in
 
     if (orientation == Qt::Horizontal)
     { // column headers
-        //return m_headerData[0]
-        return QString("%1").arg(section + 1);
+        return m_columnsHeaderData[section];
+        //return QString("%1").arg(section + 1);
     } else { // Qt::Vertical -- rows headers
-
-        return QString("%1").arg(section + 1);
+        return m_rowsHeaderData[section];
+        //return QString("%1").arg(section + 1);
     }
 }
 
@@ -77,30 +85,28 @@ bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, in
     return false;
 }
 
-/* FORSE FORSE SI PUÒ FARE
-bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
+bool DataTableModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
     if (role == Qt::EditRole)
     {
-
+        if (orientation == Qt::Horizontal)
+        {
+            m_columnsHeaderData.at(section) = value.toString();
+        }
+        else
+        {
+            m_rowsHeaderData.at(section) = value.toString();
+        }
+        emit headerDataChanged(orientation, section, section);
         return true;
     }
     return false;
-}*/
-
-/*
-bool DataTableModel::insertRows(int row, int count, const QModelIndex& parent) {
-    beginInsertRows(parent, row, row + count - 1);
-    m_rowCount += row;
-    m_data.push_back(vector<double>(m_columnCount, 0));
-    endInsertRows();
-    emit dataChanged(index(row, 0), index(row + count, columnCount()));
-    return true;
-}*/
+}
 
 void DataTableModel::insertRow()
 {
     beginResetModel();
+    m_rowsHeaderData.push_back(m_rowCount); // NON FUNZIONA TROVARE LA SOLUZIONE
     m_rowCount++;
     m_data.push_back(vector<double>(m_columnCount, 0));
     endResetModel();
@@ -122,6 +128,7 @@ void DataTableModel::removeRow()
 void DataTableModel::insertColumn()
 {
     beginResetModel();
+    m_columnsHeaderData.push_back(m_columnCount); // NON FUNZIONA TROVARE LA SOLUZIONE
     m_columnCount++;
     for (int i = 0; i < m_rowCount; i++)
             m_data.at(i).push_back(0);
@@ -155,10 +162,11 @@ double DataTableModel::getYMax()
 
 
 /******** CONTINUA A BUILDARE *********/
-
+/*
 vector<vector<double>> DataTableModel::getValues(){
     return m_data;
 }
 vector<vector<string>> DataTableModel::getHeaders(){
     return m_headerData;
 }
+*/

@@ -18,7 +18,7 @@ public:
     //friend void JsonParser::save(DataTableModel*, QFile&) const;
 
     DataTableModel(int c_rows = 4, int c_cols = 2, QObject *parent = 0); // overwrite necessario per definizione
-    explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<vector<string>>&);
+    //explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<vector<string>>&);
     DataTableModel(const DataTableModel& model);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
@@ -29,7 +29,7 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-    // NON SERVE A NULLA CREDO bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
+    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
 
     void insertRow();
     void removeRow();
@@ -40,12 +40,13 @@ public:
     //double getYMax();
 
 
-    vector<vector<double>> getValues();
-    vector<vector<string>> getHeaders();
+    //vector<vector<double>> getValues();
+    //vector<vector<string>> getHeaders();
 
 private:
-    vector<vector<double>> m_data; //
-    vector<vector<string>> m_headerData;
+    vector<vector<double>> m_data;
+    vector<QVariant> m_columnsHeaderData;
+    vector<QVariant> m_rowsHeaderData;
     int m_rowCount;
     int m_columnCount;
 };
