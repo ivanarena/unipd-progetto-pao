@@ -1,28 +1,25 @@
-#ifndef LINECHART_H
-#define LINECHART_H
-
+#ifndef BARCHART_H
+#define BARCHART_H
 
 #include "chart.h"
 #include "model.h"
+#include <QBarCategoryAxis>
+#include <QBarSet>
+#include <QBarSeries>
+#include <QValueAxis>
 
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QChart>
-#include <QtCharts>
-#include <QLineSeries>
-#include <QCategoryAxis>
-
-class LineChart : public Chart
+class BarChart : public Chart
 {
     Q_OBJECT
 private:
     DataTableModel *model;
-    QCategoryAxis *XAxis;
+    QBarCategoryAxis *XAxis;
     QValueAxis *YAxis;
 
-    vector<QLineSeries *> m_series;
+    QBarSeries *m_series;
+    vector<QBarSet *> m_sets;
 public:
-    LineChart(DataTableModel *c_model);
+    BarChart(DataTableModel *c_model);
 
     virtual void mapData() override;
     virtual void updateAxes() override;
@@ -36,4 +33,4 @@ public slots:
     virtual void updateSeriesName(Qt::Orientation, int, int) override;
 };
 
-#endif // LINECHART_H
+#endif // BARCHART_H

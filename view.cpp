@@ -34,6 +34,7 @@
 #include "scene.h"
 #include "chart.h"
 #include "linechart.h"
+#include "barchart.h"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ void View::setToolBar()
 {
     QComboBox *chartSelectionBox = new QComboBox;
     chartSelectionBox->addItem("Line Chart");
-    chartSelectionBox->addItem("Pie Chart");
+    chartSelectionBox->addItem("Bar Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -84,7 +85,6 @@ void View::setToolBar()
     toolBar->addSeparator();
 
     toolBar->setIconSize(QSize(36, 36));
-
 }
 
 void View::setMenus()
@@ -159,7 +159,7 @@ View::View(QWidget *parent)
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel(4,4);
 
-    LineChart *chart = new LineChart(model);
+    BarChart *chart = new BarChart(model);
     Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
 
