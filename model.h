@@ -36,9 +36,8 @@ public:
     void insertColumn();
     void removeColumn();
 
-    //double getXMax();
-    //double getYMax();
-
+    double max();
+    double min();
 
     vector<vector<double>> getData();
     vector<QVariant> getRowsHeaders();

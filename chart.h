@@ -17,7 +17,9 @@ public:
     virtual void mapData();
     virtual void insertSeries();
     virtual void removeSeries();
-    virtual void updateAxis();
+    virtual void updateAxes();
+    virtual void insertSeriesValue();
+    virtual void removeSeriesValue();
 
     virtual ~Chart();
 

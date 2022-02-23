@@ -21,7 +21,7 @@ void LineChart::mapData()
     {
         QLineSeries *series = new QLineSeries;
         series->setName(model->getRowsHeaders().at(i).toString());
-        double k = 0.5;
+        double k = 0;
         for (int j = 0; j < model->columnCount(); j++)
         {
             series->append(QPointF(k, data[i].at(j)));
@@ -35,7 +35,15 @@ void LineChart::mapData()
         m_series.push_back(series);
     }
 
-    LineChart::updateAxis();
+    LineChart::updateAxes();
+}
+
+
+void LineChart::updateAxes()
+{
+    XAxis->setRange(0, model->columnCount()-1); // set max and min
+    //YAxis->applyNiceNumbers();
+    YAxis->setRange(model->min(), model->max());
 }
 
 LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
@@ -47,8 +55,9 @@ LineChart::LineChart(DataTableModel *c_model) : model(c_model), XAxis(new QCateg
 
     for (int i = 0; i < model->columnCount(); i++)
     {
-        XAxis->append(model->getColumnsHeaders().at(i).toString(), i+1);
+        XAxis->append(model->getColumnsHeaders().at(i).toString(), i);
     }
+    XAxis->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
 
     addAxis(XAxis, Qt::AlignBottom);
     addAxis(YAxis, Qt::AlignLeft);
@@ -76,7 +85,7 @@ void LineChart::insertSeries()
     series->attachAxis(YAxis);
 
     m_series.push_back(series);
-    updateAxis();
+    updateAxes();
 }
 
 void LineChart::removeSeries()
@@ -89,13 +98,34 @@ void LineChart::removeSeries()
 
     m_series.pop_back();
 
-    updateAxis();
+    updateAxes();
 }
 
-void LineChart::updateAxis()
+void LineChart::insertSeriesValue()
 {
-    XAxis->setRange(0, model->columnCount()); // set max and min
-    YAxis->applyNiceNumbers();
+    vector<vector<double>> data = model->getData();
+    int i = 0;
+    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    {
+        (*it)->append(QPointF(model->columnCount() - 1,
+                              data[i].at(model->columnCount() - 1)));
+        i++;
+    }
+
+    XAxis->append(model->getColumnsHeaders().at(model->columnCount() - 1).toString(), model->columnCount() - 1);
+    updateAxes();
+}
+
+void LineChart::removeSeriesValue()
+{
+    vector<vector<double>> data = model->getData();
+    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    {
+        (*it)->remove(model->columnCount());
+    }
+    const QString labelToRemove = XAxis->categoriesLabels().back();
+    XAxis->remove(labelToRemove);
+    updateAxes();
 }
 
 void LineChart::replaceValue(QModelIndex i, QModelIndex j)
@@ -104,7 +134,7 @@ void LineChart::replaceValue(QModelIndex i, QModelIndex j)
     const QPointF oldPoint = m_series[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
     m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
-    updateAxis();
+    updateAxes();
 }
 
 void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last)

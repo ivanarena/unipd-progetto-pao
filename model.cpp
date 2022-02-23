@@ -141,17 +141,27 @@ void DataTableModel::removeColumn()
     else throw QString("There are no more columns to remove.");
 }
 
-/*
-double DataTableModel::getXMax()
+double DataTableModel::max()
 {
-    auto it = max_element(begin(m_data), end(m_data));
-    return 0;
+    double maxValue = -__DBL_MAX__;
+    for (auto it = m_data.begin(); it != m_data.end(); it++)
+    {
+        double rowMax = *max_element(it->begin(), it->end());
+        if (rowMax > maxValue) maxValue = rowMax;
+    }
+    return maxValue;
 }
 
-double DataTableModel::getYMax()
+double DataTableModel::min()
 {
-    return 0;
-}*/
+    double minValue = __DBL_MAX__;
+    for (auto it = m_data.begin(); it != m_data.end(); it++)
+    {
+        double rowMin = *min_element(it->begin(), it->end());
+        if (rowMin < minValue) minValue = rowMin;
+    }
+    return minValue;
+}
 
 
 /******** CONTINUA A BUILDARE *********/

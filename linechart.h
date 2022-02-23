@@ -30,9 +30,11 @@ public:
     // TODO: BIND MODEL SIGNALS TO LINECHART SLOTS TO UPDATE SERIES with replace
 
     virtual void mapData() override;
-    virtual void insertSeries() override;
+    virtual void updateAxes() override;
+    virtual void insertSeries() override; // add row
     virtual void removeSeries() override;
-    virtual void updateAxis() override;
+    virtual void insertSeriesValue() override; // add column
+    virtual void removeSeriesValue() override;
 
 public slots:
     virtual void replaceValue(QModelIndex, QModelIndex) override;
