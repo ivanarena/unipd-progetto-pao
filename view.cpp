@@ -286,6 +286,7 @@ void View::renameHeadersDialog()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
+    // TODO: PREVENT SAME HEADERS NAME IN THE SAME ORIENTATION
     if (dialog.exec() == QDialog::Accepted) {
         for (unsigned int i = 0; i < rowsHeadersInputs.size(); i++)
         {

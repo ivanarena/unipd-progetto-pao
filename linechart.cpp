@@ -136,11 +136,14 @@ void LineChart::replaceValue(QModelIndex i, QModelIndex j)
     updateAxes();
 }
 
-void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
+void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
 {
-    if (orientation == Qt::Horizontal)
+    if (orientation == Qt::Vertical)
     {
-        XAxis->replaceLabel(m_series.at(first)->name(), model->getColumnsHeaders().at(last).toString());
-        m_series.at(first)->setName(model->getColumnsHeaders().at(last).toString());
+        m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
+    }
+    else
+    {
+        XAxis->replaceLabel(XAxis->categoriesLabels().at(first), model->getColumnsHeaders().at(last).toString());
     }
 }
