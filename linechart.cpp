@@ -122,7 +122,7 @@ void LineChart::removeSeriesValue()
     {
         (*it)->remove(model->columnCount());
     }
-    const QString labelToRemove = XAxis->categoriesLabels().back();
+    const QString labelToRemove = *XAxis->categoriesLabels().rbegin();
     XAxis->remove(labelToRemove);
     updateAxes();
 }
