@@ -99,7 +99,7 @@ bool DataTableModel::setHeaderData(int section, Qt::Orientation orientation, con
 void DataTableModel::insertRow()
 {
     beginResetModel();
-    m_rowsHeaderData.push_back(m_rowCount); // NON FUNZIONA TROVARE LA SOLUZIONE
+    m_rowsHeaderData.push_back(m_rowCount);
     m_rowCount++;
     m_data.push_back(vector<double>(m_columnCount, 0));
     endResetModel();
@@ -110,6 +110,7 @@ void DataTableModel::removeRow()
     if (m_rowCount)
     {
         beginResetModel();
+        m_rowsHeaderData.pop_back();
         m_rowCount--;
         m_data.pop_back();
         endResetModel();
@@ -121,7 +122,7 @@ void DataTableModel::removeRow()
 void DataTableModel::insertColumn()
 {
     beginResetModel();
-    m_columnsHeaderData.push_back(m_columnCount); // NON FUNZIONA TROVARE LA SOLUZIONE
+    m_columnsHeaderData.push_back(m_columnCount);
     m_columnCount++;
     for (int i = 0; i < m_rowCount; i++)
             m_data.at(i).push_back(0);
@@ -133,6 +134,7 @@ void DataTableModel::removeColumn()
     if (m_columnCount)
     {
         beginResetModel();
+        m_columnsHeaderData.pop_back();
         m_columnCount--;
         for (int i = 0; i < m_rowCount; i++)
                 m_data.at(i).pop_back();

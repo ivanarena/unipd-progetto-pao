@@ -72,12 +72,11 @@ void LineChart::insertSeries()
 {
     vector<vector<double>> data = model->getData();
     QLineSeries *series = new QLineSeries;
-    series->setName(model->getRowsHeaders().at(model->columnCount()).toString());
-    int k = 0;
+    series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
+
     for (int j = 0; j < model->columnCount(); j++)
     {
-        series->append(QPointF(k, data[model->columnCount()].at(j)));
-        k++;
+        series->append(QPointF(j, data[model->rowCount() - 1].at(j)));
     }
     addSeries(series);
 
