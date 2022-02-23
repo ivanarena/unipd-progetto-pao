@@ -10,6 +10,8 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include "model.h"
+#include "linechart.h"
+#include "barchart.h"
 
 
 class Scene : public QWidget
@@ -28,6 +30,8 @@ public:
     DataTableModel *getModel() const;
     QChart *getChart() const;
     QChartView *getChartView() const;
+
+    void setChart(int chartIndex);
 
 signals:
 

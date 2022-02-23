@@ -62,9 +62,8 @@ QChart * View::createPieChart(DataTableModel *model)
 
 void View::setToolBar()
 {
-    QComboBox *chartSelectionBox = new QComboBox;
-    chartSelectionBox->addItem("Line Chart");
-    chartSelectionBox->addItem("Bar Chart");
+    chartSelector->addItem("Line Chart");
+    chartSelector->addItem("Bar Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -81,7 +80,7 @@ void View::setToolBar()
     toolBar->addAction(insertColumn);
     toolBar->addAction(removeColumn);
     toolBar->addSeparator();
-    toolBar->addWidget(chartSelectionBox);
+    toolBar->addWidget(chartSelector);
     toolBar->addSeparator();
 
     toolBar->setIconSize(QSize(36, 36));
@@ -122,6 +121,7 @@ View::View(QWidget *parent)
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
       insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
       removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
+      chartSelector(new QComboBox),
       exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this))
 {
     tabView->setTabsClosable(true);
@@ -139,6 +139,8 @@ View::View(QWidget *parent)
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));
 
+
+
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
     //connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
@@ -148,6 +150,7 @@ View::View(QWidget *parent)
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
     connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
+    connect(chartSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changeCurrentChart(int)));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -159,7 +162,7 @@ View::View(QWidget *parent)
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
     DataTableModel *model = new DataTableModel(4,4);
 
-    BarChart *chart = new BarChart(model);
+    LineChart *chart = new LineChart(model);
     Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
 
@@ -300,6 +303,11 @@ void View::renameHeadersDialog()
         }
     }
     else dialog.reject();
+}
+
+void View::changeCurrentChart(int index)
+{
+    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->setChart(index);
 }
 
 void View::insertRowTriggered()

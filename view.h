@@ -43,6 +43,7 @@ private:
     QAction *removeRow;
     QAction *insertColumn;
     QAction *removeColumn;
+    QComboBox *chartSelector;
     QAction *exitApp;
 
     Controller controller;
@@ -61,6 +62,8 @@ public:
 public slots:
     Scene *createNewTab(DataTableModel *model = new DataTableModel, QChart *chart = new QtCharts::QChart);
     void closeTab(const int& index);
+
+    void changeCurrentChart(int);
 
     // QActions methods
     void newTabDialog();

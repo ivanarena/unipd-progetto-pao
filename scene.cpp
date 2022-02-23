@@ -33,3 +33,26 @@ QChartView *Scene::getChartView() const
 {
     return chartView;
 }
+
+void Scene::setChart(int chartIndex)
+{
+    /*
+    delete chartView;
+    delete chart;
+
+
+    switch (chartIndex)
+    {
+        case 0:
+            chart = new LineChart(model);
+            break;
+        case 1:
+            chart = new BarChart(model);
+            break;
+        default:
+            break;
+    }
+
+    chartView = new QChartView(chart);
+    */
+}
