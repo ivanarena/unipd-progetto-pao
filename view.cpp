@@ -150,7 +150,7 @@ View::View(QWidget *parent)
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
     connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
-    connect(chartSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changeCurrentChart(int)));
+    connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -307,7 +307,7 @@ void View::renameHeadersDialog()
 
 void View::changeCurrentChart(int index)
 {
-    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->setChart(index);
+    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->setActiveChart(index);
 }
 
 void View::insertRowTriggered()

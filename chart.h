@@ -15,11 +15,11 @@ public:
     Chart();
 
     virtual void mapData();
-    virtual void insertSeries();
-    virtual void removeSeries();
+    virtual void insertSeries(); // usalo quando aggiungi righe
+    virtual void removeSeries(); // '''' rimuovi ''
     virtual void updateAxes();
-    virtual void insertSeriesValue();
-    virtual void removeSeriesValue();
+    virtual void insertSeriesValue(); // usalo quando aggiungi colonne
+    virtual void removeSeriesValue(); // '''' rimuovi ''
 
     virtual ~Chart();
 

@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "barchart.h"
 
 Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)
     : QWidget{parent}, sceneLayout(new QGridLayout(this)),
@@ -34,12 +35,10 @@ QChartView *Scene::getChartView() const
     return chartView;
 }
 
-void Scene::setChart(int chartIndex)
+void Scene::setActiveChart(int chartIndex)
 {
-    /*
-    delete chartView;
-    delete chart;
-
+    QChart *oldChart = chart;
+    chart = new BarChart(model);
 
     switch (chartIndex)
     {
@@ -53,6 +52,6 @@ void Scene::setChart(int chartIndex)
             break;
     }
 
-    chartView = new QChartView(chart);
-    */
+    chartView->setChart(chart);
+    delete oldChart;
 }

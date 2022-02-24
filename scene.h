@@ -31,7 +31,7 @@ public:
     QChart *getChart() const;
     QChartView *getChartView() const;
 
-    void setChart(int chartIndex);
+    void setActiveChart(int chartIndex);
 
 signals:
 
