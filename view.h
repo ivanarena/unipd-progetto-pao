@@ -6,6 +6,9 @@
 #include <QTableView>
 #include <QMenuBar>
 #include <QGridLayout>
+#include <QtCharts/QChart>
+#include <QChart>
+#include <QtCharts/QChartView>
 #include <QToolBar>
 #include <QMenu>
 #include <QMenuBar>
@@ -13,6 +16,8 @@
 #include "controller.h"
 #include "parser.h"
 #include "jsonparser.h"
+#include "scene.h"
+
 
 using namespace QtCharts;
 using namespace std;
@@ -22,23 +27,26 @@ class View : public QWidget
     Q_OBJECT
 
 private:
-    QTabWidget *tabView;
     QGridLayout *mainLayout;
+    QTabWidget *tabView;
+
     QToolBar *toolBar;
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
 
-    Controller controller;
-
     QAction *newTab;
     QAction *openModel;
     QAction *saveModel;
-    QAction *addRow;
+    QAction *renameHeaders;
+    QAction *insertRow;
     QAction *removeRow;
-    QAction *addColumn;
+    QAction *insertColumn;
     QAction *removeColumn;
+    QComboBox *chartSelector;
     QAction *exitApp;
+
+    Controller controller;
 public:
     View(QWidget *parent = nullptr);
     ~View();
@@ -52,13 +60,20 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    QWidget *createNewTab(DataTableModel *model = new DataTableModel);
+    Scene *createNewTab(DataTableModel *model = new DataTableModel, QChart *chart = new QtCharts::QChart);
     void closeTab(const int& index);
 
-    // QActions
+    void changeCurrentChart(int);
+
+    // QActions methods
     void newTabDialog();
     void importFile();
     void saveFile();
+    void renameHeadersDialog();
+    void insertRowTriggered();
+    void removeRowTriggered();
+    void insertColumnTriggered();
+    void removeColumnTriggered();
 };
 
 #endif // VIEW_H

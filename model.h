@@ -17,8 +17,10 @@ public:
 
     //friend void JsonParser::save(DataTableModel*, QFile&) const;
 
-    DataTableModel(int c_rows = 5, int c_cols = 6, QObject *parent = 0); // overwrite necessario per definizione
-    explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<vector<string>>&);
+    DataTableModel(int c_rows = 4, int c_cols = 2, QObject *parent = 0); // overwrite necessario per definizione
+    explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<QVariant>&, const vector<QVariant>&);
+    DataTableModel(const DataTableModel& model);
+
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
     int columnCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
 
@@ -27,21 +29,24 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-    // NON SERVE A NULLA CREDO bool setHeaderData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole);
+    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
 
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    void insertRow();
+    void removeRow();
+    void insertColumn();
+    void removeColumn();
 
-//    void addRow(); // FUNZIONA QUI MA NON SU VIEW (IL CONNECT NON VA)
-//    void addColumn(); // same per tutte ^^
-//    void removeRow();
-//    void removeColumn();
-    vector<vector<double>> getValues();
-    vector<vector<string>> getHeaders();
+    double max();
+    double min();
+
+    vector<vector<double>> getData();
+    vector<QVariant> getRowsHeaders();
+    vector<QVariant> getColumnsHeaders();
 
 private:
-    // Da sostituire con std::vector
-    vector<vector<double>> m_data; //  vettori di vettori (?)
-    vector<vector<string>> m_headerData;
+    vector<vector<double>> m_data;
+    vector<QVariant> m_columnsHeaderData;
+    vector<QVariant> m_rowsHeaderData;
     int m_rowCount;
     int m_columnCount;
 };

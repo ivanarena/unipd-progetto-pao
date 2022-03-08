@@ -9,19 +9,35 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    barchart.cpp \
+    chart.cpp \
     controller.cpp \
+    error.cpp \
     jsonparser.cpp \
+    linechart.cpp \
     main.cpp \
     model.cpp \
+    modelerror.cpp \
     parser.cpp \
-    view.cpp
+    parsingerror.cpp \
+    scene.cpp \
+    view.cpp \
+    xmlparser.cpp
 
 HEADERS += \
+    barchart.h \
+    chart.h \
     controller.h \
+    error.h \
     jsonparser.h \
+    linechart.h \
     model.h \
+    modelerror.h \
     parser.h \
-    view.h
+    parsingerror.h \
+    scene.h \
+    view.h \
+    xmlparser.h
 
 RESOURCES = res.qrc
 
