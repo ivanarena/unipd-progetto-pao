@@ -22,7 +22,7 @@ SOURCES += \
     parsingerror.cpp \
     scene.cpp \
     view.cpp \
-    xmlparser.cpp
+    xmlparser.cpp \
     scene.cpp \
     view.cpp
 
@@ -39,7 +39,7 @@ HEADERS += \
     parsingerror.h \
     scene.h \
     view.h \
-    xmlparser.h
+    xmlparser.h \
     scene.h \
     view.h
 
