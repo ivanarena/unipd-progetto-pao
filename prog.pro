@@ -23,6 +23,8 @@ SOURCES += \
     scene.cpp \
     view.cpp \
     xmlparser.cpp
+    scene.cpp \
+    view.cpp
 
 HEADERS += \
     barchart.h \
@@ -38,6 +40,8 @@ HEADERS += \
     scene.h \
     view.h \
     xmlparser.h
+    scene.h \
+    view.h
 
 RESOURCES = res.qrc
 

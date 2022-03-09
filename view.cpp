@@ -353,6 +353,8 @@ void View::removeColumnTriggered()
     }
 }
 
+/*
+
 void View::importFile(){
 /*  const QStringList filters({"Json Files (*.json)",
                                "Xml Files (*.xml)"

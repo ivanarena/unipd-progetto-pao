@@ -2,10 +2,8 @@
 #include <QByteArray>
 #include <QList>
 #include <QVariant>
-
 #include "parsingerror.h"
 #include <iostream>
-
 
 DataTableModel* JsonParser::load(const QString& path) const {
     QFile file(path);
@@ -85,4 +83,3 @@ void JsonParser::save(DataTableModel * model, QFile& file) const{
     QByteArray saving =doc.toJson();
     file.write(saving);
 }
-
