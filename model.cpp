@@ -1,7 +1,17 @@
 #include "model.h"
+#include <iostream>
+#include "modelerror.h"
+#include <algorithm>
+
 using namespace std;
 #include <iostream>
 
+
+bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+}
 
 DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstractTableModel(parent)
 {
@@ -22,8 +32,8 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
     for (int i = 1; i < m_rowCount; i++) m_data.push_back(vector<double>(m_columnCount, i+1));
 }
 
-/*DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<vector<string>>& headers)
-    : QAbstractTableModel(parent), m_data(values), m_headerData(headers), m_rowCount(row), m_columnCount(col) {}*/
+DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<QVariant>& columnHeaders, const vector<QVariant>& rowHeaders)
+    : QAbstractTableModel(parent), m_data(values), m_columnsHeaderData(columnHeaders), m_rowsHeaderData(rowHeaders),m_rowCount(row), m_columnCount(col) {}
 
 DataTableModel::DataTableModel(const DataTableModel& model)
     : m_data(model.m_data), m_columnsHeaderData(model.m_columnsHeaderData), m_rowsHeaderData(model.m_rowsHeaderData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount) {}
@@ -69,6 +79,15 @@ Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const // rende mod
 
 bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role) // modifica effettivamente le celle
 {
+    try{
+        if(!is_number(value.toString().toStdString())) throw new modelError(wrong_format);
+    }
+
+    catch(Error* e){
+        e->show();
+        return false;
+    }
+
     if (index.isValid() && role == Qt::EditRole)
     {
         m_data[index.row()].at(index.column()) = value.toDouble();
@@ -117,7 +136,6 @@ void DataTableModel::removeRow()
     }
     else throw QString("There are no more rows to remove.");
 }
-
 
 void DataTableModel::insertColumn()
 {

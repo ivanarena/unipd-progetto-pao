@@ -35,7 +35,10 @@
 #include "chart.h"
 #include "linechart.h"
 #include "barchart.h"
-
+#include "error.h"
+#include "modelerror.h"
+#include "parsingerror.h"
+#include "xmlparser.h"
 using namespace std;
 
 QChart * View::createPieChart(DataTableModel *model)
@@ -143,8 +146,8 @@ View::View(QWidget *parent)
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
-    //connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
-    //connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
+    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
     connect(renameHeaders, SIGNAL(triggered()), this, SLOT(renameHeadersDialog()));
     connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
@@ -353,13 +356,40 @@ void View::removeColumnTriggered()
 /*
 
 void View::importFile(){
-    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a JSON Document"),"/home", tr("Json document(*.json)"));
-    //if(import == "") throw Error;              ===>   ECCEZIONE, TODO
-    Parser* parser = new JsonParser();
-    createNewTab(parser->load(import));
+/*  const QStringList filters({"Json Files (*.json)",
+                               "Xml Files (*.xml)"
+                              });
+    QFileDialog dialog(this);
+    dialog.setNameFilters(filters);
+    dialog.setDirectory("./home");
+    dialog.exec();
+    QString import = dialog.selectedFiles().first();
+*/
+    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),"/home", tr("Json files (*.json);;XML files (*.xml)"));
+    if(import != ""){
+
+        Parser* parser;
+
+        if(import.endsWith(".xml")){
+            parser=new XmlParser();
+        }
+        if(import.endsWith(".json")){
+            parser=new JsonParser();
+        }
+        try{
+            parser->load(import);
+        }
+        catch(Error* e){
+            e->show();
+            importFile();
+            return;
+        }
+        createNewTab(parser->load(import));
+    }
 }
 
 void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
+    //QFileDialog d_fileName =
     QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
     QFile f(fileName);
     f.open( QIODevice::WriteOnly );
@@ -376,18 +406,18 @@ void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
         val.push_back(first);
         val.push_back(second);
         val.push_back(third);
-        vector<string> primo = {"tony", "montana"};
-        vector<string> secondo = {"agosto", "settembre", "novembre"};
-        head.push_back(primo);
-        head.push_back(secondo);
+        vector<QVariant> primo = {"tony", "montana"};
+        vector<QVariant> secondo = {"agosto", "settembre", "novembre"};
+
 
     // ====================== FINE TEST
 
-    parser->save(new DataTableModel(0,rows,cols,val,head), f);
+    parser->save(new DataTableModel(0,rows,cols,val,primo,secondo), f);
+    //parser->save(getModel(), f);
     //TODO
     f.close();
 }
-*/
+
 View::~View()
 {
 }
