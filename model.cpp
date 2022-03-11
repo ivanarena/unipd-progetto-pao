@@ -4,8 +4,6 @@
 #include <algorithm>
 
 using namespace std;
-#include <iostream>
-
 
 bool is_number(const std::string& s)
 {
@@ -136,6 +134,7 @@ void DataTableModel::removeRow()
     }
     else throw QString("There are no more rows to remove.");
 }
+
 
 void DataTableModel::insertColumn()
 {

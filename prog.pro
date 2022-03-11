@@ -22,9 +22,7 @@ SOURCES += \
     parsingerror.cpp \
     scene.cpp \
     view.cpp \
-    xmlparser.cpp \
-    scene.cpp \
-    view.cpp
+    xmlparser.cpp
 
 HEADERS += \
     barchart.h \
@@ -39,9 +37,7 @@ HEADERS += \
     parsingerror.h \
     scene.h \
     view.h \
-    xmlparser.h \
-    scene.h \
-    view.h
+    xmlparser.h
 
 RESOURCES = res.qrc
 
