@@ -392,27 +392,7 @@ void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
     QFile f(fileName);
     f.open( QIODevice::WriteOnly );
     Parser* parser = new JsonParser();
-
-    // ======================= TEST
-        int cols = 2;
-        int rows= 3;
-        vector<vector<double>> val;
-        vector<vector<string>> head;
-        vector<double> first = {2,3,4};
-        vector<double> second = {23, 4,1};
-        vector<double> third = {4, 5, 7};
-        val.push_back(first);
-        val.push_back(second);
-        val.push_back(third);
-        vector<QVariant> primo = {"tony", "montana"};
-        vector<QVariant> secondo = {"agosto", "settembre", "novembre"};
-
-
-    // ====================== FINE TEST
-
-    parser->save(new DataTableModel(0,rows,cols,val,primo,secondo), f);
-    //parser->save(getModel(), f);
-    //TODO
+    parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
     f.close();
 }
 
