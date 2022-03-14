@@ -7,8 +7,7 @@
 #include <iostream>
 
 
-DataTableModel* JsonParser::load(const QString& path) const {
-    QFile file(path);
+DataTableModel* JsonParser::load(QFile& file) const {
     file.open(QIODevice::ReadOnly);
     QByteArray loading = file.readAll();
     QJsonDocument JDoc = QJsonDocument::fromJson(loading);
@@ -24,7 +23,6 @@ DataTableModel* JsonParser::load(const QString& path) const {
     QJsonArray JA_columns = JV_columns.toArray();
     int col_Count=0;
     for(auto it = JA_columns.begin(); it!=JA_columns.end(); ++it){
-        cout<<"ssss"<<endl;
         col_Count++;
         columnsHeaders.push_back(((*it).toVariant()));
     }
@@ -40,20 +38,15 @@ DataTableModel* JsonParser::load(const QString& path) const {
     int row_Count=0;
     int checkcol;
     for(auto it = rows_map.begin(); it!=rows_map.end(); ++it){
-        cout<<"bb"<<endl;
         rowsHeaders.push_back((it.key()));
         //if(!(it.value()).canConvert<QJsonArray>()) throw new parsingError();
-        cout<<it.value().typeName();
         QList<QVariant> row_Array = (it.value()).toList();
         values.push_back(*(new vector<double>));
         checkcol=0;
-        cout<<row_Array[1].toDouble()<<endl;
         for(auto vit = row_Array.begin(); vit!= row_Array.end(); ++vit){
             values[row_Count].push_back((*vit).toDouble());
             checkcol++;
-            std::cout<<"aa"<<endl;
         }
-        std::cout<<col_Count<<" "<<checkcol<<endl;
         if(checkcol!=col_Count) throw new parsingError();
         row_Count++;
     }
@@ -84,5 +77,6 @@ void JsonParser::save(DataTableModel * model, QFile& file) const{
     QJsonDocument doc(finalObj);
     QByteArray saving =doc.toJson();
     file.write(saving);
+    file.close();
 }
 

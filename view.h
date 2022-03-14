@@ -37,7 +37,9 @@ private:
 
     QAction *newTab;
     QAction *openModel;
-    QAction *saveModel;
+    QAction* saveModel;
+    QAction *saveModeltoJson;
+    QAction* saveModeltoXml;
     QAction *renameHeaders;
     QAction *insertRow;
     QAction *removeRow;
@@ -60,7 +62,7 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    Scene *createNewTab(DataTableModel *model = new DataTableModel, QChart *chart = new QtCharts::QChart);
+    Scene *createNewTab(DataTableModel *model = new DataTableModel(), QtCharts::QChart *chart = new QtCharts::QChart);
     void closeTab(const int& index);
 
     void changeCurrentChart(int);
@@ -69,6 +71,8 @@ public slots:
     void newTabDialog();
     void importFile();
     void saveFile();
+    void saveAsJson();
+    void saveAsXml();
     void renameHeadersDialog();
     void insertRowTriggered();
     void removeRowTriggered();

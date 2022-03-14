@@ -9,6 +9,7 @@ class Error
 public:
     Error() = default;
     virtual void show() const = 0;
+    virtual ~Error() = default;
 };
 
 #endif // ERROR_H

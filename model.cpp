@@ -11,13 +11,15 @@ bool is_number(const std::string& s)
         s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
+DataTableModel::DataTableModel(): empty(true) {}
+
 DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstractTableModel(parent)
 {
     Q_UNUSED(parent)
 
     m_rowCount = c_rows;
     m_columnCount = c_cols;
-
+    empty = false;
 
     for (int i = 0; i < m_rowCount; i++) m_rowsHeaderData.push_back(QVariant(i));
     for (int i = 0; i < m_columnCount; i++) m_columnsHeaderData.push_back(QVariant(i));
@@ -31,10 +33,10 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
 }
 
 DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<QVariant>& columnHeaders, const vector<QVariant>& rowHeaders)
-    : QAbstractTableModel(parent), m_data(values), m_columnsHeaderData(columnHeaders), m_rowsHeaderData(rowHeaders),m_rowCount(row), m_columnCount(col) {}
+    : QAbstractTableModel(parent), m_data(values), m_columnsHeaderData(columnHeaders), m_rowsHeaderData(rowHeaders),m_rowCount(row), m_columnCount(col), empty(false) {}
 
 DataTableModel::DataTableModel(const DataTableModel& model)
-    : m_data(model.m_data), m_columnsHeaderData(model.m_columnsHeaderData), m_rowsHeaderData(model.m_rowsHeaderData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount) {}
+    : m_data(model.m_data), m_columnsHeaderData(model.m_columnsHeaderData), m_rowsHeaderData(model.m_rowsHeaderData), m_rowCount(model.m_rowCount), m_columnCount(model.m_columnCount), empty(false) {}
 
 int DataTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -185,18 +187,18 @@ double DataTableModel::min()
 
 /******** CONTINUA A BUILDARE *********/
 
-vector<vector<double>> DataTableModel::getData()
+vector<vector<double>> DataTableModel::getData() const
 {
     return m_data;
 }
 
 
-vector<QVariant> DataTableModel::getRowsHeaders()
+vector<QVariant> DataTableModel::getRowsHeaders() const
 {
     return m_rowsHeaderData;
 }
 
-vector<QVariant> DataTableModel::getColumnsHeaders()
+vector<QVariant> DataTableModel::getColumnsHeaders() const
 {
     return m_columnsHeaderData;
 }

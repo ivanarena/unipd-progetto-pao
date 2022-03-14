@@ -95,7 +95,8 @@ void View::setMenus()
     fileMenu->addAction(newTab);
     fileMenu->addSeparator();
     fileMenu->addAction(openModel);
-    fileMenu->addAction(saveModel);
+    fileMenu->addAction(saveModeltoJson);
+    fileMenu->addAction(saveModeltoXml);
     fileMenu->addSeparator();
     fileMenu->addAction(exitApp);
 
@@ -119,6 +120,8 @@ View::View(QWidget *parent)
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
       saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
+      saveModeltoJson(new QAction(QIcon(":/res/save-file.png"), "Save as Json", this)),
+      saveModeltoXml(new QAction(QIcon(":/res/save-file.png"), "Save as Xml", this)),
       renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
       insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
@@ -135,10 +138,12 @@ View::View(QWidget *parent)
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
-    saveModel->setShortcuts(QKeySequence::SaveAs);
+    saveModel->setShortcut(QKeySequence(tr("Ctr+Shift+S")));
+    saveModeltoJson->setShortcut(QKeySequence(tr("Ctr+Shift+J")));
+    saveModeltoXml->setShortcut(QKeySequence(tr("Ctr+Shift+X")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));
-    removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
+    removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));
 
@@ -148,6 +153,8 @@ View::View(QWidget *parent)
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
     connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(saveModeltoJson, SIGNAL(triggered()), this, SLOT(saveAsJson()));
+    connect(saveModeltoXml, SIGNAL(triggered()), this, SLOT(saveAsXml()));
     connect(renameHeaders, SIGNAL(triggered()), this, SLOT(renameHeadersDialog()));
     connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
@@ -163,8 +170,9 @@ View::View(QWidget *parent)
     // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
 
     // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    DataTableModel *model = new DataTableModel(4,4);
 
+
+    DataTableModel* model =new DataTableModel(10,10,nullptr);
     LineChart *chart = new LineChart(model);
     Scene *defaultTab = createNewTab(model, chart);
     tabView->addTab(defaultTab, "Table 1");
@@ -173,7 +181,6 @@ View::View(QWidget *parent)
     mainLayout->addWidget(toolBar, 1, 0);
     mainLayout->addWidget(tabView, 2, 0);
     setLayout(mainLayout);
-
 }
 
 
@@ -219,7 +226,7 @@ void View::newTabDialog()
         cols = colsInput->text().toInt(&safe, 10);
         if (rows && cols)
         {
-            DataTableModel *model = new DataTableModel(rows, cols);
+            DataTableModel *model = new DataTableModel(rows, cols,nullptr);
             LineChart *chart = new LineChart(model);
             createNewTab(model, chart);
             renameHeadersDialog();
@@ -354,45 +361,80 @@ void View::removeColumnTriggered()
 }
 
 void View::importFile(){
-/*  const QStringList filters({"Json Files (*.json)",
-                               "Xml Files (*.xml)"
-                              });
-    QFileDialog dialog(this);
-    dialog.setNameFilters(filters);
-    dialog.setDirectory("./home");
-    dialog.exec();
-    QString import = dialog.selectedFiles().first();
-*/
+
     QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),"/home", tr("Json files (*.json);;XML files (*.xml)"));
+    QFile file(import);
     if(import != ""){
+
+        QFileInfo fileInfo(file.fileName());
+        QString filename(fileInfo.fileName());
 
         Parser* parser;
 
         if(import.endsWith(".xml")){
             parser=new XmlParser();
+            filename.replace(".xml","");
         }
         if(import.endsWith(".json")){
             parser=new JsonParser();
+            filename.replace(".json","");
+
         }
         try{
-            parser->load(import);
+            parser->load(file);
         }
         catch(Error* e){
             e->show();
+            delete e;
             importFile();
-            return;
         }
-        createNewTab(parser->load(import));
+        DataTableModel* model = parser->load(file);
+        delete parser;
+
+        LineChart *chart = new LineChart(model);
+        Scene *defaultTab = createNewTab(model, chart);
+        tabView->addTab(defaultTab, filename);
     }
 }
 
-void View::saveFile(){ // TO-DO: AGGIUNGERE AUTOMATICAMENTE ESTENSIONE
-    //QFileDialog d_fileName =
+void View::saveFile(){
+    QDialog saveDialog;
+    QFormLayout form(&saveDialog);
+    QLabel* text = new QLabel("Choose the file format");
+    text->setAlignment(Qt::AlignCenter);
+    form.addRow(text);
+    form.addRow(new QLabel("          "));
+    QDialogButtonBox buttons;
+    QPushButton* Xml = new QPushButton("Xml",this);
+    QPushButton* Json = new QPushButton("Json", this);
+    buttons.addButton(Xml,QDialogButtonBox::DestructiveRole);
+    buttons.addButton(Json,QDialogButtonBox::DestructiveRole);
+    form.addRow(&buttons);
+    connect(Xml, SIGNAL(clicked()), this, SLOT(saveAsXml()));
+    connect(Json, SIGNAL(clicked()), this, SLOT(saveAsJson()));
+    saveDialog.exec();
+}
+
+void View::saveAsJson(){
     QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
-    QFile f(fileName);
+    Parser* parser;
+    QFile f(fileName + ".json");
     f.open( QIODevice::WriteOnly );
-    Parser* parser = new JsonParser();
+    parser = new JsonParser();
     parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
+    delete parser;
+    f.close();
+}
+
+void View::saveAsXml(){
+
+    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
+    Parser* parser;
+    QFile f(fileName + ".xml");
+    f.open( QIODevice::WriteOnly );
+    parser = new XmlParser();
+    parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
+    delete parser;
     f.close();
 }
 
