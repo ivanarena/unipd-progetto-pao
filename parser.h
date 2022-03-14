@@ -17,7 +17,7 @@ class Parser{
 private:
 
 public:
-    virtual DataTableModel* load(const QString&) const = 0;
+    virtual DataTableModel* load(QFile&) const = 0;
     virtual void save(DataTableModel*, QFile&) const = 0;
     virtual ~Parser() = default;
 };

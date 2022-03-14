@@ -6,7 +6,7 @@
 
 class JsonParser: public Parser{
 public:
-    DataTableModel* load(const QString&) const override;
+    DataTableModel* load(QFile&) const override;
     void save(DataTableModel*, QFile&) const override;
 };
 

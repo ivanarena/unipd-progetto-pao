@@ -4,10 +4,14 @@
 #include "parser.h"
 #include "controller.h"
 
+#include <QXmlSimpleReader>
+#include <QXmlInputSource>
+#include <QDomDocument>
+
 class XmlParser : public Parser
 {
 public:
-    DataTableModel* load(const QString&) const override;
+    DataTableModel* load(QFile&) const override;
     void save(DataTableModel*, QFile&) const override;
 };
 

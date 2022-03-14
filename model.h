@@ -16,10 +16,12 @@ class DataTableModel : public QAbstractTableModel
 public:
 
     //friend void JsonParser::save(DataTableModel*, QFile&) const;
-
-    DataTableModel(int c_rows = 4, int c_cols = 2, QObject *parent = 0); // overwrite necessario per definizione
+    explicit DataTableModel();
+    explicit DataTableModel(int c_rows, int c_cols, QObject *parent); // overwrite necessario per definizione
     explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<QVariant>&, const vector<QVariant>&);
     DataTableModel(const DataTableModel& model);
+
+    bool isEmpty() const;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
     int columnCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
@@ -39,9 +41,9 @@ public:
     double max();
     double min();
 
-    vector<vector<double>> getData();
-    vector<QVariant> getRowsHeaders();
-    vector<QVariant> getColumnsHeaders();
+    vector<vector<double>> getData() const;
+    vector<QVariant> getRowsHeaders() const;
+    vector<QVariant> getColumnsHeaders() const;
 
 private:
     vector<vector<double>> m_data;
@@ -49,6 +51,7 @@ private:
     vector<QVariant> m_rowsHeaderData;
     int m_rowCount;
     int m_columnCount;
+    bool empty;
 };
 
 #endif // MODEL_H
