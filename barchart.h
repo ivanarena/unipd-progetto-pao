@@ -22,7 +22,7 @@ public:
     BarChart(DataTableModel *c_model);
 
     virtual void mapData() override;
-    virtual void updateAxes() override;
+    virtual void updateChartView() override;
     virtual void insertSeries() override; // add row
     virtual void removeSeries() override;
     virtual void insertSeriesValue() override; // add column

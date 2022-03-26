@@ -21,6 +21,7 @@ SOURCES += \
     modelerror.cpp \
     parser.cpp \
     parsingerror.cpp \
+    piechart.cpp \
     scene.cpp \
     view.cpp \
     xmlparser.cpp
@@ -36,6 +37,7 @@ HEADERS += \
     modelerror.h \
     parser.h \
     parsingerror.h \
+    piechart.h \
     scene.h \
     view.h \
     xmlparser.h

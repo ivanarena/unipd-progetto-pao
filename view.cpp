@@ -35,38 +35,19 @@
 #include "chart.h"
 #include "linechart.h"
 #include "barchart.h"
+#include "pie_chart.h"
 #include "error.h"
 #include "modelerror.h"
 #include "parsingerror.h"
 #include "xmlparser.h"
 using namespace std;
 
-QChart * View::createPieChart(DataTableModel *model)
-{
-    QChart *pieChart = new QChart();
-    QVPieModelMapper *pieMapper = new QVPieModelMapper();
-    pieChart->setTitle("Pie chart");
-    pieChart->setAnimationOptions(QChart::AllAnimations);
-    QPieSeries *series = new QPieSeries(pieChart);
-
-    pieMapper->setSeries(series);
-    pieMapper->setModel(model); //TODO: capire come implementare il piechart con questo set di dati
-    pieMapper->setLabelsColumn(0); // a quale colonna associare  label
-    pieMapper->setValuesColumn(1); // a quale colonna associare valore
-    pieMapper->setFirstRow(0); //da che riga del model inizio
-    pieMapper->setRowCount(model->rowCount()); //una riga -> una slice
-
-    pieChart->addSeries(series);
-    series->setPieSize(5);
-    series->setHoleSize(0.5);
-
-    return pieChart;
-}
 
 void View::setToolBar()
 {
     chartSelector->addItem("Line Chart");
     chartSelector->addItem("Bar Chart");
+    chartSelector->addItem("Pie Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -381,19 +362,19 @@ void View::importFile(){
 
         }
         try{
-            parser->load(file);
+            DataTableModel* model = parser->load(file);
+            delete parser;
+
+            LineChart *chart = new LineChart(model);
+            Scene *defaultTab = createNewTab(model, chart);
+            tabView->addTab(defaultTab, filename);
         }
         catch(Error* e){
             e->show();
             delete e;
             importFile();
         }
-        DataTableModel* model = parser->load(file);
-        delete parser;
 
-        LineChart *chart = new LineChart(model);
-        Scene *defaultTab = createNewTab(model, chart);
-        tabView->addTab(defaultTab, filename);
     }
 }
 

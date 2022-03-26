@@ -10,7 +10,7 @@ Chart::Chart()
 void Chart::mapData() {}
 void Chart::insertSeries() {}
 void Chart::removeSeries() {}
-void Chart::updateAxes() {}
+void Chart::updateChartView() {}
 void Chart::insertSeriesValue() {}
 void Chart::removeSeriesValue() {}
 

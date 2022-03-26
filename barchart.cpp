@@ -21,10 +21,10 @@ void BarChart::mapData()
     m_series->attachAxis(XAxis);
     m_series->attachAxis(YAxis);
 
-    BarChart::updateAxes();
+    BarChart::updateChartView();
 }
 
-void BarChart::updateAxes()
+void BarChart::updateChartView()
 {
     YAxis->setRange(model->min(), model->max());
 }
@@ -62,7 +62,7 @@ void BarChart::insertSeries()
     m_series->append(set);
     m_sets.push_back(set);
 
-    updateAxes();
+    updateChartView();
 }
 
 void BarChart::removeSeries()
@@ -70,7 +70,7 @@ void BarChart::removeSeries()
     m_series->remove(dynamic_cast<QBarSet *>(m_sets.back()));
     m_sets.pop_back();
 
-    updateAxes();
+    updateChartView();
 }
 
 void BarChart::insertSeriesValue()
@@ -84,7 +84,7 @@ void BarChart::insertSeriesValue()
     }
 
     XAxis->append(model->getColumnsHeaders().at(model->columnCount() - 1).toString());
-    updateAxes();
+    updateChartView();
 }
 
 void BarChart::removeSeriesValue()
@@ -93,14 +93,14 @@ void BarChart::removeSeriesValue()
         (*it)->remove(model->columnCount());
 
     XAxis->remove(*XAxis->categories().rbegin());
-    updateAxes();
+    updateChartView();
 }
 
 void BarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 {
     vector<vector<double>> data = model->getData();
     m_sets.at(i.row())->replace(j.column(), data[i.row()].at(j.column()));
-    updateAxes();
+    updateChartView();
 }
 
 void BarChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
