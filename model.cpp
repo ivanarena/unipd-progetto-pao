@@ -202,3 +202,17 @@ vector<QVariant> DataTableModel::getColumnsHeaders() const
 {
     return m_columnsHeaderData;
 }
+
+bool isZeroVector(const vector<double>& v){
+    for(auto it = v.begin(); it!=v.end();++it){
+        if(*it!=0.0) return false;
+    }
+    return true;
+}
+
+bool DataTableModel::isThereZeroRow() const{
+    for(auto it = m_data.begin(); it!= m_data.end(); ++it){
+            if(isZeroVector(*it)) return true;
+    }
+    return false;
+}

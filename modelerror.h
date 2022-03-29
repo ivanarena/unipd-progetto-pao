@@ -11,7 +11,7 @@ class modelError: public Error
 private:
     m_type type;
 public:
-    explicit modelError(m_type);
+    explicit modelError(m_type = m_type::wrong_format);
     void show() const;
     m_type getType() const;
 };

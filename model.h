@@ -45,12 +45,14 @@ public:
     vector<QVariant> getRowsHeaders() const;
     vector<QVariant> getColumnsHeaders() const;
 
+    bool isThereZeroRow() const;
+
 private:
+    int m_rowCount;
+    int m_columnCount;
     vector<vector<double>> m_data;
     vector<QVariant> m_columnsHeaderData;
     vector<QVariant> m_rowsHeaderData;
-    int m_rowCount;
-    int m_columnCount;
     bool empty;
 };
 

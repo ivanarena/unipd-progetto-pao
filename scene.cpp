@@ -1,5 +1,8 @@
 #include "scene.h"
 #include "barchart.h"
+#include "piechart.h"
+#include "linechart.h"
+#include <typeinfo>
 
 Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)
     : QWidget{parent}, sceneLayout(new QGridLayout(this)),
@@ -38,20 +41,26 @@ QChartView *Scene::getChartView() const
 void Scene::setActiveChart(int chartIndex)
 {
     QChart *oldChart = chart;
-    chart = new BarChart(model);
 
     switch (chartIndex)
     {
         case 0:
-            chart = new LineChart(model);
+            if(typeid(*chart) != typeid(LineChart)) chart = new LineChart(model);
+            else return;
             break;
         case 1:
-            chart = new BarChart(model);
+            if(typeid(*chart) != typeid(BarChart)) chart = new BarChart(model);
+            else return;
+            break;
+        case 2:
+            if(typeid(*chart) != typeid(PieChart)) chart = new PieChart(model);
+            else return;
             break;
         default:
             break;
     }
 
     chartView->setChart(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
     delete oldChart;
 }

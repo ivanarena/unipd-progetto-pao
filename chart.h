@@ -17,7 +17,7 @@ public:
     virtual void mapData();
     virtual void insertSeries(); // usalo quando aggiungi righe
     virtual void removeSeries(); // '''' rimuovi ''
-    virtual void updateAxes();
+    virtual void updateChartView();
     virtual void insertSeriesValue(); // usalo quando aggiungi colonne
     virtual void removeSeriesValue(); // '''' rimuovi ''
 

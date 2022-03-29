@@ -35,38 +35,19 @@
 #include "chart.h"
 #include "linechart.h"
 #include "barchart.h"
+#include "pie_chart.h"
 #include "error.h"
 #include "modelerror.h"
 #include "parsingerror.h"
 #include "xmlparser.h"
 using namespace std;
 
-QChart * View::createPieChart(DataTableModel *model)
-{
-    QChart *pieChart = new QChart();
-    QVPieModelMapper *pieMapper = new QVPieModelMapper();
-    pieChart->setTitle("Pie chart");
-    pieChart->setAnimationOptions(QChart::AllAnimations);
-    QPieSeries *series = new QPieSeries(pieChart);
-
-    pieMapper->setSeries(series);
-    pieMapper->setModel(model); //TODO: capire come implementare il piechart con questo set di dati
-    pieMapper->setLabelsColumn(0); // a quale colonna associare  label
-    pieMapper->setValuesColumn(1); // a quale colonna associare valore
-    pieMapper->setFirstRow(0); //da che riga del model inizio
-    pieMapper->setRowCount(model->rowCount()); //una riga -> una slice
-
-    pieChart->addSeries(series);
-    series->setPieSize(5);
-    series->setHoleSize(0.5);
-
-    return pieChart;
-}
 
 void View::setToolBar()
 {
     chartSelector->addItem("Line Chart");
     chartSelector->addItem("Bar Chart");
+    chartSelector->addItem("Pie Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -138,9 +119,9 @@ View::View(QWidget *parent)
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
-    saveModel->setShortcut(QKeySequence(tr("Ctr+Shift+S")));
-    saveModeltoJson->setShortcut(QKeySequence(tr("Ctr+Shift+J")));
-    saveModeltoXml->setShortcut(QKeySequence(tr("Ctr+Shift+X")));
+    saveModel->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
+    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
+    saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+X")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
@@ -161,6 +142,8 @@ View::View(QWidget *parent)
     connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
     connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
+    connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
+    connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(changeTabName(int)));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -173,9 +156,7 @@ View::View(QWidget *parent)
 
 
     DataTableModel* model =new DataTableModel(10,10,nullptr);
-    LineChart *chart = new LineChart(model);
-    Scene *defaultTab = createNewTab(model, chart);
-    tabView->addTab(defaultTab, "Table 1");
+    createNewTab("default",model);
 
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -187,11 +168,12 @@ View::View(QWidget *parent)
 //======================== PUBLIC SLOTS =========================================
 
 
-Scene *View::createNewTab(DataTableModel *model, QChart *chart)
+Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
-    Scene *scene = new Scene(model, chart);
-    tabView->addTab(scene, QString("Table %1").arg((tabView->currentIndex() + 2))); // possible conflicts with openfile
+    Scene *scene = new Scene(model, new Chart());
+    tabView->addTab(scene, tabName); // possible conflicts with openfile
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
+    chartSelector->setCurrentIndex(-1);
     return scene;
 }
 
@@ -227,8 +209,7 @@ void View::newTabDialog()
         if (rows && cols)
         {
             DataTableModel *model = new DataTableModel(rows, cols,nullptr);
-            LineChart *chart = new LineChart(model);
-            createNewTab(model, chart);
+            createNewTab("default",model);
             renameHeadersDialog();
         }
         else dialog.reject();
@@ -248,6 +229,7 @@ void View::closeTab(const int& index)
 
     delete(tabItem);
     tabItem = nullptr;
+    if(tabView->count()<=0) chartSelector->setCurrentIndex(-1);
 }
 
 void View::renameHeadersDialog()
@@ -317,7 +299,20 @@ void View::renameHeadersDialog()
 
 void View::changeCurrentChart(int index)
 {
-    static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->setActiveChart(index);
+   if(tabView->count()>=1) static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->setActiveChart(index);
+}
+
+void View::setChartSelectorIndex(int tabIndex){
+    QChart* current_chart = static_cast<Scene *>(tabView->widget(tabIndex))->getChart();
+    int chartIndex=-1;
+    if(typeid(*current_chart) == typeid(LineChart)) chartIndex=0;
+    else if(typeid(*current_chart) == typeid(BarChart)) chartIndex=1;
+    else if(typeid(*current_chart) == typeid(PieChart)) chartIndex=2;
+    chartSelector->setCurrentIndex(chartIndex);
+}
+
+void View::changeTabName(int tabIndex){
+    tabView->widget(tabIndex)->setWindowTitle("changed");
 }
 
 void View::insertRowTriggered()
@@ -335,7 +330,7 @@ void View::removeRowTriggered()
     }
     catch (const QString &errorMessage)
     {
-        QMessageBox::critical(this, "Error", errorMessage);
+        //QMessageBox::critical(this, "Error", errorMessage);
     }
 
 
@@ -381,19 +376,18 @@ void View::importFile(){
 
         }
         try{
-            parser->load(file);
+            DataTableModel* model = parser->load(file);
+            delete parser;
+
+            createNewTab(filename,model);
+            tabView->setCurrentIndex(tabView->currentIndex() + 1);
+            chartSelector->setCurrentIndex(-1);
         }
         catch(Error* e){
             e->show();
             delete e;
             importFile();
         }
-        DataTableModel* model = parser->load(file);
-        delete parser;
-
-        LineChart *chart = new LineChart(model);
-        Scene *defaultTab = createNewTab(model, chart);
-        tabView->addTab(defaultTab, filename);
     }
 }
 
@@ -412,6 +406,7 @@ void View::saveFile(){
     form.addRow(&buttons);
     connect(Xml, SIGNAL(clicked()), this, SLOT(saveAsXml()));
     connect(Json, SIGNAL(clicked()), this, SLOT(saveAsJson()));
+    connect(Xml, SIGNAL(clicked()), &saveDialog, SLOT(reject()));
     saveDialog.exec();
 }
 
