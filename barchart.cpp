@@ -52,6 +52,8 @@ BarChart::BarChart(DataTableModel *c_model)
 
 void BarChart::insertSeries()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     const QString label = model->getRowsHeaders().at(model->rowCount() - 1).toString();
     QBarSet *set = new QBarSet(label);
@@ -67,6 +69,8 @@ void BarChart::insertSeries()
 
 void BarChart::removeSeries()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     m_series->remove(dynamic_cast<QBarSet *>(m_sets.back()));
     m_sets.pop_back();
 
@@ -75,6 +79,8 @@ void BarChart::removeSeries()
 
 void BarChart::insertSeriesValue()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     int i = 0;
     for (auto it = m_sets.begin(); it != m_sets.end(); it++)
@@ -89,6 +95,8 @@ void BarChart::insertSeriesValue()
 
 void BarChart::removeSeriesValue()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     for (auto it = m_sets.begin(); it < m_sets.end(); it++)
         (*it)->remove(model->columnCount());
 
@@ -98,6 +106,8 @@ void BarChart::removeSeriesValue()
 
 void BarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     m_sets.at(i.row())->replace(j.column(), data[i.row()].at(j.column()));
     updateChartView();
@@ -105,6 +115,8 @@ void BarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 
 void BarChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     if (orientation == Qt::Vertical)
         m_sets.at(first)->setLabel(model->getRowsHeaders().at(last).toString());
     else

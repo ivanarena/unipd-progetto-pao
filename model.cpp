@@ -170,7 +170,8 @@ double DataTableModel::max()
         double rowMax = *max_element(it->begin(), it->end());
         if (rowMax > maxValue) maxValue = rowMax;
     }
-    return maxValue;
+    if (maxValue != -__DBL_MAX__) return maxValue;
+    else return 0;
 }
 
 double DataTableModel::min()
@@ -181,7 +182,8 @@ double DataTableModel::min()
         double rowMin = *min_element(it->begin(), it->end());
         if (rowMin < minValue) minValue = rowMin;
     }
-    return minValue;
+    if (minValue != __DBL_MAX__) return minValue;
+    else return 0;
 }
 
 

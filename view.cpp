@@ -120,10 +120,10 @@ View::View(QWidget *parent)
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
     saveModel->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
-    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
+    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Alt+J")));
     saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+X")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
-    insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_J));
+    insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));

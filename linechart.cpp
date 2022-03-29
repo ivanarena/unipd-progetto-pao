@@ -38,6 +38,7 @@ void LineChart::mapData()
 
 void LineChart::updateChartView()
 {
+    //setAnimationOptions(QChart::NoAnimation);
     XAxis->setRange(0, model->columnCount()-1); // set max and min
     //YAxis->applyNiceNumbers();
     YAxis->setRange(model->min(), model->max());
@@ -57,7 +58,9 @@ LineChart::LineChart(DataTableModel *c_model)
     addAxis(XAxis, Qt::AlignBottom);
     addAxis(YAxis, Qt::AlignLeft);
 
+
     LineChart::mapData();
+
 
     connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
     connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
@@ -65,6 +68,8 @@ LineChart::LineChart(DataTableModel *c_model)
 
 void LineChart::insertSeries()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     QLineSeries *series = new QLineSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
@@ -85,6 +90,8 @@ void LineChart::insertSeries()
 
 void LineChart::removeSeries()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     if (m_series.back())
         QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
     else return;
@@ -98,6 +105,8 @@ void LineChart::removeSeries()
 
 void LineChart::insertSeriesValue()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     int i = 0;
     for (auto it = m_series.begin(); it != m_series.end(); it++)
@@ -113,6 +122,8 @@ void LineChart::insertSeriesValue()
 
 void LineChart::removeSeriesValue()
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     for (auto it = m_series.begin(); it != m_series.end(); it++)
         (*it)->remove(model->columnCount());
 
@@ -123,15 +134,20 @@ void LineChart::removeSeriesValue()
 
 void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     vector<vector<double>> data = model->getData();
     const QPointF oldPoint = m_series[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
+    setAnimationOptions(QChart::SeriesAnimations);
     m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
     updateChartView();
 }
 
 void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
 {
+    setAnimationOptions(QChart::SeriesAnimations);
+
     if (orientation == Qt::Vertical)
         m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
     else
