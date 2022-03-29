@@ -1,5 +1,6 @@
 #include "piechart.h"
 #include "modelerror.h"
+#include <iostream>
 
 MainSlice::MainSlice(QPieSeries *Series, QObject *parent)
     : QPieSlice(parent),
@@ -30,7 +31,7 @@ void MainSlice::updateLabel()
     this->setLabel(QString("%1 %2%").arg(mName).arg(percentage() * 100, 0, 'f', 2));
 }
 
-QPieSeries* MainSlice::series() const{
+QPieSeries* MainSlice::extseries() const{
     return mSeries;
 }
 
@@ -56,17 +57,21 @@ void PieChart::setMaxSlice(){
     }
     if(!maxSlice){
         maxSlice = max;
-        QPieSeries* maxSeries = maxSlice->series();
+        QPieSeries* maxSeries = maxSlice->extseries();
+        maxSeries->setLabelsVisible(true);
+        maxSeries->setLabelsPosition(QPieSlice::LabelOutside);
+    }
+    else if(maxSlice!=max){
+        QPieSeries* maxSeries = maxSlice->extseries();
+        maxSeries->setLabelsVisible(false);
+        maxSlice = max;
+        maxSeries = maxSlice->extseries();
         maxSeries->setLabelsVisible();
         maxSeries->setLabelsPosition(QPieSlice::LabelOutside);
     }
-    if(maxSlice!=max){
-        QPieSeries* maxSeries = maxSlice->series();
-        maxSeries->setLabelsVisible(false);
-        maxSlice = max;
-        maxSeries = maxSlice->series();
-        maxSeries->setLabelsVisible();
-        maxSeries->setLabelsPosition(QPieSlice::LabelOutside);
+    else{
+        QPieSeries* maxSeries = maxSlice->extseries();
+        maxSeries->setLabelsVisible(true);
     }
 }
 
@@ -77,9 +82,30 @@ bool PieChart::colorYetUsed(const QColor& color) const{
     return false;
 }
 
+
+QColor PieChart::createRandomColor(){
+    srand(time(NULL));
+    QColor color = QColor(rand()%255,rand()%255,rand()%255);
+    while(colorYetUsed(color) || color.lightness()>200 ) color = QColor(rand()%255,rand()%255,rand()%255);
+    colors.push_back(color);
+    return color;
+}
+
 void PieChart::updateChartView(){
     setAngles();
     setMaxSlice();
+    for(auto slice : mainSlices){
+        slice->setValue(slice->extseries()->sum());
+    }
+}
+
+void PieChart::setExtSeries(QPieSeries * serie, QColor color, QFont font){
+    const auto slices = serie->slices();
+    for (QPieSlice *slice : slices) {
+        color = color.lighter(105);
+        slice->setBrush(color);
+        slice->setLabelFont(font);
+    }
 }
 
 void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
@@ -100,25 +126,36 @@ void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
 
     externalSeries->setPieSize(0.7);
     externalSeries->setHoleSize(0.6);
-    const auto slices = externalSeries->slices();
-    for (QPieSlice *slice : slices) {
-        color = color.lighter(105);
-        slice->setBrush(color);
-        slice->setLabelFont(font);
-    }
-
+    setExtSeries(externalSeries, color, font);
 
     QChart::addSeries(externalSeries);
 
     PieChart::updateChartView();
 }
 
-QColor PieChart::createRandomColor(){
-    srand(time(NULL));
-    QColor color = QColor(rand()%255,rand()%255,rand()%255);
-    while(colorYetUsed(color) || color.lightness()>200 ) color = QColor(rand()%255,rand()%255,rand()%255);
-    colors.push_back(color);
-    return color;
+void PieChart::mapData(){
+    vector<vector<double>> values = model->getData();
+    vector<QVariant> rowHeaders = model-> getRowsHeaders();
+    vector<QVariant> columnHeaders = model->getColumnsHeaders();
+    for(int row_i = 0; row_i < model->rowCount(); ++row_i){
+        QPieSeries* serie = new QPieSeries();
+        serie->setName(rowHeaders[row_i].toString());
+        for(int column_i = 0; column_i < model->columnCount(); ++column_i){
+            serie->append(columnHeaders[column_i].toString(),values[row_i][column_i]);
+        }
+        insertToPie(serie, createRandomColor());
+    }
+}
+
+
+PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
+    //if(model->isThereZeroRow()) throw new modelError();
+    mainSeries = new QPieSeries();
+    mainSeries->setPieSize(0.6);
+    QChart::addSeries(mainSeries);
+    setTitle("PieChart");
+    legend()->setVisible(false);
+    PieChart::mapData();
 }
 
 void PieChart::insertSeries(){  //UNA SERIE CON TUTTI VALORI A 0 MANDA A PUTTANE LA PIE
@@ -132,51 +169,80 @@ void PieChart::insertSeries(){  //UNA SERIE CON TUTTI VALORI A 0 MANDA A PUTTANE
         serie->append(columnHeaders[column_i].toString(),values[column_i]);
     }
     */
+    if(model->columnCount()==0) return;
+    setVisible(true);
     QPieSeries* serie = new QPieSeries();
     serie->setName("TEST");
     for(int i = 0; i<model->columnCount(); ++i){
         serie->append("test", 10);
     }
     insertToPie(serie,createRandomColor());
-    //if(mainSeries->count()==1) setVisible(true);
 }
 
 void PieChart::removeSeries(){
     if(mainSeries->count()>1){
-        mainSlices.back()->series()->clear();
+        mainSlices.back()->extseries()->clear();
         mainSlices.pop_back();
         mainSeries->remove(mainSeries->slices().back());
         updateChartView();
     }
-    else{
-        mainSlices.back()->series()->clear();
+    else if(mainSeries->count()==1){
+        mainSlices.back()->extseries()->clear();
         mainSlices.pop_back();
         mainSeries->clear();
+        colors.clear();
+        maxSlice=nullptr;
     }
 }
 
-void PieChart::mapData(){
-    vector<vector<double>> values = model->getData();
-    vector<QVariant> rowHeaders = model-> getRowsHeaders();
-    vector<QVariant> columnHeaders = model->getColumnsHeaders();
-    srand(time(NULL));
-    for(int row_i = 0; row_i < model->m_rowCount; ++row_i){
+void PieChart::insertSeriesValue(){
+    setVisible(true);
+    /*
+    vector<vector<double>> data = model->getData();
+    QString label = model->getColumnsHeaders()[model->columnCount()-1].toString();
+    int i=0;
+    for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it, ++i){
+        (*it)->series()->append(new QPieSlice(label,data[i][model->columnCount()-1]));
+    }*/
+    if(model->columnCount()==1 && model->rowCount()>0){
+        /*
+        vector<double> values = model->getData().front();
+        QString rowHeader = model->getRowsHeaders().front().toString();
+        vector<QVariant> columnHeaders = model->getColumnsHeaders();
         QPieSeries* serie = new QPieSeries();
-        serie->setName(rowHeaders[row_i].toString());
-        for(int column_i = 0; column_i < model->m_columnCount; ++column_i){
-            serie->append(columnHeaders[column_i].toString(),values[row_i][column_i]);
-        }
-        insertToPie(serie, createRandomColor());
+        serie->setName(rowHeader);
+        for(int i=0; i<model->columnCount(); ++i){
+            serie->append(columnHeaders[i].toString(), values[i]);
+        }*/
+
+        QPieSeries* serie = new QPieSeries();
+        serie->setName("prova");
+        serie->append("e",2);
+        insertToPie(serie,createRandomColor());
+        updateChartView();
     }
+    if(mainSeries->count()==0) return;
+    for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
+        auto ext = (*it)->extseries();
+        ext->append(new QPieSlice("Ima",10));
+        setExtSeries(ext, (*it)->color(), QFont("Arial",8));
+    }
+    updateChartView();
 }
 
+void PieChart::removeSeriesValue(){
+    //if(mainSeries->count()==0) return;
+    for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
+        QPieSeries* serie = (*it)->extseries();
+        if(serie && !(serie->slices().isEmpty())) serie->remove(serie->slices().back());
+    }
+    updateChartView();
+    if(model->columnCount()==0) setVisible(false);
+}
 
-PieChart::PieChart(DataTableModel *p_model): model(p_model) {
-    if(model->isThereZeroRow()) throw new modelError();
-    mainSeries = new QPieSeries();
-    mainSeries->setPieSize(0.6);
-    QChart::addSeries(mainSeries);
-    setTitle("PieChart");
-    legend()->setVisible(false);
-    PieChart::mapData();
+void PieChart::replaceValue(QModelIndex i, QModelIndex j){
+    cout<<"DIOCANE";
+    auto replacing = mainSlices[i.row()]->extseries()->slices();
+    replacing[j.column()]->setValue(model->getData()[i.row()][j.column()]);
+    updateChartView();
 }

@@ -16,7 +16,7 @@ class LineChart : public Chart
 {
     Q_OBJECT
 private:
-    DataTableModel *model;
+    //DataTableModel *model;
     QCategoryAxis *XAxis;
     QValueAxis *YAxis;
 

@@ -4,7 +4,7 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QModelIndex>
-
+#include "model.h"
 
 using namespace QtCharts;
 
@@ -12,7 +12,7 @@ class Chart : public QChart
 {
     Q_OBJECT
 public:
-    Chart();
+    Chart(DataTableModel*);
 
     virtual void mapData();
     virtual void insertSeries(); // usalo quando aggiungi righe
@@ -26,6 +26,8 @@ public:
 public slots:
     virtual void replaceValue(QModelIndex, QModelIndex);
     virtual void updateSeriesName(Qt::Orientation, int, int);
+protected:
+    DataTableModel* model;
 };
 
 #endif // CHART_H

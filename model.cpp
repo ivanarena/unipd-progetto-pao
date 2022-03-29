@@ -2,7 +2,6 @@
 #include <iostream>
 #include "modelerror.h"
 #include <algorithm>
-
 using namespace std;
 
 bool is_number(const std::string& s)

@@ -33,6 +33,7 @@ private:
     void setAngles();
     bool colorYetUsed(const QColor&) const;
     QColor createRandomColor();
+    void setExtSeries(QPieSeries*, QColor, QFont);
 
 public:
     PieChart(DataTableModel *c_model);
@@ -41,11 +42,11 @@ public:
     virtual void updateChartView() override;
     virtual void insertSeries() override; // add row
     virtual void removeSeries() override;
-    //virtual void insertSeriesValue() override; // add column
-    //virtual void removeSeriesValue() override;
+    virtual void insertSeriesValue() override; // add column
+    virtual void removeSeriesValue() override;
 
 public slots:
-    //virtual void replaceValue(QModelIndex, QModelIndex) override;
+    virtual void replaceValue(QModelIndex, QModelIndex) override;
     //virtual void updateSeriesName(Qt::Orientation, int, int) override;
 
 };
@@ -63,7 +64,7 @@ public:
 
     void setName(QString name);
     QString name() const;
-    QPieSeries* series() const;
+    QPieSeries* extseries() const;
 
 public Q_SLOTS:
     void updateLabel();

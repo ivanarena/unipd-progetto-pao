@@ -1,10 +1,11 @@
 #include <QModelIndex>
 #include "chart.h"
+#include "model.h"
 
-
-Chart::Chart()
+Chart::Chart(DataTableModel* c_model): model(c_model)
 {
-
+    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
+    connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
 }
 
 void Chart::mapData() {}

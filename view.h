@@ -62,10 +62,12 @@ public:
     QTableView * createTableView(DataTableModel *model);
 
 public slots:
-    Scene *createNewTab(DataTableModel *model = new DataTableModel(), QtCharts::QChart *chart = new QtCharts::QChart);
+    Scene *createNewTab(QString, DataTableModel *model = new DataTableModel());
     void closeTab(const int& index);
 
     void changeCurrentChart(int);
+    void setChartSelectorIndex(int);
+    void changeTabName(int);
 
     // QActions methods
     void newTabDialog();

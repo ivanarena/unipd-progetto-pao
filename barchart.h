@@ -12,7 +12,7 @@ class BarChart : public Chart
 {
     Q_OBJECT
 private:
-    DataTableModel *model;
+    //DataTableModel *model;
     QBarCategoryAxis *XAxis;
     QValueAxis *YAxis;
 
