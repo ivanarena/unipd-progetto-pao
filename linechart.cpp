@@ -45,7 +45,7 @@ void LineChart::updateChartView()
 }
 
 LineChart::LineChart(DataTableModel *c_model)
-    : model(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
+    : Chart(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
 {
     setTitle("Line Chart");
     // TODO: set title to bold
@@ -61,9 +61,6 @@ LineChart::LineChart(DataTableModel *c_model)
 
     LineChart::mapData();
 
-
-    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
-    connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
 }
 
 void LineChart::insertSeries()

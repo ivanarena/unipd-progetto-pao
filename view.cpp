@@ -143,7 +143,7 @@ View::View(QWidget *parent)
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
     connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
-    connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(changeTabName(int)));
+    connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(changeTabName(int)));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -170,7 +170,7 @@ View::View(QWidget *parent)
 
 Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
-    Scene *scene = new Scene(model, new Chart());
+    Scene *scene = new Scene(model, new Chart(model));
     tabView->addTab(scene, tabName); // possible conflicts with openfile
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
     chartSelector->setCurrentIndex(-1);
@@ -182,6 +182,8 @@ void View::newTabDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
+    QString tabLabel = QString("Tab name");
+    QLineEdit* tabInput = new QLineEdit(&dialog);
     QString rowsLabel = QString("Rows number");
     QLineEdit *rowsInput = new QLineEdit(&dialog);
     QString colsLabel = QString("Columns number");
@@ -192,6 +194,8 @@ void View::newTabDialog()
 
     form.addRow(new QLabel("Create new table:"));
     form.addRow(new QLabel());
+    form.addRow(tabLabel, tabInput);
+    form.addRow(new QLabel());
     form.addRow(rowsLabel, rowsInput);
     form.addRow(colsLabel, colsInput);
     form.addRow(new QLabel());
@@ -201,15 +205,17 @@ void View::newTabDialog()
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
     int rows, cols;
+    QString tabName;
     bool safe;
 
     if (dialog.exec() == QDialog::Accepted) {
         rows = rowsInput->text().toInt(&safe, 10);
         cols = colsInput->text().toInt(&safe, 10);
+        tabName = tabInput->text();
         if (rows && cols)
         {
             DataTableModel *model = new DataTableModel(rows, cols,nullptr);
-            createNewTab("default",model);
+            createNewTab(tabName,model);
             renameHeadersDialog();
         }
         else dialog.reject();
@@ -312,13 +318,50 @@ void View::setChartSelectorIndex(int tabIndex){
 }
 
 void View::changeTabName(int tabIndex){
-    tabView->widget(tabIndex)->setWindowTitle("changed");
+
+    QString newname = QInputDialog::getText(this,tr(""), tr("New Tab Name:"), QLineEdit::Normal);
+    if(!newname.isEmpty()){
+        tabView->setTabText(tabIndex,newname);
+    }
 }
 
 void View::insertRowTriggered()
 {
-    controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+
+    QString rowLabel = QString("Row Header");
+    QLineEdit *rowInput = new QLineEdit(&dialog);
+    QString defaultValue = QString("Default Value");
+    QLineEdit *valueInput = new QLineEdit(&dialog);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+
+    form.addRow(new QLabel("New Row"));
+    form.addRow(new QLabel());
+    form.addRow(rowLabel, rowInput);
+    form.addRow(new QLabel());
+    form.addRow(defaultValue, valueInput);
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
+
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    double d_value;
+    QString rowHeader;
+
+    if (dialog.exec() == QDialog::Accepted) {
+        d_value = valueInput->text().toDouble();
+        rowHeader = rowInput->text();
+        if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
+        {
+            controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(),rowHeader,d_value);
+            dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
+        }
+        else dialog.reject();
+    }
 }
 
 void View::removeRowTriggered()
@@ -330,7 +373,7 @@ void View::removeRowTriggered()
     }
     catch (const QString &errorMessage)
     {
-        //QMessageBox::critical(this, "Error", errorMessage);
+        QMessageBox::critical(this, "Error", errorMessage);
     }
 
 
@@ -338,8 +381,41 @@ void View::removeRowTriggered()
 
 void View::insertColumnTriggered()
 {
-    controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-    dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeriesValue();
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+
+    QString columnLabel = QString("Column Header");
+    QLineEdit *columnInput = new QLineEdit(&dialog);
+    QString defaultValue = QString("Default Value");
+    QLineEdit *valueInput = new QLineEdit(&dialog);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+
+    form.addRow(new QLabel("New Row"));
+    form.addRow(new QLabel());
+    form.addRow(columnLabel, columnInput);
+    form.addRow(new QLabel());
+    form.addRow(defaultValue, valueInput);
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
+
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    double d_value;
+    QString rowHeader;
+
+    if (dialog.exec() == QDialog::Accepted) {
+        d_value = valueInput->text().toDouble();
+        rowHeader = columnInput->text();
+        if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
+        {
+            controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(),rowHeader,d_value);
+            dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeriesValue();
+        }
+        else dialog.reject();
+    }
 }
 
 void View::removeColumnTriggered()

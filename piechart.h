@@ -20,7 +20,6 @@ class PieChart : public Chart
     Q_OBJECT
 
 private:
-    DataTableModel* model;
     QPieSeries* mainSeries;
     vector<MainSlice*> mainSlices;
     MainSlice* maxSlice;
@@ -46,8 +45,8 @@ public:
     virtual void removeSeriesValue() override;
 
 public slots:
-    //virtual void replaceValue(QModelIndex, QModelIndex) override;
-    //virtual void updateSeriesName(Qt::Orientation, int, int) override;
+    virtual void replaceValue(QModelIndex, QModelIndex) override;
+    virtual void updateSeriesName(Qt::Orientation, int, int) override;
 
 };
 

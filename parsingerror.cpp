@@ -1,9 +1,10 @@
 #include "parsingerror.h"
 
+parsingError::parsingError(const QString& message){
+    setText("Parser found an error");
+    setDetailedText(message);
+}
 
-void parsingError::show() const{
-        QMessageBox error;
-        error.setText("Input is not in the valid form");
-        error.detailedText();
-        error.exec();
+void parsingError::show() {
+    exec();
 }

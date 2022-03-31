@@ -1,14 +1,13 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-enum type {parsingerror, modelerror};
-enum subtype { format , data };
+#include <QMessageBox>
 
-class Error
+class Error: public QMessageBox
 {
 public:
     Error() = default;
-    virtual void show() const = 0;
+    virtual void show()=0;
     virtual ~Error() = default;
 };
 

@@ -13,9 +13,9 @@ public:
 signals:
 
 public slots:
-    void insertRowReceived(DataTableModel *model);
+    void insertRowReceived(DataTableModel *model, const QString&, double);
     void removeRowReceived(DataTableModel *model);
-    void insertColumnReceived(DataTableModel *model);
+    void insertColumnReceived(DataTableModel *model, const QString&, double);
     void removeColumnReceived(DataTableModel *model);
 };
 

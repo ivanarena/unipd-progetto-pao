@@ -33,9 +33,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
 
-    void insertRow();
+    void insertRow(const QString &, double);
     void removeRow();
-    void insertColumn();
+    void insertColumn(const QString&, double);
     void removeColumn();
 
     double max();

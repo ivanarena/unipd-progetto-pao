@@ -79,14 +79,15 @@ Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const // rende mod
 
 bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role) // modifica effettivamente le celle
 {
-    try{
-        if(!is_number(value.toString().toStdString())) throw new modelError(wrong_format);
+    /*try{
+        if(!is_number(value.toString().toStdString())) throw new modelError();
     }
 
     catch(Error* e){
         e->show();
+        delete e;
         return false;
-    }
+    }*/
 
     if (index.isValid() && role == Qt::EditRole)
     {
@@ -115,12 +116,12 @@ bool DataTableModel::setHeaderData(int section, Qt::Orientation orientation, con
     return false;
 }
 
-void DataTableModel::insertRow()
+void DataTableModel::insertRow(const QString& label, double d_value)
 {
     beginResetModel();
-    m_rowsHeaderData.push_back(m_rowCount);
+    m_rowsHeaderData.push_back(label);
     m_rowCount++;
-    m_data.push_back(vector<double>(m_columnCount, 0));
+    m_data.push_back(vector<double>(m_columnCount, d_value));
     endResetModel();
 }
 
@@ -138,13 +139,13 @@ void DataTableModel::removeRow()
 }
 
 
-void DataTableModel::insertColumn()
+void DataTableModel::insertColumn(const QString& label , double d_value)
 {
     beginResetModel();
-    m_columnsHeaderData.push_back(m_columnCount);
+    m_columnsHeaderData.push_back(label);
     m_columnCount++;
     for (int i = 0; i < m_rowCount; i++)
-            m_data.at(i).push_back(0);
+            m_data.at(i).push_back(d_value);
     endResetModel();
 }
 

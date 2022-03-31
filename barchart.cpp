@@ -30,7 +30,7 @@ void BarChart::updateChartView()
 }
 
 BarChart::BarChart(DataTableModel *c_model)
-    : model(c_model), XAxis(new QBarCategoryAxis), YAxis(new QValueAxis), m_series(new QBarSeries)
+    : Chart(c_model), XAxis(new QBarCategoryAxis), YAxis(new QValueAxis), m_series(new QBarSeries)
 {
     setTitle("Bar Chart");
     // TODO: set title to bold
@@ -45,9 +45,6 @@ BarChart::BarChart(DataTableModel *c_model)
     addAxis(YAxis, Qt::AlignLeft);
 
     BarChart::mapData();
-
-    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
-    connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
 }
 
 void BarChart::insertSeries()

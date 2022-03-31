@@ -5,13 +5,12 @@
 #include <QDialog>
 #include "error.h"
 
-enum p_type {};
 
 class parsingError: public Error
 {
 public:
-    parsingError() = default;
-    void show() const;
+    parsingError(const QString& message = "");
+    void show() override;
 };
 
 #endif // PARSINGERROR_H
