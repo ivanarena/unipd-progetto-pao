@@ -411,6 +411,7 @@ void View::insertColumnTriggered()
         rowHeader = columnInput->text();
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
         {
+
             controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(),rowHeader,d_value);
             dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeriesValue();
         }

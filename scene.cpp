@@ -41,7 +41,6 @@ QChartView *Scene::getChartView() const
 void Scene::setActiveChart(int chartIndex)
 {
     QChart *oldChart = chart;
-
     switch (chartIndex)
     {
         case 0:
@@ -59,7 +58,6 @@ void Scene::setActiveChart(int chartIndex)
         default:
             break;
     }
-
     chartView->setChart(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     delete oldChart;

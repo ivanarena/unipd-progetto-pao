@@ -135,6 +135,43 @@ void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
     PieChart::updateChartView();
 }
 
+bool PieChart::isEmpty() const{
+    for(int i = 0; i<model->columnCount(); ++i) for(auto row : model->getData()) if(row[i]!= 0) return false;
+    return true;
+}
+
+bool PieChart::hasNegative() const{
+    for(int i = 0; i<model->columnCount(); ++i) for(auto row : model->getData()) if(row[i]< 0) return true;
+    return false;
+}
+
+void PieChart::clearPie(){
+    mainSeries->clear();
+    for(auto slice : mainSlices) slice->extseries()->clear();
+    mainSlices.clear();
+    maxSlice = nullptr;
+    colors.clear();
+}
+
+void PieChart::checkErrors(){
+    bool empty = isEmpty();
+    bool negative = hasNegative();
+
+    if(empty || negative){
+        state=inconsistent;
+        clearPie();
+        if(empty) throw QString("PieChart cannot be empty");
+        if(negative) throw QString("PieChart cannot have negative values");
+    }
+
+    else if(state!=consistent) state = variating;
+    if(state == variating){
+        PieChart::mapData();
+        state=consistent;
+        throw bool(true);
+    }
+}
+
 void PieChart::mapData(){
     vector<vector<double>> values = model->getData();
     vector<QVariant> rowHeaders = model-> getRowsHeaders();
@@ -151,19 +188,24 @@ void PieChart::mapData(){
 
 
 PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
-    //if(model->isThereZeroRow()) throw
     mainSeries = new QPieSeries();
     mainSeries->setPieSize(0.6);
     QChart::addSeries(mainSeries);
     setTitle("PieChart");
     legend()->setVisible(false);
     setAnimationOptions(QChart::AllAnimations);
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) {return; }
     PieChart::mapData();
 }
 
 
-void PieChart::insertSeries(){  //UNA SERIE CON TUTTI VALORI A 0 MANDA A PUTTANE LA PIE
-    if(model->columnCount()==0) return;
+void PieChart::insertSeries(){
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) { return; }
+
     vector<double> values = model->getData()[model->rowCount()-1];
     vector<QVariant> columnHeaders = model->getColumnsHeaders();
     const QString label = (model->getRowsHeaders()[model->rowCount()-1]).toString();
@@ -176,34 +218,34 @@ void PieChart::insertSeries(){  //UNA SERIE CON TUTTI VALORI A 0 MANDA A PUTTANE
 }
 
 void PieChart::removeSeries(){
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) {return; }
+
     if(mainSeries->count()>1){
         mainSlices.back()->extseries()->clear();
         mainSlices.pop_back();
         mainSeries->remove(mainSeries->slices().back());
         updateChartView();
     }
-    else if(mainSeries->count()==1){
-        mainSlices.back()->extseries()->clear();
-        mainSlices.pop_back();
-        mainSeries->clear();
-        colors.clear();
-        maxSlice=nullptr;
-    }
+    else clearPie();
 }
 
 void PieChart::insertSeriesValue(){
 
-    if(model->columnCount()==1 && model->rowCount()>0){
-        cout<<"H";
-        PieChart::mapData();
-    }
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) { return; }
 
-    if(mainSeries->count()==0) return;
+    if(model->columnCount()==1 && model->rowCount()>0){
+        PieChart::mapData();
+        return;
+    }
 
     else for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
             auto ext = (*it)->extseries();
             vector<vector<double>> data = model->getData();
-            ext->append(new QPieSlice(model->getColumnsHeaders()[model->columnCount()-1].toString(),model->getData()[model->rowCount()-1][model->columnCount()-1]));
+            if(model->rowCount()>0) ext->append(new QPieSlice(model->getColumnsHeaders()[model->columnCount()-1].toString(),model->getData()[model->rowCount()-1][model->columnCount()-1]));
             setExtSeries(ext, (*it)->color(), QFont("Arial",8));
             updateChartView();
          }
@@ -211,13 +253,9 @@ void PieChart::insertSeriesValue(){
 
 
 void PieChart::removeSeriesValue(){
-    if(model->columnCount()==0){
-        mainSeries->clear();
-        for(auto slice : mainSlices) slice->extseries()->clear();
-        mainSlices.clear();
-        maxSlice = nullptr;
-        colors.clear();
-    }
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) {return; }
     if(mainSeries->count()==0) return;
     for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
         QPieSeries* serie = (*it)->extseries();
@@ -228,12 +266,14 @@ void PieChart::removeSeriesValue(){
 
 
 void PieChart::replaceValue(QModelIndex i, QModelIndex j){
+    try {checkErrors();}
+    catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
+    catch(bool) {return; }
     mainSlices[i.row()]->extseries()->slices()[j.column()]->setValue(model->getData()[i.row()][j.column()]);
     updateChartView();
 }
 
 void PieChart::updateSeriesName(Qt::Orientation orientation, int first, int last){
-    setAnimationOptions(QChart::SeriesAnimations);
     if (orientation == Qt::Vertical){
         MainSlice* slice =mainSlices[first];
         slice->setName(model->getRowsHeaders()[last].toString());
