@@ -32,6 +32,7 @@ void BarChart::updateChartView()
 BarChart::BarChart(DataTableModel *c_model)
     : Chart(c_model), XAxis(new QBarCategoryAxis), YAxis(new QValueAxis), m_series(new QBarSeries)
 {
+
     setTitle("Bar Chart");
     // TODO: set title to bold
     legend()->setVisible(true);

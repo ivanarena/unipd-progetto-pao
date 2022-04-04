@@ -44,8 +44,7 @@ public:
     vector<vector<double>> getData() const;
     vector<QVariant> getRowsHeaders() const;
     vector<QVariant> getColumnsHeaders() const;
-
-    bool isThereZeroRow() const;
+    static bool is_number(const std::string& s);
 
 private:
     int m_rowCount;

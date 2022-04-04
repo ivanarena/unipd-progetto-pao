@@ -13,15 +13,14 @@ SOURCES += \
     barchart.cpp \
     chart.cpp \
     controller.cpp \
-    error.cpp \
     jsonparser.cpp \
     linechart.cpp \
     main.cpp \
     model.cpp \
-    modelerror.cpp \
     parser.cpp \
-    parsingerror.cpp \
     piechart.cpp \
+    polarchart.cpp \
+    scatterchart.cpp \
     scene.cpp \
     view.cpp \
     xmlparser.cpp
@@ -30,14 +29,13 @@ HEADERS += \
     barchart.h \
     chart.h \
     controller.h \
-    error.h \
     jsonparser.h \
     linechart.h \
     model.h \
-    modelerror.h \
     parser.h \
-    parsingerror.h \
     piechart.h \
+    polarchart.h \
+    scatterchart.h \
     scene.h \
     view.h \
     xmlparser.h

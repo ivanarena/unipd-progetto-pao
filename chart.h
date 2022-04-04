@@ -8,7 +8,7 @@
 
 using namespace QtCharts;
 
-class Chart : public QChart
+class Chart :public QChart
 {
     Q_OBJECT
 public:

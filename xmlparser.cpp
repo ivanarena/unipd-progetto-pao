@@ -1,11 +1,12 @@
 #include "xmlparser.h"
 #include <iostream>
 using namespace std;
+
+
 DataTableModel* XmlParser::load(QFile& file) const{
-    //cout<<path.toStdString();
     file.open(QIODevice::ReadOnly);
     QDomDocument doc("xml");
-    //if(!doc.setContent(&file)) cout<<"";
+    doc.setContent(&file);
     file.close();
     vector<vector<double>> values;
     vector<QVariant> columnsHeader;
@@ -15,28 +16,39 @@ DataTableModel* XmlParser::load(QFile& file) const{
 
     QDomElement docElem = doc.documentElement();
     QDomNode child = docElem.firstChild();
+    if(child.isNull()) throw QString("Xml file is not well built");
     QDomElement xml_columnsHeaders = child.toElement();
-    //cout<<xml_columnsHeaders.tagName().toStdString();
-    //if(xml_columnsHeaders.tagName()!="Columns") throw new ParsingError();
+    if(xml_columnsHeaders.tagName()!="Columns") throw QString("Columns where not found");
     QString s_columnsHeaders = xml_columnsHeaders.text();
     QStringList l_columnHeaders = s_columnsHeaders.split(',');
-    for(auto it = l_columnHeaders.begin(); it!= l_columnHeaders.end(); ++it , ++columnCount) columnsHeader.push_back(*it);
+    if(l_columnHeaders.count()==1 && l_columnHeaders.front()=="") l_columnHeaders.clear();
+    for(auto it = l_columnHeaders.begin(); it!= l_columnHeaders.end(); ++it) {
+        columnsHeader.push_back(*it);
+    }
     child=child.nextSibling();
     QDomElement xml_rowsHeaders = child.toElement();
-    //if(xml_rowsHeaders.tagName()!="Rows") throw new ParsingError();
+    if(xml_rowsHeaders.tagName()!="Rows") throw QString("Rows where not found");
     QDomNode subchild = xml_rowsHeaders.firstChild();
+    if(columnCount>0 && subchild.isNull()) throw QString("An error was found in the rows section");
     for(int i=0; !subchild.isNull(); ++i , subchild=subchild.nextSibling(), ++rowCount){
         QDomElement xml_rows = subchild.toElement();
         rowsHeaders.push_back(xml_rows.tagName());
         QString s_rowsValues = xml_rows.text();
         QStringList l_rowValues = s_rowsValues.split(',');
+        if(l_rowValues.count()==1 && l_rowValues.front()=="") l_rowValues.clear();
         values.push_back(*new vector<double>);
-        for(auto it = l_rowValues.begin(); it!=l_rowValues.end(); ++it) if(*it!="") values[i].push_back((*it).toDouble());
+        int colCheck=0;
+        for(auto it = l_rowValues.begin(); it!=l_rowValues.end(); ++it, ++colCheck) {
+            if(!DataTableModel::is_number((*it).toStdString())) throw QString("Only numbers accepted as data");
+            if(*it!="") values[i].push_back((*it).toDouble());
+        }
+        if(colCheck!=columnCount)
+            throw QString("All rows must have the same number of elements, and that number must be the number of columns");
     }
-    //if(!n.nextSibling().isNull()) throw new ParsingError();
 
     return new DataTableModel(nullptr, rowCount, columnCount, values, columnsHeader, rowsHeaders);
 }
+
 void XmlParser::save(DataTableModel* model, QFile& file) const{
 
     QDomDocument doc("xml");
@@ -59,6 +71,7 @@ void XmlParser::save(DataTableModel* model, QFile& file) const{
     root.appendChild(rowTag);
 
     vector<QVariant> row_Heads = model->getRowsHeaders();
+
     vector<vector<double>> values = model->getData();
     int i=0;
     for(auto it = row_Heads.begin(); it!= row_Heads.end(); ++it, ++i){

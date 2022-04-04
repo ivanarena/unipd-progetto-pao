@@ -36,9 +36,9 @@
 #include "linechart.h"
 #include "barchart.h"
 #include "pie_chart.h"
+#include "polarchart.h"
+#include "scatterchart.h"
 #include "error.h"
-#include "modelerror.h"
-#include "parsingerror.h"
 #include "xmlparser.h"
 using namespace std;
 
@@ -48,13 +48,16 @@ void View::setToolBar()
     chartSelector->addItem("Line Chart");
     chartSelector->addItem("Bar Chart");
     chartSelector->addItem("Pie Chart");
+    chartSelector->addItem("PolarChart");
+    chartSelector->addItem("ScatterChart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
     toolBar->addAction(newTab);
     toolBar->addSeparator();
     toolBar->addAction(openModel);
-    toolBar->addAction(saveModel);
+    toolBar->addAction(saveModeltoJson);
+    toolBar->addAction(saveModeltoXml);
     toolBar->addSeparator();
     toolBar->addAction(renameHeaders);
     toolBar->addSeparator();
@@ -119,16 +122,15 @@ View::View(QWidget *parent)
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
-    saveModel->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
-    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Alt+J")));
+    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
     saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+X")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
-    removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));
+    removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
 
-
+    QShortcut* save = new QShortcut(QKeySequence(tr("Ctrl+Shift+S")), this);
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
@@ -144,6 +146,7 @@ View::View(QWidget *parent)
     connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
     connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(changeTabName(int)));
+    connect(save, SIGNAL(activated()), this, SLOT(saveFile()));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
 
     setToolBar();
@@ -156,7 +159,7 @@ View::View(QWidget *parent)
 
 
     DataTableModel* model =new DataTableModel(10,10,nullptr);
-    createNewTab("default",model);
+    createNewTab("Project1",model);
 
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -240,6 +243,7 @@ void View::closeTab(const int& index)
 
 void View::renameHeadersDialog()
 {
+    if(tabView->count()==0) return;
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
@@ -314,6 +318,8 @@ void View::setChartSelectorIndex(int tabIndex){
     if(typeid(*current_chart) == typeid(LineChart)) chartIndex=0;
     else if(typeid(*current_chart) == typeid(BarChart)) chartIndex=1;
     else if(typeid(*current_chart) == typeid(PieChart)) chartIndex=2;
+    else if(typeid(*current_chart) == typeid(PolarChart)) chartIndex=3;
+    else if(typeid(*current_chart) == typeid(ScatterChart)) chartIndex=4;
     chartSelector->setCurrentIndex(chartIndex);
 }
 
@@ -325,8 +331,61 @@ void View::changeTabName(int tabIndex){
     }
 }
 
+void View::insertRowCol(DataTableModel* model){
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+
+    QString rowLabel = QString("Row Header");
+    QLineEdit *rowInput = new QLineEdit(&dialog);
+    QString colLabel = QString("Column Header");
+    QLineEdit *colInput = new QLineEdit(&dialog);
+    QString Value = QString("Value");
+    QLineEdit *valueInput = new QLineEdit(&dialog);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+
+    form.addRow(new QLabel("New Model"));
+    form.addRow(new QLabel());
+    form.addRow(rowLabel, rowInput);
+    form.addRow(new QLabel());
+    form.addRow(colLabel,colInput);
+    form.addRow(new QLabel());
+    form.addRow(Value, valueInput);
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
+
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    double value;
+    QString rowHeader;
+    QString colHeader;
+
+    if (dialog.exec() == QDialog::Accepted) {
+        value = valueInput->text().toDouble();
+        rowHeader = rowInput->text();
+        colHeader = colInput->text();
+        if (!valueInput->text().isEmpty() && !rowHeader.isEmpty() && !colHeader.isEmpty())
+        {
+            controller.insertColumnReceived(model,colHeader,value);
+            controller.insertRowReceived(model,rowHeader,value);
+            Chart* chart = dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart());
+            chart->insertSeries();
+            chart->insertSeriesValue();
+        }
+        else dialog.reject();
+    }
+}
+
 void View::insertRowTriggered()
 {
+    if(tabView->count()==0) return;
+    DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
+    if(model->rowCount()==0 && model->columnCount()==0){
+        insertRowCol(model);
+        return;
+    }
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
@@ -357,7 +416,7 @@ void View::insertRowTriggered()
         rowHeader = rowInput->text();
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
         {
-            controller.insertRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(),rowHeader,d_value);
+            controller.insertRowReceived(model,rowHeader,d_value);
             dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
         }
         else dialog.reject();
@@ -366,6 +425,7 @@ void View::insertRowTriggered()
 
 void View::removeRowTriggered()
 {
+    if(tabView->count()==0) return;
     try
     {
         controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
@@ -381,6 +441,12 @@ void View::removeRowTriggered()
 
 void View::insertColumnTriggered()
 {
+    if(tabView->count()==0) return;
+    DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
+    if(model->rowCount()==0 && model->columnCount()==0){
+        insertRowCol(model);
+        return;
+    }
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
@@ -392,7 +458,7 @@ void View::insertColumnTriggered()
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                Qt::Horizontal, &dialog);
 
-    form.addRow(new QLabel("New Row"));
+    form.addRow(new QLabel("New Column"));
     form.addRow(new QLabel());
     form.addRow(columnLabel, columnInput);
     form.addRow(new QLabel());
@@ -412,7 +478,7 @@ void View::insertColumnTriggered()
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
         {
 
-            controller.insertColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(),rowHeader,d_value);
+            controller.insertColumnReceived(model,rowHeader,d_value);
             dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeriesValue();
         }
         else dialog.reject();
@@ -421,6 +487,7 @@ void View::insertColumnTriggered()
 
 void View::removeColumnTriggered()
 {
+    if(tabView->count()==0) return;
     try
     {
         controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
@@ -460,15 +527,15 @@ void View::importFile(){
             tabView->setCurrentIndex(tabView->currentIndex() + 1);
             chartSelector->setCurrentIndex(-1);
         }
-        catch(Error* e){
-            e->show();
-            delete e;
-            importFile();
+        catch(const QString& message ){
+            delete parser;
+            QMessageBox::critical(this,"Error found while parsing",message);
         }
     }
 }
 
 void View::saveFile(){
+    if(tabView->count()==0) return;
     QDialog saveDialog;
     QFormLayout form(&saveDialog);
     QLabel* text = new QLabel("Choose the file format");
@@ -488,18 +555,31 @@ void View::saveFile(){
 }
 
 void View::saveAsJson(){
+    if(tabView->count()==0) return;
     QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
     Parser* parser;
     QFile f(fileName + ".json");
     f.open( QIODevice::WriteOnly );
     parser = new JsonParser();
+    try{
     parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
+    }
+    catch(const QString& message){
+        QMessageBox::critical(this,"Error found while parsing",message);
+    }
     delete parser;
     f.close();
 }
 
 void View::saveAsXml(){
 
+    auto rows_heads = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getRowsHeaders();
+    for(auto head : rows_heads) if(DataTableModel::is_number(head.toString().toStdString())){
+        QMessageBox::critical(this, "Error found while parsing","In Xml files row headers cannot be numbers");
+        return;
+    }
+
+    if(tabView->count()==0) return;
     QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
     Parser* parser;
     QFile f(fileName + ".xml");

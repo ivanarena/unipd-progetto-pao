@@ -1,54 +1,42 @@
-#include "linechart.h"
+#include "scatterchart.h"
 
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QChart>
-#include <QtCharts>
-#include <QLineSeries>
-#include <QModelIndex>
-#include <QValueAxis>
-#include <QHXYModelMapper>
-#include <QCategoryAxis>
-#include <iostream>
-
-using namespace std;
-using namespace QtCharts;
-
-void LineChart::mapData()
+void ScatterChart::mapData()
 {
     vector<vector<double>> data = model->getData();
     for (int i = 0; i < model->rowCount(); i++)
     {
-        QLineSeries *series = new QLineSeries;
+        QScatterSeries *series = new QScatterSeries;
         series->setName(model->getRowsHeaders().at(i).toString());
 
-        for (int j = 0; j < model->columnCount(); j++)
+        for (int j = 0; j < model->columnCount(); j++){
             series->append(QPointF(j, data[i].at(j)));
+            series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        }
 
         addSeries(series);
-        m_series.push_back(series);
+        ScatterSeries.push_back(series);
 
         series->attachAxis(XAxis);
         series->attachAxis(YAxis);
 
     }
 
-    LineChart::updateChartView();
+    ScatterChart::updateChartView();
 }
 
-void LineChart::updateChartView()
+void ScatterChart::updateChartView()
 {
     //setAnimationOptions(QChart::NoAnimation);
-    XAxis->setRange(0, model->columnCount()-1); // set max and min
+    XAxis->setRange(-0.5, model->columnCount()-0.5); // set max and min
     //YAxis->applyNiceNumbers();
-    YAxis->setRange(model->min(), model->max());
+    YAxis->setRange(model->min()-0.5, model->max()+0.5);
 }
 
-LineChart::LineChart(DataTableModel *c_model)
+ScatterChart::ScatterChart(DataTableModel *c_model)
     : Chart(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
 {
 
-    setTitle("Line Chart");
+    setTitle("Scatter Chart");
     // TODO: set title to bold
     setAnimationOptions(QChart::AllAnimations);
 
@@ -60,25 +48,26 @@ LineChart::LineChart(DataTableModel *c_model)
     addAxis(YAxis, Qt::AlignLeft);
 
 
-    LineChart::mapData();
+    ScatterChart::mapData();
 
 }
 
-void LineChart::insertSeries()
+void ScatterChart::insertSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
-    QLineSeries *series = new QLineSeries;
+    QScatterSeries *series = new QScatterSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
 
     for (int j = 0; j < model->columnCount(); j++)
     {
         series->append(QPointF(j, data[model->rowCount() - 1].at(j)));
+        series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     }
 
     addSeries(series);
-    m_series.push_back(series);
+    ScatterSeries.push_back(series);
 
     series->attachAxis(XAxis);
     series->attachAxis(YAxis);
@@ -86,28 +75,28 @@ void LineChart::insertSeries()
     updateChartView();
 }
 
-void LineChart::removeSeries()
+void ScatterChart::removeSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
-    if (m_series.back())
-        QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
+    if (ScatterSeries.back())
+        QChart::removeSeries(dynamic_cast<QScatterSeries *>(ScatterSeries.back()));
     else return;
 
-    delete m_series.back();
+    delete ScatterSeries.back();
 
-    m_series.pop_back();
+    ScatterSeries.pop_back();
 
     updateChartView();
 }
 
-void LineChart::insertSeriesValue()
+void ScatterChart::insertSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
     int i = 0;
-    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    for (auto it = ScatterSeries.begin(); it != ScatterSeries.end(); it++)
     {
         (*it)->append(QPointF(model->columnCount() - 1,
                               data[i].at(model->columnCount() - 1)));
@@ -118,11 +107,11 @@ void LineChart::insertSeriesValue()
     updateChartView();
 }
 
-void LineChart::removeSeriesValue()
+void ScatterChart::removeSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
-    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    for (auto it = ScatterSeries.begin(); it != ScatterSeries.end(); it++)
         (*it)->remove(model->columnCount());
 
     const QString labelToRemove = *XAxis->categoriesLabels().rbegin();
@@ -130,24 +119,24 @@ void LineChart::removeSeriesValue()
     updateChartView();
 }
 
-void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
+void ScatterChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
-    const QPointF oldPoint = m_series[i.row()]->at(j.column());
+    const QPointF oldPoint = ScatterSeries[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
     setAnimationOptions(QChart::SeriesAnimations);
-    m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
+    ScatterSeries[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
     updateChartView();
 }
 
-void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void ScatterChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
     if (orientation == Qt::Vertical)
-        m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
+        ScatterSeries.at(first)->setName(model->getRowsHeaders().at(last).toString());
     else
         XAxis->replaceLabel(XAxis->categoriesLabels().at(first), model->getColumnsHeaders().at(last).toString());
 }

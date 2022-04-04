@@ -49,6 +49,9 @@ private:
     QAction *exitApp;
 
     Controller controller;
+
+    void insertRowCol(DataTableModel*);
+
 public:
     View(QWidget *parent = nullptr);
     ~View();

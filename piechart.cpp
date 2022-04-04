@@ -1,5 +1,4 @@
 #include "piechart.h"
-#include "modelerror.h"
 #include <iostream>
 #include <QMessageBox>
 
@@ -188,12 +187,14 @@ void PieChart::mapData(){
 
 
 PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
+
     mainSeries = new QPieSeries();
     mainSeries->setPieSize(0.6);
     QChart::addSeries(mainSeries);
     setTitle("PieChart");
-    legend()->setVisible(false);
     setAnimationOptions(QChart::AllAnimations);
+    legend()->setVisible(false);
+
     try {checkErrors();}
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) {return; }

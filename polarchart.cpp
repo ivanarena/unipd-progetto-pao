@@ -1,42 +1,28 @@
-#include "linechart.h"
+#include "polarchart.h"
 
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QChart>
-#include <QtCharts>
-#include <QLineSeries>
-#include <QModelIndex>
-#include <QValueAxis>
-#include <QHXYModelMapper>
-#include <QCategoryAxis>
-#include <iostream>
-
-using namespace std;
-using namespace QtCharts;
-
-void LineChart::mapData()
+void PolarChart::mapData()
 {
     vector<vector<double>> data = model->getData();
     for (int i = 0; i < model->rowCount(); i++)
     {
-        QLineSeries *series = new QLineSeries;
+        QSplineSeries *series = new QSplineSeries;
         series->setName(model->getRowsHeaders().at(i).toString());
 
         for (int j = 0; j < model->columnCount(); j++)
             series->append(QPointF(j, data[i].at(j)));
 
-        addSeries(series);
-        m_series.push_back(series);
+        QPolarChart::addSeries(series);
+        SplineSeries.push_back(series);
 
         series->attachAxis(XAxis);
         series->attachAxis(YAxis);
 
     }
 
-    LineChart::updateChartView();
+    PolarChart::updateChartView();
 }
 
-void LineChart::updateChartView()
+void PolarChart::updateChartView()
 {
     //setAnimationOptions(QChart::NoAnimation);
     XAxis->setRange(0, model->columnCount()-1); // set max and min
@@ -44,41 +30,42 @@ void LineChart::updateChartView()
     YAxis->setRange(model->min(), model->max());
 }
 
-LineChart::LineChart(DataTableModel *c_model)
+PolarChart::PolarChart(DataTableModel *c_model)
     : Chart(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
 {
-
-    setTitle("Line Chart");
+    QPolarChart::setTitle("Polar Chart");
+    QPolarChart::setAnimationOptions(QChart::AllAnimations);
     // TODO: set title to bold
-    setAnimationOptions(QChart::AllAnimations);
 
     for (int i = 0; i < model->columnCount(); i++)
         XAxis->append(model->getColumnsHeaders().at(i).toString(), i);
     XAxis->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
 
-    addAxis(XAxis, Qt::AlignBottom);
-    addAxis(YAxis, Qt::AlignLeft);
+    QPolarChart::addAxis(XAxis, QPolarChart::PolarOrientationAngular);
+    QPolarChart::addAxis(YAxis, QPolarChart::PolarOrientationRadial);
 
 
-    LineChart::mapData();
+    PolarChart::mapData();
 
 }
 
-void LineChart::insertSeries()
+void PolarChart::insertSeries()
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
-    QLineSeries *series = new QLineSeries;
+    QSplineSeries *series = new QSplineSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
+
 
     for (int j = 0; j < model->columnCount(); j++)
     {
         series->append(QPointF(j, data[model->rowCount() - 1].at(j)));
     }
 
-    addSeries(series);
-    m_series.push_back(series);
+    QPolarChart::addSeries(series);
+    SplineSeries.push_back(series);
 
     series->attachAxis(XAxis);
     series->attachAxis(YAxis);
@@ -86,28 +73,26 @@ void LineChart::insertSeries()
     updateChartView();
 }
 
-void LineChart::removeSeries()
+void PolarChart::removeSeries()
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
-    if (m_series.back())
-        QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
-    else return;
-
-    delete m_series.back();
-
-    m_series.pop_back();
+    if(!SplineSeries.empty()) {
+        delete SplineSeries.back();
+        SplineSeries.pop_back();
+    }
+    else SplineSeries.clear();
 
     updateChartView();
 }
 
-void LineChart::insertSeriesValue()
+void PolarChart::insertSeriesValue()
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
     int i = 0;
-    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    for (auto it = SplineSeries.begin(); it != SplineSeries.end(); it++)
     {
         (*it)->append(QPointF(model->columnCount() - 1,
                               data[i].at(model->columnCount() - 1)));
@@ -118,11 +103,11 @@ void LineChart::insertSeriesValue()
     updateChartView();
 }
 
-void LineChart::removeSeriesValue()
+void PolarChart::removeSeriesValue()
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+    //QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
-    for (auto it = m_series.begin(); it != m_series.end(); it++)
+    for (auto it = SplineSeries.begin(); it != SplineSeries.end(); it++)
         (*it)->remove(model->columnCount());
 
     const QString labelToRemove = *XAxis->categoriesLabels().rbegin();
@@ -130,24 +115,25 @@ void LineChart::removeSeriesValue()
     updateChartView();
 }
 
-void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
+void PolarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
     vector<vector<double>> data = model->getData();
-    const QPointF oldPoint = m_series[i.row()]->at(j.column());
+    const QPointF oldPoint = SplineSeries[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
-    setAnimationOptions(QChart::SeriesAnimations);
-    m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
+    SplineSeries[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
     updateChartView();
 }
 
-void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void PolarChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
 {
-    setAnimationOptions(QChart::SeriesAnimations);
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
     if (orientation == Qt::Vertical)
-        m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
+        SplineSeries.at(first)->setName(model->getRowsHeaders().at(last).toString());
     else
         XAxis->replaceLabel(XAxis->categoriesLabels().at(first), model->getColumnsHeaders().at(last).toString());
 }
+

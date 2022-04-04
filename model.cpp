@@ -1,11 +1,10 @@
 #include "model.h"
 #include <iostream>
-#include "modelerror.h"
 #include <algorithm>
 
 using namespace std;
 
-bool is_number(const std::string& s)
+bool DataTableModel::is_number(const std::string& s)
 {
     return !s.empty() && std::find_if(s.begin(),
         s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
@@ -204,18 +203,4 @@ vector<QVariant> DataTableModel::getRowsHeaders() const
 vector<QVariant> DataTableModel::getColumnsHeaders() const
 {
     return m_columnsHeaderData;
-}
-
-bool isZeroVector(const vector<double>& v){
-    for(auto it = v.begin(); it!=v.end();++it){
-        if(*it!=0.0) return false;
-    }
-    return true;
-}
-
-bool DataTableModel::isThereZeroRow() const{
-    for(auto it = m_data.begin(); it!= m_data.end(); ++it){
-            if(isZeroVector(*it)) return true;
-    }
-    return false;
 }

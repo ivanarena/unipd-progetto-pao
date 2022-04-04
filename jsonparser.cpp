@@ -3,54 +3,47 @@
 #include <QList>
 #include <QVariant>
 
-#include "parsingerror.h"
 #include <iostream>
-
 
 DataTableModel* JsonParser::load(QFile& file) const {
     file.open(QIODevice::ReadOnly);
     QByteArray loading = file.readAll();
     QJsonDocument JDoc = QJsonDocument::fromJson(loading);
-    //if(!JDoc.isObject()) throw new parsingError;                        //<-----
     QJsonObject JObj = JDoc.object();
+    if(JObj.isEmpty()) throw QString("Json file is not well built");
     vector<QVariant> columnsHeaders;
     vector<QVariant> rowsHeaders;
     vector<vector<double>> values;
 
-// ===============================   COLONNE:
     QJsonValue JV_columns =  JObj[QString("Columns")];
-    //if(!rowsHeaders.isArray()) throw new parsingError();              //<----
+    if(JV_columns.isNull()) throw QString("Columns where not found");
     QJsonArray JA_columns = JV_columns.toArray();
     int col_Count=0;
     for(auto it = JA_columns.begin(); it!=JA_columns.end(); ++it){
         col_Count++;
         columnsHeaders.push_back(((*it).toVariant()));
     }
-// ================================================
 
-
-
-// ===============================  RIGHE:
     QJsonValue JV_rows = JObj[QString("Rows")];
-    //if(!column.isObject()) throw new parsingError();
+    if(JV_rows.isNull()) throw QString("Rows where not found");
     QJsonObject rowsObj=JV_rows.toObject();
     QMap<QString,QVariant> rows_map = rowsObj.toVariantMap();
     int row_Count=0;
     int checkcol;
     for(auto it = rows_map.begin(); it!=rows_map.end(); ++it){
         rowsHeaders.push_back((it.key()));
-        //if(!(it.value()).canConvert<QJsonArray>()) throw new parsingError();
         QList<QVariant> row_Array = (it.value()).toList();
         values.push_back(*(new vector<double>));
         checkcol=0;
         for(auto vit = row_Array.begin(); vit!= row_Array.end(); ++vit){
+            if(!DataTableModel::is_number((*vit).toString().toStdString())) throw QString("Only numbers accepted as data");
             values[row_Count].push_back((*vit).toDouble());
             checkcol++;
         }
-        if(checkcol!=col_Count) throw new parsingError();
+        if(checkcol!=col_Count) throw QString("All rows must have the same number of elements, and that number must be the number of columns");
         row_Count++;
     }
-// ================================================
+
     file.close();
     return new DataTableModel(nullptr, row_Count, col_Count, values, columnsHeaders , rowsHeaders);
 }

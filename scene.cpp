@@ -2,6 +2,8 @@
 #include "barchart.h"
 #include "piechart.h"
 #include "linechart.h"
+#include "polarchart.h"
+#include <scatterchart.h>
 #include <typeinfo>
 
 Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)
@@ -55,6 +57,14 @@ void Scene::setActiveChart(int chartIndex)
             if(typeid(*chart) != typeid(PieChart)) chart = new PieChart(model);
             else return;
             break;
+        /*case 3:
+            if(typeid(*chart) != typeid(PolarChart)) chart = static_cast<QPolarChart*>(new PolarChart(model));
+            else return;
+            break;*/
+        case 4:
+        if(typeid(*chart) != typeid(ScatterChart)) chart = new ScatterChart(model);
+        else return;
+        break;
         default:
             break;
     }
