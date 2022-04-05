@@ -10,9 +10,8 @@
 #include "model.h"
 
 
-class PolarChart : virtual public Chart, virtual public QPolarChart
+class PolarChart : public Chart, virtual public QPolarChart
 {
-    Q_OBJECT;
 private:
     QCategoryAxis *XAxis;
     QValueAxis *YAxis;
