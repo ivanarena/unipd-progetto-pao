@@ -368,8 +368,8 @@ void View::insertRowCol(DataTableModel* model){
         colHeader = colInput->text();
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty() && !colHeader.isEmpty())
         {
-            controller.insertColumnReceived(model,colHeader,value);
             controller.insertRowReceived(model,rowHeader,value);
+            controller.insertColumnReceived(model,colHeader,value);
             Chart* chart = dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart());
             chart->insertSeries();
             chart->insertSeriesValue();

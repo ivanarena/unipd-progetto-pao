@@ -37,7 +37,7 @@ BarChart::BarChart(DataTableModel *c_model)
     // TODO: set title to bold
     legend()->setVisible(true);
     legend()->setAlignment(Qt::AlignTop);
-    setAnimationOptions(QChart::AllAnimations);
+    setAnimationOptions(QChart::NoAnimation);
 
     for (int i = 0; i < model->columnCount(); i++)
         XAxis->append(model->getColumnsHeaders().at(i).toString());

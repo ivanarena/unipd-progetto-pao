@@ -57,10 +57,10 @@ void Scene::setActiveChart(int chartIndex)
             if(typeid(*chart) != typeid(PieChart)) chart = new PieChart(model);
             else return;
             break;
-        /*case 3:
+        case 3:
             if(typeid(*chart) != typeid(PolarChart)) chart = static_cast<QPolarChart*>(new PolarChart(model));
             else return;
-            break;*/
+            break;
         case 4:
         if(typeid(*chart) != typeid(ScatterChart)) chart = new ScatterChart(model);
         else return;

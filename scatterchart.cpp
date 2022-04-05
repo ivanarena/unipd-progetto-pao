@@ -38,7 +38,7 @@ ScatterChart::ScatterChart(DataTableModel *c_model)
 
     setTitle("Scatter Chart");
     // TODO: set title to bold
-    setAnimationOptions(QChart::AllAnimations);
+    setAnimationOptions(QChart::NoAnimation);
 
     for (int i = 0; i < model->columnCount(); i++)
         XAxis->append(model->getColumnsHeaders().at(i).toString(), i);

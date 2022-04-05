@@ -192,7 +192,7 @@ PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
     mainSeries->setPieSize(0.6);
     QChart::addSeries(mainSeries);
     setTitle("PieChart");
-    setAnimationOptions(QChart::AllAnimations);
+    setAnimationOptions(QChart::NoAnimation);
     legend()->setVisible(false);
 
     try {checkErrors();}

@@ -34,7 +34,7 @@ PolarChart::PolarChart(DataTableModel *c_model)
     : Chart(c_model), XAxis(new QCategoryAxis), YAxis(new QValueAxis)
 {
     QPolarChart::setTitle("Polar Chart");
-    QPolarChart::setAnimationOptions(QChart::AllAnimations);
+    QPolarChart::setAnimationOptions(QChart::NoAnimation);
     // TODO: set title to bold
 
     for (int i = 0; i < model->columnCount(); i++)
