@@ -37,6 +37,7 @@ public:
     void removeRow();
     void insertColumn(const QString&, double);
     void removeColumn();
+    void insertRowAndColumn(const QString&, const QString&, double); // only if 0 rows 0 cols
 
     double max();
     double min();

@@ -116,7 +116,7 @@ bool DataTableModel::setHeaderData(int section, Qt::Orientation orientation, con
 }
 
 void DataTableModel::insertRow(const QString& label, double d_value)
-{
+{    
     beginResetModel();
     m_rowsHeaderData.push_back(label);
     m_rowCount++;
@@ -161,6 +161,18 @@ void DataTableModel::removeColumn()
     }
     else throw QString("There are no more columns to remove.");
 }
+
+void DataTableModel::insertRowAndColumn(const QString& rowLabel, const QString& columnLabel, double d_value)
+{
+    beginResetModel();
+    m_rowsHeaderData.push_back(rowLabel);
+    m_columnsHeaderData.push_back(columnLabel);
+    m_rowCount++;
+    m_columnCount++;
+    m_data.push_back(vector<double>(m_columnCount, d_value));
+    endResetModel();
+}
+
 
 double DataTableModel::max()
 {

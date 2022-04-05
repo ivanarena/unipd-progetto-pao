@@ -17,7 +17,7 @@ void Controller::removeRowReceived(DataTableModel *model)
     model->removeRow();
 }
 
-void Controller::insertColumnReceived(DataTableModel *model,const QString& label, double d_value)
+void Controller::insertColumnReceived(DataTableModel *model, const QString& label, double d_value)
 {
     model->insertColumn(label,d_value);
 }
@@ -26,3 +26,9 @@ void Controller::removeColumnReceived(DataTableModel *model)
 {
     model->removeColumn();
 }
+
+void Controller::insertRowAndColumnReceived(DataTableModel *model, const QString& rowLabel, const QString& colLabel, double d_value)
+{
+    model->insertRowAndColumn(rowLabel, colLabel, d_value);
+}
+

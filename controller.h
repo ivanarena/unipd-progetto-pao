@@ -17,6 +17,7 @@ public slots:
     void removeRowReceived(DataTableModel *model);
     void insertColumnReceived(DataTableModel *model, const QString&, double);
     void removeColumnReceived(DataTableModel *model);
+    void insertRowAndColumnReceived(DataTableModel *model, const QString&, const QString&, double);
 };
 
 #endif // CONTROLLER_H
