@@ -2,7 +2,8 @@
     <qresource prefix="/">
         <file>res/new-file.png</file>
         <file>res/open-file.png</file>
-        <file>res/save-file.png</file>
+        <file>res/save-json.png</file>
+        <file>res/save-xml.png</file>
         <file>res/insert-row.png</file>
         <file>res/remove-row.png</file>
         <file>res/insert-column.png</file>
