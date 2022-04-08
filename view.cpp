@@ -45,6 +45,7 @@ using namespace std;
 
 void View::setToolBar()
 {
+    // chartSelector->setPlaceholderText("Choose a chart"); non disponibile in qt 9 rip
     chartSelector->addItem("Line Chart");
     chartSelector->addItem("Bar Chart");
     chartSelector->addItem("Pie Chart");
@@ -93,11 +94,12 @@ void View::setMenus()
     editMenu->addAction(insertColumn);
     editMenu->addAction(removeColumn);
     editMenu->addSeparator();
+
+    // TODO: implementare un menù about
 }
 
 //============================== COSTRUTTORE ===========================================
 
-// IMPORTANTISSIMO!!!!! IMPLEMENTARE UN VETTORE CHE SCORRE I MODELLI E GESTISCE I MODELLI DI OGNI TAB
 View::View(QWidget *parent)
     : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu),
@@ -117,7 +119,7 @@ View::View(QWidget *parent)
     tabView->setTabsClosable(true);
 
     // QActions shortcuts
-    // TODO ADD MORE SHORTCUTS
+    // TODO: settare le shortcut per il salvataggio e le righe/col giuste e togliere quel robo dialog
     QList<QKeySequence> newTabShortcuts;
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
@@ -147,19 +149,14 @@ View::View(QWidget *parent)
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
     connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(changeTabName(int)));
     connect(save, SIGNAL(activated()), this, SLOT(saveFile()));
-    // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // non funzia
+    // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // TODO: sistemare perché non funzia
 
     setToolBar();
     setMenus();
 
-    // VISUALIZER E SELETTORE GRAFICI (DA FARE)
-    // TODO: CREARE UNA QLIST DI PUNTATORI A CHARVIEW PER SCORRERE I GRAFICI
-
-    // TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-
-
-    DataTableModel* model =new DataTableModel(10,10,nullptr);
-    createNewTab("Project1",model);
+    // TODO: TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
+    DataTableModel* model = new DataTableModel(10,10,nullptr);
+    createNewTab("Project1", model);
 
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -174,7 +171,7 @@ View::View(QWidget *parent)
 Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
     Scene *scene = new Scene(model, new Chart(model));
-    tabView->addTab(scene, tabName); // possible conflicts with openfile
+    tabView->addTab(scene, tabName);
     tabView->setCurrentIndex(tabView->currentIndex() + 1);
     chartSelector->setCurrentIndex(-1);
     return scene;
@@ -381,14 +378,20 @@ void View::insertRowTriggered()
 {
     if(tabView->count()==0) return;
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if(model->rowCount()==0 && model->columnCount()==0){
+    if (model->rowCount()==0 && model->columnCount()==0)
+    {
         insertRowCol(model);
         return;
+    } else if (model->columnCount() == 0) {
+        QMessageBox::critical(this, "Error", "There are no columns in your model. You need to add a column first.");
+        insertColumnTriggered();
     }
+
+
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
-    QString rowLabel = QString("Row Header");
+    QString rowLabel = QString("Row Label");
     QLineEdit *rowInput = new QLineEdit(&dialog);
     QString defaultValue = QString("Default Value");
     QLineEdit *valueInput = new QLineEdit(&dialog);
@@ -415,7 +418,7 @@ void View::insertRowTriggered()
         rowHeader = rowInput->text();
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
         {
-            controller.insertRowReceived(model,rowHeader,d_value);
+            controller.insertRowReceived(model, rowHeader, d_value);
             dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeries();
         }
         else dialog.reject();
@@ -445,11 +448,14 @@ void View::insertColumnTriggered()
     if(model->rowCount()==0 && model->columnCount()==0){
         insertRowCol(model);
         return;
+    } else if (model->rowCount() == 0) {
+        QMessageBox::critical(this, "Error", "There are no rows in your model. You need to add a row first.");
+        insertRowTriggered();
     }
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
-    QString columnLabel = QString("Column Header");
+    QString columnLabel = QString("Column Label");
     QLineEdit *columnInput = new QLineEdit(&dialog);
     QString defaultValue = QString("Default Value");
     QLineEdit *valueInput = new QLineEdit(&dialog);

@@ -150,4 +150,6 @@ void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int las
         m_series.at(first)->setName(model->getRowsHeaders().at(last).toString());
     else
         XAxis->replaceLabel(XAxis->categoriesLabels().at(first), model->getColumnsHeaders().at(last).toString());
+
+    updateChartView();
 }
