@@ -34,6 +34,7 @@ private:
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
+    QMenu *aboutMenu;
 
     QAction *newTab;
     QAction *openModel;
@@ -70,7 +71,7 @@ public slots:
 
     void changeCurrentChart(int);
     void setChartSelectorIndex(int);
-    void changeTabName(int);
+    void renameTab(int);
 
     // QActions methods
     void newTabDialog();

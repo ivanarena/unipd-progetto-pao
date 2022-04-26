@@ -45,18 +45,18 @@ using namespace std;
 
 void View::setToolBar()
 {
-    // chartSelector->setPlaceholderText("Choose a chart"); non disponibile in qt 9 rip
-    chartSelector->addItem("Line Chart");
-    chartSelector->addItem("Bar Chart");
-    chartSelector->addItem("Pie Chart");
-    chartSelector->addItem("PolarChart");
-    chartSelector->addItem("ScatterChart");
+    // chartSelector->setPlaceholderText("Choose a chart"); // non disponibile in qt 9 rip
+    chartSelector->addItem(QIcon(":/res/line-chart.png"), "Line Chart");
+    chartSelector->addItem(QIcon(":/res/bar-chart.png"), "Bar Chart");
+    chartSelector->addItem(QIcon(":/res/pie-chart.png"), "Pie Chart");
+    chartSelector->addItem(QIcon(":/res/polar-chart.png"), "PolarChart");
+    chartSelector->addItem(QIcon(":/res/scatter-chart.png"), "ScatterChart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
     toolBar->addAction(newTab);
-    toolBar->addSeparator();
     toolBar->addAction(openModel);
+    toolBar->addSeparator();
     toolBar->addAction(saveModeltoJson);
     toolBar->addAction(saveModeltoXml);
     toolBar->addSeparator();
@@ -96,13 +96,14 @@ void View::setMenus()
     editMenu->addSeparator();
 
     // TODO: implementare un menù about
+    aboutMenu = menuBar->addMenu(tr("&About"));
 }
 
 //============================== COSTRUTTORE ===========================================
 
 View::View(QWidget *parent)
     : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
-      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu),
+      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu),
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
       saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
@@ -147,7 +148,7 @@ View::View(QWidget *parent)
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
     connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
-    connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(changeTabName(int)));
+    connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(renameTab(int)));
     connect(save, SIGNAL(activated()), this, SLOT(saveFile()));
     // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // TODO: sistemare perché non funzia
 
@@ -320,8 +321,7 @@ void View::setChartSelectorIndex(int tabIndex){
     chartSelector->setCurrentIndex(chartIndex);
 }
 
-void View::changeTabName(int tabIndex){
-
+void View::renameTab(int tabIndex) {
     QString newname = QInputDialog::getText(this,tr(""), tr("New Tab Name:"), QLineEdit::Normal);
     if(!newname.isEmpty()){
         tabView->setTabText(tabIndex,newname);
