@@ -132,6 +132,7 @@ View::View(QWidget *parent)
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
+    exitApp->setShortcut(QKeySequence(Qt::Key_Alt + Qt::Key_F4));
 
     QShortcut* save = new QShortcut(QKeySequence(tr("Ctrl+Shift+S")), this);
 
@@ -150,13 +151,13 @@ View::View(QWidget *parent)
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
     connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(renameTab(int)));
     connect(save, SIGNAL(activated()), this, SLOT(saveFile()));
-    // connect(exitApp, SIGNAL(triggered()), this, SLOT(QApplication::quit())); // TODO: sistemare perché non funzia
+    connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
 
     setToolBar();
     setMenus();
 
     // TODO: TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    DataTableModel* model = new DataTableModel(10,10,nullptr);
+    DataTableModel* model = new DataTableModel(4,4,nullptr);
     createNewTab("Project1", model);
 
     mainLayout->addWidget(menuBar, 0, 0);
@@ -245,6 +246,11 @@ void View::renameHeadersDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
+    form.setRowWrapPolicy(QFormLayout::DontWrapRows);
+    form.setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    form.setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    form.setLabelAlignment(Qt::AlignLeft);
+
     vector<QVariant> rowsHeaders = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getRowsHeaders();
     vector<QVariant> columnsHeaders = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getColumnsHeaders();
 
@@ -289,18 +295,31 @@ void View::renameHeadersDialog()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-    // TODO: PREVENT SAME HEADERS NAME IN THE SAME ORIENTATION
+    // TODO: con tante righe/colonne sta roba diventa gigantesca e ingestibile
+
+    // TODO: PREVENT SAME HEADERS NAME IN THE SAME ORIENTATION -- Kinda risolto ma se vuoi tipo shiftarli di uno è un problemino
     if (dialog.exec() == QDialog::Accepted) {
+
         for (unsigned int i = 0; i < rowsHeadersInputs.size(); i++)
         {
             QVariant newHeader = rowsHeadersInputs[i]->text();
             if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Vertical, newHeader);
         }
+
         for (unsigned int i = 0; i < columnsHeadersInputs.size(); i++)
         {
             QVariant newHeader = columnsHeadersInputs[i]->text();
-            if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, newHeader);
+            if (newHeader != "" && std::find(columnsHeaders.begin(), columnsHeaders.end(), newHeader) == columnsHeaders.end())
+                static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, newHeader);
+            else if (newHeader == "") {
+                continue;
+            } else {
+                QMessageBox::critical(this, "Error", "Found column headers with same name.");
+                break;
+            }
         }
+
+
     }
     else dialog.reject();
 }
