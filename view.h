@@ -38,10 +38,10 @@ private:
 
     QAction *newTab;
     QAction *openModel;
-    QAction* saveModel;
     QAction *saveModeltoJson;
     QAction* saveModeltoXml;
     QAction *renameHeaders;
+    QAction *renameTab;
     QAction *insertRow;
     QAction *removeRow;
     QAction *insertColumn;
@@ -72,12 +72,12 @@ public slots:
 
     void changeCurrentChart(int);
     void setChartSelectorIndex(int);
-    void renameTab(int);
+    void renameTabDoubleClick(int);
+    void renameTabFromButton();
 
     // QActions methods
     void newTabDialog();
     void importFile();
-    void saveFile();
     void saveAsJson();
     void saveAsXml();
     void renameHeadersDialog();

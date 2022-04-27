@@ -34,7 +34,6 @@ BarChart::BarChart(DataTableModel *c_model)
 {
 
     setTitle("Bar Chart");
-    // TODO: set title to bold
     legend()->setVisible(true);
     legend()->setAlignment(Qt::AlignTop);
     setAnimationOptions(QChart::NoAnimation);

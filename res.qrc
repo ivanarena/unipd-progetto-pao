@@ -10,6 +10,7 @@
         <file>res/remove-column.png</file>
         <file>res/exit-app.png</file>
         <file>res/rename-headers.png</file>
+        <file>res/rename-tab.png</file>
         <file>res/line-chart.png</file>
         <file>res/bar-chart.png</file>
         <file>res/pie-chart.png</file>

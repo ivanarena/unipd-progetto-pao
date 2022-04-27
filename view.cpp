@@ -61,6 +61,7 @@ void View::setToolBar()
     toolBar->addAction(saveModeltoXml);
     toolBar->addSeparator();
     toolBar->addAction(renameHeaders);
+    toolBar->addAction(renameTab);
     toolBar->addSeparator();
     toolBar->addAction(insertRow);
     toolBar->addAction(removeRow);
@@ -87,6 +88,7 @@ void View::setMenus()
 
     editMenu = menuBar->addMenu(tr("&Edit"));
     editMenu->addAction(renameHeaders);
+    editMenu->addAction(renameTab);
     editMenu->addSeparator();
     editMenu->addAction(insertRow);
     editMenu->addAction(removeRow);
@@ -107,10 +109,10 @@ View::View(QWidget *parent)
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu),
       newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
-      saveModel(new QAction(QIcon(":/res/save-file.png"), "Save", this)),
       saveModeltoJson(new QAction(QIcon(":/res/save-json.png"), "Save as Json", this)),
       saveModeltoXml(new QAction(QIcon(":/res/save-xml.png"), "Save as Xml", this)),
       renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
+      renameTab(new QAction(QIcon(":/res/rename-tab.png"), "Rename tab", this)),
       insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
       insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
@@ -127,8 +129,8 @@ View::View(QWidget *parent)
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
     openModel->setShortcuts(QKeySequence::Open);
-    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+Shift+J")));
-    saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+X")));
+    saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+S")));
+    saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
@@ -136,29 +138,26 @@ View::View(QWidget *parent)
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
     exitApp->setShortcut(QKeySequence(Qt::Key_Alt + Qt::Key_F4));
 
-    QShortcut* save = new QShortcut(QKeySequence(tr("Ctrl+Shift+S")), this);
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(newTab, SIGNAL(triggered()), this, SLOT(newTabDialog()));
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
-    connect(saveModel, SIGNAL(triggered()), this, SLOT(saveFile()));
     connect(saveModeltoJson, SIGNAL(triggered()), this, SLOT(saveAsJson()));
     connect(saveModeltoXml, SIGNAL(triggered()), this, SLOT(saveAsXml()));
     connect(renameHeaders, SIGNAL(triggered()), this, SLOT(renameHeadersDialog()));
+    connect(renameTab, SIGNAL(triggered()), this, SLOT(renameTabFromButton()));
     connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
     connect(removeRow, SIGNAL(triggered()), this, SLOT(removeRowTriggered()));
     connect(insertColumn, SIGNAL(triggered()), this, SLOT(insertColumnTriggered()));
     connect(removeColumn, SIGNAL(triggered()), this, SLOT(removeColumnTriggered()));
     connect(chartSelector, SIGNAL(activated(int)), this, SLOT(changeCurrentChart(int)));
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
-    connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(renameTab(int)));
-    connect(save, SIGNAL(activated()), this, SLOT(saveFile()));
+    connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(renameTabDoubleClick(int)));
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
 
     setToolBar();
     setMenus();
 
-    // TODO: TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
 
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
@@ -252,8 +251,10 @@ void View::renameHeadersDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
+    //form.setMaximumSize(QSize(600, 800));
+    form.setSizeConstraint(QLayout::SetMinAndMaxSize);
     form.setRowWrapPolicy(QFormLayout::DontWrapRows);
-    form.setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    form.setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     form.setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
     form.setLabelAlignment(Qt::AlignLeft);
 
@@ -346,10 +347,21 @@ void View::setChartSelectorIndex(int tabIndex){
     chartSelector->setCurrentIndex(chartIndex);
 }
 
-void View::renameTab(int tabIndex) {
-    QString newname = QInputDialog::getText(this,tr(""), tr("New Tab Name:"), QLineEdit::Normal);
-    if(!newname.isEmpty()){
-        tabView->setTabText(tabIndex,newname);
+void View::renameTabDoubleClick(int tabIndex) {
+    QString newName = QInputDialog::getText(this, tr("Rename current project"), tr("New project name:"), QLineEdit::Normal);
+    if(!newName.isEmpty()){
+        tabView->setTabText(tabIndex, newName);
+    } else {
+        QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
+    }
+}
+
+void View::renameTabFromButton() {
+    QString newName = QInputDialog::getText(this,tr("Rename current project"), tr("New project name:"), QLineEdit::Normal);
+    if(!newName.isEmpty()){
+        tabView->setTabText(tabView->currentIndex(), newName);
+    } else {
+        QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
     }
 }
 
@@ -564,25 +576,6 @@ void View::importFile(){
     }
 }
 
-void View::saveFile(){
-    if(tabView->count()==0) return;
-    QDialog saveDialog;
-    QFormLayout form(&saveDialog);
-    QLabel* text = new QLabel("Choose the file format");
-    text->setAlignment(Qt::AlignCenter);
-    form.addRow(text);
-    form.addRow(new QLabel("          "));
-    QDialogButtonBox buttons;
-    QPushButton* Xml = new QPushButton("Xml",this);
-    QPushButton* Json = new QPushButton("Json", this);
-    buttons.addButton(Xml,QDialogButtonBox::DestructiveRole);
-    buttons.addButton(Json,QDialogButtonBox::DestructiveRole);
-    form.addRow(&buttons);
-    connect(Xml, SIGNAL(clicked()), this, SLOT(saveAsXml()));
-    connect(Json, SIGNAL(clicked()), this, SLOT(saveAsJson()));
-    connect(Xml, SIGNAL(clicked()), &saveDialog, SLOT(reject()));
-    saveDialog.exec();
-}
 
 void View::saveAsJson(){
     if(tabView->count()==0) return;

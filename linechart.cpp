@@ -49,7 +49,6 @@ LineChart::LineChart(DataTableModel *c_model)
 {
 
     setTitle("Line Chart");
-    // TODO: set title to bold
     setAnimationOptions(QChart::NoAnimation);
 
     for (int i = 0; i < model->columnCount(); i++)
