@@ -26,12 +26,14 @@ class View : public QWidget
 private:
     QGridLayout *mainLayout;
     QTabWidget *tabView;
+    QLabel *welcome;
 
     QToolBar *toolBar;
     QMenuBar *menuBar;
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *aboutMenu;
+    QMenu *samples;
 
     QAction *newTab;
     QAction *openModel;
@@ -54,6 +56,8 @@ private:
 
     void insertRowCol(DataTableModel*);
 
+    bool firstStart;
+
 public:
     View(QWidget *parent = nullptr);
     ~View();
@@ -62,6 +66,8 @@ public:
 
     void setToolBar();
     void setMenus();
+    void setWelcome();
+    void checkWelcome();
 
     void createTableView();
     QTableView * createTableView(DataTableModel *model);
@@ -88,6 +94,7 @@ public slots:
 
     void helpDialog();
     void aboutDialog();
+    void openCoronaSample();
 };
 
 #endif // VIEW_H

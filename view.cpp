@@ -75,6 +75,9 @@ void View::setMenus()
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
+    samples = fileMenu->addMenu(tr("&Samples"));
+    samples->setIcon(QIcon(":res/samples.png"));
+    samples->addAction(coronaSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -94,17 +97,30 @@ void View::setMenus()
 
     // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
-    aboutMenu->addAction(coronaSample);
     aboutMenu->addAction(help);
     aboutMenu->addAction(about);
 
 }
 
+void View::setWelcome(){
+    welcome = new QLabel();
+    welcome->setMargin(10);
+    welcome->setAlignment(Qt::AlignCenter);
+    welcome->setText("\n\n Welcome to our chart viewer! \n\n 1. Create a new project or open an already existing one in the format of JSON or XML\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts! \n\n" );
+}
+void View::checkWelcome(){
+    if(firstStart){
+        mainLayout->removeWidget(welcome);
+        mainLayout->addWidget(tabView,3,0);
+        firstStart=false;
+    }
+}
+
 //============================== COSTRUTTORE ===========================================
 
 View::View(QWidget *parent)
-    : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
-      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu),
+    : QWidget(parent), firstStart(true), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
+      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu), samples(new QMenu),
       newTab(new QAction(QIcon(":/res/new-file.png"), "New project", this)),
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open project", this)),
       saveModeltoJson(new QAction(QIcon(":/res/save-json.png"), "Save as Json", this)),
@@ -117,9 +133,10 @@ View::View(QWidget *parent)
       removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
       exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this)),
-      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Sample",this)),
+      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Deaths",this)),
       help(new QAction(QIcon(":/res/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/about.png"), "About...", this))
+
 {
     tabView->setTabsClosable(true);
 
@@ -158,17 +175,22 @@ View::View(QWidget *parent)
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
+    connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
+
 
     setToolBar();
     setMenus();
+    setWelcome();
 
 
     mainLayout->addWidget(menuBar, 0, 0);
+    menuBar->setMaximumHeight(22);
     mainLayout->addWidget(toolBar, 1, 0);
+    toolBar->setMinimumWidth(630);
+    chartSelector->setCurrentIndex(-1);
     tabView->setMinimumSize(800,500);
-    mainLayout->addWidget(tabView, 2, 0);
+    mainLayout->addWidget(welcome,2,0);
     setLayout(mainLayout);
-    createNewTab("", 0);
 
 }
 
@@ -178,6 +200,7 @@ View::View(QWidget *parent)
 
 Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
+    checkWelcome();
     Scene *scene;
     if(model){
         scene = new Scene(model, new Chart(model));
@@ -190,46 +213,45 @@ Scene *View::createNewTab(QString tabName,DataTableModel *model)
 
 void View::newTabDialog()
 {
-    QDialog dialog(this);
-    QFormLayout form(&dialog);
+  QDialog dialog(this);
+  QFormLayout form(&dialog);
 
-    QString tabLabel = QString("Project name");
-    QLineEdit* tabInput = new QLineEdit(&dialog);
-    QString rowsLabel = QString("Rows number");
-    QLineEdit *rowsInput = new QLineEdit(&dialog);
-    QString colsLabel = QString("Columns number");
-    QLineEdit *colsInput = new QLineEdit(&dialog);
+  QString tabLabel = QString("Project name");
+  QLineEdit *tabInput = new QLineEdit(&dialog);
+  QString rowsLabel = QString("Rows number");
+  QLineEdit *rowsInput = new QLineEdit(&dialog);
+  QString colsLabel = QString("Columns number");
+  QLineEdit *colsInput = new QLineEdit(&dialog);
 
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                               Qt::Horizontal, &dialog);
+  QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                             Qt::Horizontal, &dialog);
 
-    form.addRow(new QLabel("Create new table:"));
-    form.addRow(new QLabel());
-    form.addRow(tabLabel, tabInput);
-    form.addRow(new QLabel());
-    form.addRow(rowsLabel, rowsInput);
-    form.addRow(colsLabel, colsInput);
-    form.addRow(new QLabel());
-    form.addRow(&buttonBox);
+  form.addRow(new QLabel("Create new table:"));
+  form.addRow(new QLabel());
+  form.addRow(tabLabel, tabInput);
+  form.addRow(new QLabel());
+  form.addRow(rowsLabel, rowsInput);
+  form.addRow(colsLabel, colsInput);
+  form.addRow(new QLabel());
+  form.addRow(&buttonBox);
 
-    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-    int rows, cols;
-    QString tabName;
-    bool safe;
+  int rows, cols;
+  QString tabName;
+  bool safe;
 
-    if (dialog.exec() == QDialog::Accepted) {
-        rows = rowsInput->text().toInt(&safe, 10);
-        cols = colsInput->text().toInt(&safe, 10);
-        tabName = tabInput->text();
-        if (rows && cols)
-        {
-            DataTableModel *model = new DataTableModel(rows, cols,nullptr);
-            createNewTab(tabName,model);
-            renameHeadersDialog();
-        }
-        else dialog.reject();
+  if (dialog.exec() == QDialog::Accepted) {
+    rows = rowsInput->text().toInt(&safe, 10);
+    cols = colsInput->text().toInt(&safe, 10);
+    tabName = tabInput->text();
+    if (rows && cols) {
+      DataTableModel *model = new DataTableModel(rows, cols, nullptr);
+      createNewTab(tabName, model);
+      renameHeadersDialog();
+    } else
+      dialog.reject();
     }
 }
 
@@ -568,7 +590,6 @@ void View::importFile(){
         try{
             DataTableModel* model = parser->load(file);
             delete parser;
-
             createNewTab(filename,model);
             tabView->setCurrentIndex(tabView->currentIndex() + 1);
             chartSelector->setCurrentIndex(-1);
@@ -625,6 +646,19 @@ void View::helpDialog() {
 void View::aboutDialog() {
     QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++";
     QMessageBox::information(this, "About this", text);
+}
+
+void View::openCoronaSample(){
+    QFile file(":/res/CovidDeaths2020_FocusOnEu.json");
+    QString filename("CovidDeaths2020_FocusOnEu");
+    JsonParser parser;
+    try{
+        createNewTab(filename,parser.load(file));
+        tabView->setCurrentIndex(tabView->currentIndex() + 1);
+        chartSelector->setCurrentIndex(1);
+        changeCurrentChart(1);
+    }
+    catch(QString) {};
 }
 
 View::~View()

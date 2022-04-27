@@ -1,0 +1,41 @@
+{
+    "Columns": [
+        "March 2020"
+
+    ],
+    "Rows": {
+        "World" : [
+            44661
+        ],
+        "Europe": [
+            31013
+        ],
+        "North America": [
+            5796
+        ],
+        "South America" : [
+            484
+        ],
+        "Asia": [
+            7141
+        ],
+        "Africa" : [
+            198
+        ],
+        "Italy": [
+            12428
+        ],
+        "Spain": [
+            8496
+        ],
+        "France": [
+            3526
+        ],
+        "Germany":[
+            583
+        ],
+        "United Kingdom":[
+            2456
+        ]
+    }
+}
