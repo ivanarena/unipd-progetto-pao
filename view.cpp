@@ -5,11 +5,9 @@
 #include "controller.h"
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
-#include <QLineSeries>
 #include <QGridLayout>
 #include <QApplication>
 #include <QStyle>
-#include <QVXYModelMapper>
 #include <QHeaderView>
 #include <QTabWidget>
 #include <QToolButton>
@@ -18,9 +16,6 @@
 #include <QList>
 #include <QAbstractButton>
 #include <QPushButton>
-#include <QVPieModelMapper>
-#include <QtCharts/QPieSlice>
-#include <QtCharts/QPieSeries>
 #include <QMenu>
 #include <QComboBox>
 #include <QKeySequence>
@@ -79,8 +74,8 @@ void View::setMenus()
 {
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
-    fileMenu->addSeparator();
     fileMenu->addAction(openModel);
+    fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
     fileMenu->addSeparator();
@@ -100,6 +95,9 @@ void View::setMenus()
     // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
     aboutMenu->addAction(coronaSample);
+    aboutMenu->addAction(help);
+    aboutMenu->addAction(about);
+
 }
 
 //============================== COSTRUTTORE ===========================================
@@ -107,24 +105,25 @@ void View::setMenus()
 View::View(QWidget *parent)
     : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu),
-      newTab(new QAction(QIcon(":/res/new-file.png"), "New", this)),
-      openModel(new QAction(QIcon(":/res/open-file.png"), "Open", this)),
+      newTab(new QAction(QIcon(":/res/new-file.png"), "New project", this)),
+      openModel(new QAction(QIcon(":/res/open-file.png"), "Open project", this)),
       saveModeltoJson(new QAction(QIcon(":/res/save-json.png"), "Save as Json", this)),
       saveModeltoXml(new QAction(QIcon(":/res/save-xml.png"), "Save as Xml", this)),
       renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
-      renameTab(new QAction(QIcon(":/res/rename-tab.png"), "Rename tab", this)),
+      renameTab(new QAction(QIcon(":/res/rename-tab.png"), "Rename project", this)),
       insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
       removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
       insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
       removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
       exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this)),
-      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Sample",this))
+      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Sample",this)),
+      help(new QAction(QIcon(":/res/help.png"), "User guide", this)),
+      about(new QAction(QIcon(":/res/about.png"), "About...", this))
 {
     tabView->setTabsClosable(true);
 
     // QActions shortcuts
-    // TODO: settare le shortcut per il salvataggio e le righe/col giuste e togliere quel robo dialog
     QList<QKeySequence> newTabShortcuts;
     newTabShortcuts << QKeySequence::New << QKeySequence::AddTab;
     newTab->setShortcuts(newTabShortcuts);
@@ -132,11 +131,14 @@ View::View(QWidget *parent)
     saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+S")));
     saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
+    renameTab->setShortcut(QKeySequence(tr("Ctrl+Shift+T")));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     removeRow->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
     insertColumn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_K));
     removeColumn->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
     exitApp->setShortcut(QKeySequence(Qt::Key_Alt + Qt::Key_F4));
+    help->setShortcut(QKeySequence(Qt::Key_F11));
+    about->setShortcut(QKeySequence(Qt::Key_Alt + Qt::Key_Comma));
 
 
     connect(tabView, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
@@ -154,6 +156,8 @@ View::View(QWidget *parent)
     connect(tabView, SIGNAL(tabBarClicked(int)), this, SLOT(setChartSelectorIndex(int)));
     connect(tabView, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(renameTabDoubleClick(int)));
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
+    connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
+    connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
 
     setToolBar();
     setMenus();
@@ -189,7 +193,7 @@ void View::newTabDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
-    QString tabLabel = QString("Tab name");
+    QString tabLabel = QString("Project name");
     QLineEdit* tabInput = new QLineEdit(&dialog);
     QString rowsLabel = QString("Rows number");
     QLineEdit *rowsInput = new QLineEdit(&dialog);
@@ -611,6 +615,16 @@ void View::saveAsXml(){
     parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
     delete parser;
     f.close();
+}
+
+void View::helpDialog() {
+    QString guide = "1. Create a new project or open an already existing one in the format of JSON or XML\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts!";
+    QMessageBox::question(this, "User guide", guide, QMessageBox::Ok, QMessageBox::NoButton);
+}
+
+void View::aboutDialog() {
+    QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++";
+    QMessageBox::information(this, "About this", text);
 }
 
 View::~View()

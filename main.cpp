@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     View gui;
+    gui.setWindowTitle("Progetto P.A.O.");
     gui.show();
 
     return app.exec();

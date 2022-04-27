@@ -3,7 +3,7 @@
 #include "piechart.h"
 #include "linechart.h"
 #include "polarchart.h"
-#include <scatterchart.h>
+#include "scatterchart.h"
 #include <typeinfo>
 
 Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)

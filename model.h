@@ -5,8 +5,6 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
-//#include "parser.h"
-//#include "jsonparser.h"
 
 using namespace std;
 

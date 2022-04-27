@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QWidget>
 #include <QTableView>
 #include <QGridLayout>
 #include <QtCharts>

@@ -1,8 +1,6 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
 #include <QTableView>
 #include <QMenuBar>
 #include <QGridLayout>
@@ -11,7 +9,6 @@
 #include <QtCharts/QChartView>
 #include <QToolBar>
 #include <QMenu>
-#include <QMenuBar>
 #include "model.h"
 #include "controller.h"
 #include "parser.h"
@@ -48,7 +45,10 @@ private:
     QAction *removeColumn;
     QComboBox *chartSelector;
     QAction *exitApp;
-    QAction* coronaSample;
+    QAction *coronaSample;
+
+    QAction *help;
+    QAction *about;
 
     Controller controller;
 
@@ -85,6 +85,9 @@ public slots:
     void removeRowTriggered();
     void insertColumnTriggered();
     void removeColumnTriggered();
+
+    void helpDialog();
+    void aboutDialog();
 };
 
 #endif // VIEW_H

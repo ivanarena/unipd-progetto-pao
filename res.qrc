@@ -17,5 +17,7 @@
         <file>res/polar-chart.png</file>
         <file>res/scatter-chart.png</file>
         <file>res/corona.png</file>
+        <file>res/help.png</file>
+        <file>res/about.png</file>
     </qresource>
 </RCC>
