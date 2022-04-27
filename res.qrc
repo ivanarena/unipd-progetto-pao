@@ -15,5 +15,6 @@
         <file>res/pie-chart.png</file>
         <file>res/polar-chart.png</file>
         <file>res/scatter-chart.png</file>
+        <file>res/corona.png</file>
     </qresource>
 </RCC>

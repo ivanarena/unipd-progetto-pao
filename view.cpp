@@ -97,6 +97,7 @@ void View::setMenus()
 
     // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
+    aboutMenu->addAction(coronaSample);
 }
 
 //============================== COSTRUTTORE ===========================================
@@ -115,7 +116,8 @@ View::View(QWidget *parent)
       insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
       removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
-      exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this))
+      exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this)),
+      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Sample",this))
 {
     tabView->setTabsClosable(true);
 
@@ -157,13 +159,14 @@ View::View(QWidget *parent)
     setMenus();
 
     // TODO: TOGLIERE LA DEFAULT TAB UNA VOLTA CHE IL PROGETTO È FINITO PERCHÈ È STUPIDO PARTIRE DA UN SAMPLE
-    DataTableModel* model = new DataTableModel(4,4,nullptr);
-    createNewTab("Project1", model);
 
     mainLayout->addWidget(menuBar, 0, 0);
     mainLayout->addWidget(toolBar, 1, 0);
+    tabView->setMinimumSize(800,500);
     mainLayout->addWidget(tabView, 2, 0);
     setLayout(mainLayout);
+    createNewTab("", 0);
+
 }
 
 
@@ -172,10 +175,13 @@ View::View(QWidget *parent)
 
 Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
-    Scene *scene = new Scene(model, new Chart(model));
-    tabView->addTab(scene, tabName);
-    tabView->setCurrentIndex(tabView->currentIndex() + 1);
-    chartSelector->setCurrentIndex(-1);
+    Scene *scene;
+    if(model){
+        scene = new Scene(model, new Chart(model));
+        tabView->addTab(scene, tabName);
+        tabView->setCurrentIndex(tabView->currentIndex() + 1);
+        chartSelector->setCurrentIndex(-1);
+    }
     return scene;
 }
 
@@ -596,7 +602,7 @@ void View::saveAsJson(){
 }
 
 void View::saveAsXml(){
-
+    if(tabView->count()==0) return;
     auto rows_heads = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getRowsHeaders();
     for(auto head : rows_heads) if(DataTableModel::is_number(head.toString().toStdString())){
         QMessageBox::critical(this, "Error found while parsing","In Xml files row headers cannot be numbers");

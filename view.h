@@ -48,6 +48,7 @@ private:
     QAction *removeColumn;
     QComboBox *chartSelector;
     QAction *exitApp;
+    QAction* coronaSample;
 
     Controller controller;
 
