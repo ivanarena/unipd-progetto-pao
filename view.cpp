@@ -44,8 +44,8 @@ void View::setToolBar()
     chartSelector->addItem(QIcon(":/res/line-chart.png"), "Line Chart");
     chartSelector->addItem(QIcon(":/res/bar-chart.png"), "Bar Chart");
     chartSelector->addItem(QIcon(":/res/pie-chart.png"), "Pie Chart");
-    chartSelector->addItem(QIcon(":/res/polar-chart.png"), "PolarChart");
-    chartSelector->addItem(QIcon(":/res/scatter-chart.png"), "ScatterChart");
+    chartSelector->addItem(QIcon(":/res/polar-chart.png"), "Polar Chart");
+    chartSelector->addItem(QIcon(":/res/scatter-chart.png"), "Scatter Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -75,7 +75,7 @@ void View::setMenus()
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
-    samples = fileMenu->addMenu(tr("&Samples"));
+    samples = fileMenu->addMenu(tr("&Open Sample"));
     samples->setIcon(QIcon(":res/samples.png"));
     samples->addAction(coronaSample);
     fileMenu->addSeparator();
@@ -104,15 +104,16 @@ void View::setMenus()
 
 void View::setWelcome(){
     welcome = new QLabel();
-    welcome->setMargin(10);
-    welcome->setAlignment(Qt::AlignCenter);
-    welcome->setText("\n\n Welcome to our chart viewer! \n\n 1. Create a new project or open an already existing one in the format of JSON or XML\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts! \n\n" );
+    welcome->setMargin(20);
+    welcome->setAlignment(Qt::AlignJustify);
+    QString welcomeText = "\n\nWelcome to our Qt application!\n\n1. Create a new project or open an already existing one in the format of JSON or XML.\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels. (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts!\n\n";
+    welcome->setText(welcomeText);
 }
 void View::checkWelcome(){
     if(firstStart){
         mainLayout->removeWidget(welcome);
         mainLayout->addWidget(tabView,3,0);
-        firstStart=false;
+        firstStart = false;
     }
 }
 
@@ -184,7 +185,7 @@ View::View(QWidget *parent)
 
 
     mainLayout->addWidget(menuBar, 0, 0);
-    menuBar->setMaximumHeight(22);
+    menuBar->setMaximumHeight(30);
     mainLayout->addWidget(toolBar, 1, 0);
     toolBar->setMinimumWidth(630);
     chartSelector->setCurrentIndex(-1);
@@ -226,7 +227,7 @@ void View::newTabDialog()
   QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                              Qt::Horizontal, &dialog);
 
-  form.addRow(new QLabel("Create new table:"));
+  form.addRow(new QLabel("Create new project"));
   form.addRow(new QLabel());
   form.addRow(tabLabel, tabInput);
   form.addRow(new QLabel());
@@ -293,7 +294,7 @@ void View::renameHeadersDialog()
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                Qt::Horizontal, &dialog);
 
-    form.addRow(new QLabel("Rename table headers:"));
+    form.addRow(new QLabel("Rename table headers"));
     form.addRow(new QLabel());
     form.addRow(new QLabel("Rows headers:"));
 
@@ -639,7 +640,7 @@ void View::saveAsXml(){
 }
 
 void View::helpDialog() {
-    QString guide = "1. Create a new project or open an already existing one in the format of JSON or XML\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts!";
+    QString guide = "1. Create a new project or open an already existing one in the format of JSON or XML\n\n2. Choose a name and table size for your project.\n\n3. Change the headers labels. (optional)\n\n4. Fill the table with your data.\n\n5. Choose a chart to display and enjoy the magic of QtCharts!";
     QMessageBox::question(this, "User guide", guide, QMessageBox::Ok, QMessageBox::NoButton);
 }
 

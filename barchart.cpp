@@ -26,7 +26,9 @@ void BarChart::mapData()
 
 void BarChart::updateChartView()
 {
-    YAxis->setRange(model->min(), model->max());
+    double min = model->min();
+    if (min >= 0) YAxis->setRange(0, model->max());
+    else YAxis->setRange(min, model->max());
 }
 
 BarChart::BarChart(DataTableModel *c_model)
