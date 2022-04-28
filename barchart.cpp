@@ -58,7 +58,7 @@ void BarChart::insertSeries()
     QBarSet *set = new QBarSet(label);
 
     for (int j = 0; j < model->columnCount(); j++)
-        set->append(data[model->columnCount() - 1].at(j));
+        set->append(data[model->rowCount() - 1].at(j));
 
     m_series->append(set);
     m_sets.push_back(set);
