@@ -10,13 +10,13 @@ DataTableModel* JsonParser::load(QFile& file) const {
     QByteArray loading = file.readAll();
     QJsonDocument JDoc = QJsonDocument::fromJson(loading);
     QJsonObject JObj = JDoc.object();
-    if(JObj.isEmpty()) throw QString("Json file is not well built");
+    if(JObj.isEmpty()) throw true;
     vector<QVariant> columnsHeaders;
     vector<QVariant> rowsHeaders;
     vector<vector<double>> values;
 
     QJsonValue JV_columns =  JObj[QString("Columns")];
-    if(JV_columns.isNull()) throw QString("Columns where not found");
+    if(JV_columns.isNull()) throw true;
     QJsonArray JA_columns = JV_columns.toArray();
     int col_Count=0;
     for(auto it = JA_columns.begin(); it!=JA_columns.end(); ++it){
@@ -25,7 +25,7 @@ DataTableModel* JsonParser::load(QFile& file) const {
     }
 
     QJsonValue JV_rows = JObj[QString("Rows")];
-    if(JV_rows.isNull()) throw QString("Rows where not found");
+    if(JV_rows.isNull()) throw true;
     QJsonObject rowsObj=JV_rows.toObject();
     QMap<QString,QVariant> rows_map = rowsObj.toVariantMap();
     int row_Count=0;
@@ -36,11 +36,11 @@ DataTableModel* JsonParser::load(QFile& file) const {
         values.push_back(*(new vector<double>));
         checkcol=0;
         for(auto vit = row_Array.begin(); vit!= row_Array.end(); ++vit){
-            if(!DataTableModel::is_number((*vit).toString().toStdString())) throw QString("Only numbers accepted as data");
+            if(!DataTableModel::is_number(((*vit).toString().replace("-","")).toStdString())) throw true;
             values[row_Count].push_back((*vit).toDouble());
             checkcol++;
         }
-        if(checkcol!=col_Count) throw QString("All rows must have the same number of elements, and that number must be the number of columns");
+        if(checkcol!=col_Count) throw true;
         row_Count++;
     }
 

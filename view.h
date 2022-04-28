@@ -50,6 +50,7 @@ private:
     QAction *exitApp;
 
     QAction *coronaSample;
+    QAction *cryptoSample;
 
 
     QAction *help;
@@ -60,6 +61,7 @@ private:
     void insertRowCol(DataTableModel*);
 
     bool firstStart;
+    QString currentDirectory = "/home";
 
 public:
     View(QWidget *parent = nullptr);
@@ -99,6 +101,7 @@ public slots:
     void helpDialog();
     void aboutDialog();
     void openCoronaSample();
+    void openCryptoSample();
 };
 
 #endif // VIEW_H

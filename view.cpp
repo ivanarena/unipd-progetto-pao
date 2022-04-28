@@ -77,8 +77,9 @@ void View::setMenus()
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
     samples = fileMenu->addMenu(tr("&Open Sample"));
-    samples->setIcon(QIcon(":res/samples.png"));
-    samples->addAction(coronaSample);
+        samples->setIcon(QIcon(":res/samples.png"));
+        samples->addAction(cryptoSample);
+        samples->addAction(coronaSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -138,6 +139,7 @@ View::View(QWidget *parent)
       chartSelector(new QComboBox),
       exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this)),
       coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Deaths",this)),
+      cryptoSample(new QAction(QIcon(":/res/crypto.png"), "Crypto Stats",this)),
       help(new QAction(QIcon(":/res/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/about.png"), "About...", this))
 
@@ -182,6 +184,7 @@ View::View(QWidget *parent)
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
     connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
+    connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
 
 
     setToolBar();
@@ -382,7 +385,8 @@ void View::setChartSelectorIndex(int tabIndex){
 void View::saveChartToPng() {
     if (chartSelector->currentIndex() != -1 && tabView->count() > 0)
     {
-        QString filename = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("Images (*.png)"));
+        QString filename = QFileDialog::getSaveFileName(this, tr("Save file"), currentDirectory, tr("Images (*.png)"));
+
         QPixmap p = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->grab();
         p.save(filename, "PNG");
     } else {
@@ -391,20 +395,34 @@ void View::saveChartToPng() {
 }
 
 void View::renameTabDoubleClick(int tabIndex) {
-    QString newName = QInputDialog::getText(this, tr("Rename current project"), tr("New project name:"), QLineEdit::Normal);
-    if(!newName.isEmpty()){
-        tabView->setTabText(tabIndex, newName);
-    } else {
-        QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
+    if(tabView->count()==0) return;
+    QInputDialog dialog;
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setLabelText("Rename current project");
+    dialog.setTextValue("New Name");
+    if(dialog.exec()){
+        QString newName = dialog.textValue();
+        if(!newName.isEmpty()){
+            tabView->setTabText(tabIndex, newName);
+        } else {
+            QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
+        }
     }
 }
 
 void View::renameTabFromButton() {
-    QString newName = QInputDialog::getText(this,tr("Rename current project"), tr("New project name:"), QLineEdit::Normal);
-    if(!newName.isEmpty()){
-        tabView->setTabText(tabView->currentIndex(), newName);
-    } else {
-        QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
+    if(tabView->count()==0) return;
+    QInputDialog dialog;
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setLabelText("Rename current project");
+    dialog.setTextValue("New Name");
+    if(dialog.exec()){
+        QString newName = dialog.textValue();
+        if(!newName.isEmpty()){
+            tabView->setTabText(tabView->currentIndex(), newName);
+        } else {
+            QMessageBox::critical(this, "Error", "You didn't insert any name for the project.");
+        }
     }
 }
 
@@ -586,12 +604,14 @@ void View::removeColumnTriggered()
 
 void View::importFile(){
 
-    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),"/home", tr("Json files (*.json);;XML files (*.xml)"));
+    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),currentDirectory, tr("Json files (*.json);;XML files (*.xml)"));
     QFile file(import);
     if(import != ""){
 
         QFileInfo fileInfo(file.fileName());
         QString filename(fileInfo.fileName());
+        QString  temp(import);
+        currentDirectory = temp.replace(filename,"");
 
         Parser* parser;
 
@@ -611,19 +631,44 @@ void View::importFile(){
             tabView->setCurrentIndex(tabView->currentIndex() + 1);
             chartSelector->setCurrentIndex(-1);
         }
-        catch(const QString& message ){
+        catch(bool){
             delete parser;
-            QMessageBox::critical(this,"Error found while parsing",message);
+            QMessageBox error;
+            QMessageBox format;
+            QPixmap image;
+            if(import.endsWith(".json")){
+                image= QPixmap(":/res/jsonformat.png");
+            }
+            else if(import.endsWith(".xml")){
+                image = QPixmap(":/res/xmlformat.png");
+            }
+            error.setIcon(QMessageBox::Critical);
+            error.setText("Error found while parsing");
+            error.addButton(new QPushButton("Ok"), QMessageBox::RejectRole);
+            error.addButton(new QPushButton("More"), QMessageBox::AcceptRole);
+            if (error.exec()== QDialog::Accepted){
+                format.setIconPixmap(image);
+                format.exec();
+            }
         }
     }
 }
 
 
 void View::saveAsJson(){
-    if(tabView->count()==0) return;
-    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
+    if(tabView->count()==0) {
+        QMessageBox::critical(this, "Error", "There is no active data to export.");
+        return;
+    }
+    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), currentDirectory );
     Parser* parser;
     QFile f(fileName + ".json");
+
+    QFileInfo fileInfo(f.fileName());
+    QString filename(fileInfo.fileName());
+    QString  temp(fileName);
+    currentDirectory = temp.replace(filename,"");
+
     f.open( QIODevice::WriteOnly );
     parser = new JsonParser();
     try{
@@ -637,7 +682,10 @@ void View::saveAsJson(){
 }
 
 void View::saveAsXml(){
-    if(tabView->count()==0) return;
+    if(tabView->count()==0) {
+        QMessageBox::critical(this, "Error", "There is no active data to export.");
+        return;
+    }
     auto rows_heads = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getRowsHeaders();
     for(auto head : rows_heads) if(DataTableModel::is_number(head.toString().toStdString())){
         QMessageBox::critical(this, "Error found while parsing","In Xml files row headers cannot be numbers");
@@ -645,9 +693,15 @@ void View::saveAsXml(){
     }
 
     if(tabView->count()==0) return;
-    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), "/home" );
+    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Select a directory"), currentDirectory );
     Parser* parser;
     QFile f(fileName + ".xml");
+
+    QFileInfo fileInfo(f.fileName());
+    QString filename(fileInfo.fileName());
+    QString  temp(fileName);
+    currentDirectory = temp.replace(filename,"");
+
     f.open( QIODevice::WriteOnly );
     parser = new XmlParser();
     parser->save(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel(), f);
@@ -667,15 +721,26 @@ void View::aboutDialog() {
 
 void View::openCoronaSample(){
     QFile file(":/res/CovidDeaths2020_FocusOnEu.json");
-    QString filename("CovidDeaths2020_FocusOnEu");
+    QString filename("Covid Deaths");
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
-        tabView->setCurrentIndex(tabView->currentIndex() + 1);
         chartSelector->setCurrentIndex(1);
         changeCurrentChart(1);
     }
-    catch(QString) {};
+    catch(bool) {};
+}
+
+void View::openCryptoSample(){
+    QFile file(":/res/Crypto.json");
+    QString filename("Crypto");
+    JsonParser parser;
+    try{
+        createNewTab(filename,parser.load(file));
+        chartSelector->setCurrentIndex(0);
+        changeCurrentChart(0);
+    }
+    catch(bool) {};
 }
 
 View::~View()

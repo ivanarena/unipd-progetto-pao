@@ -22,5 +22,8 @@
         <file>res/samples.png</file>
         <file>res/export-chart.png</file>
         <file>res/CovidDeaths2020_FocusOnEu.json</file>
+        <file>res/jsonformat.png</file>
+        <file>res/xmlformat.png</file>
+        <file>res/crypto.png</file>
     </qresource>
 </RCC>
