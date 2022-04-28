@@ -20,6 +20,7 @@
         <file>res/help.png</file>
         <file>res/about.png</file>
         <file>res/samples.png</file>
+        <file>res/export-chart.png</file>
         <file>res/CovidDeaths2020_FocusOnEu.json</file>
     </qresource>
 </RCC>

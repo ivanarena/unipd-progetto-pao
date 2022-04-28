@@ -54,6 +54,7 @@ void View::setToolBar()
     toolBar->addSeparator();
     toolBar->addAction(saveModeltoJson);
     toolBar->addAction(saveModeltoXml);
+    toolBar->addAction(exportChart);
     toolBar->addSeparator();
     toolBar->addAction(renameHeaders);
     toolBar->addAction(renameTab);
@@ -81,6 +82,7 @@ void View::setMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
+    fileMenu->addAction(exportChart);
     fileMenu->addSeparator();
     fileMenu->addAction(exitApp);
 
@@ -126,6 +128,7 @@ View::View(QWidget *parent)
       openModel(new QAction(QIcon(":/res/open-file.png"), "Open project", this)),
       saveModeltoJson(new QAction(QIcon(":/res/save-json.png"), "Save as Json", this)),
       saveModeltoXml(new QAction(QIcon(":/res/save-xml.png"), "Save as Xml", this)),
+      exportChart(new QAction(QIcon(":/res/export-chart.png"), "Export chart", this)),
       renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
       renameTab(new QAction(QIcon(":/res/rename-tab.png"), "Rename project", this)),
       insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
@@ -148,6 +151,7 @@ View::View(QWidget *parent)
     openModel->setShortcuts(QKeySequence::Open);
     saveModeltoJson->setShortcut(QKeySequence(tr("Ctrl+S")));
     saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+S")));
+    saveModeltoXml->setShortcut(QKeySequence(tr("Ctrl+Shift+P")));
     renameHeaders->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     renameTab->setShortcut(QKeySequence(tr("Ctrl+Shift+T")));
     insertRow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
@@ -164,6 +168,7 @@ View::View(QWidget *parent)
     connect(openModel, SIGNAL(triggered()), this, SLOT(importFile()));
     connect(saveModeltoJson, SIGNAL(triggered()), this, SLOT(saveAsJson()));
     connect(saveModeltoXml, SIGNAL(triggered()), this, SLOT(saveAsXml()));
+    connect(exportChart, SIGNAL(triggered()), this, SLOT(saveChartToPng()));
     connect(renameHeaders, SIGNAL(triggered()), this, SLOT(renameHeadersDialog()));
     connect(renameTab, SIGNAL(triggered()), this, SLOT(renameTabFromButton()));
     connect(insertRow, SIGNAL(triggered()), this, SLOT(insertRowTriggered()));
@@ -372,6 +377,17 @@ void View::setChartSelectorIndex(int tabIndex){
     else if(typeid(*current_chart) == typeid(PolarChart)) chartIndex=3;
     else if(typeid(*current_chart) == typeid(ScatterChart)) chartIndex=4;
     chartSelector->setCurrentIndex(chartIndex);
+}
+
+void View::saveChartToPng() {
+    if (chartSelector->currentIndex() != -1 && tabView->count() > 0)
+    {
+        QString filename = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("Images (*.png)"));
+        QPixmap p = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChartView()->grab();
+        p.save(filename, "PNG");
+    } else {
+        QMessageBox::critical(this, "Error", "There is no active chart to export.");
+    }
 }
 
 void View::renameTabDoubleClick(int tabIndex) {

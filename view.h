@@ -46,8 +46,11 @@ private:
     QAction *insertColumn;
     QAction *removeColumn;
     QComboBox *chartSelector;
+    QAction *exportChart;
     QAction *exitApp;
+
     QAction *coronaSample;
+
 
     QAction *help;
     QAction *about;
@@ -86,6 +89,7 @@ public slots:
     void importFile();
     void saveAsJson();
     void saveAsXml();
+    void saveChartToPng();
     void renameHeadersDialog();
     void insertRowTriggered();
     void removeRowTriggered();
