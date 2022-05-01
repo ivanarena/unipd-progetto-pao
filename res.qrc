@@ -1,29 +1,35 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/new-file.png</file>
-        <file>res/open-file.png</file>
-        <file>res/save-json.png</file>
-        <file>res/save-xml.png</file>
-        <file>res/insert-row.png</file>
-        <file>res/remove-row.png</file>
-        <file>res/insert-column.png</file>
-        <file>res/remove-column.png</file>
-        <file>res/exit-app.png</file>
-        <file>res/rename-headers.png</file>
-        <file>res/rename-tab.png</file>
-        <file>res/line-chart.png</file>
-        <file>res/bar-chart.png</file>
-        <file>res/pie-chart.png</file>
-        <file>res/polar-chart.png</file>
-        <file>res/scatter-chart.png</file>
-        <file>res/corona.png</file>
-        <file>res/help.png</file>
-        <file>res/about.png</file>
-        <file>res/samples.png</file>
-        <file>res/export-chart.png</file>
-        <file>res/CovidDeaths2020_FocusOnEu.json</file>
-        <file>res/jsonformat.png</file>
-        <file>res/xmlformat.png</file>
-        <file>res/crypto.png</file>
+        <file>res/icons/new-file.png</file>
+        <file>res/icons/open-file.png</file>
+        <file>res/icons/save-json.png</file>
+        <file>res/icons/save-xml.png</file>
+        <file>res/icons/insert-row.png</file>
+        <file>res/icons/remove-row.png</file>
+        <file>res/icons/insert-column.png</file>
+        <file>res/icons/remove-column.png</file>
+        <file>res/icons/exit-app.png</file>
+        <file>res/icons/rename-headers.png</file>
+        <file>res/icons/rename-tab.png</file>
+        <file>res/icons/line-chart.png</file>
+        <file>res/icons/bar-chart.png</file>
+        <file>res/icons/pie-chart.png</file>
+        <file>res/icons/polar-chart.png</file>
+        <file>res/icons/scatter-chart.png</file>
+        <file>res/icons/corona.png</file>
+        <file>res/icons/help.png</file>
+        <file>res/icons/about.png</file>
+        <file>res/icons/samples.png</file>
+        <file>res/icons/export-chart.png</file>
+        <file>res/icons/crypto.png</file>
+      
+      
+        <file>res/help/jsonformat.png</file>
+        <file>res/help/xmlformat.png</file>
+
+
+        <file>res/samples/covid_deaths_2020_focus_on_eu.json</file>
+        <file>res/samples/crypto.json</file>
+        <file>res/samples/yearly_expenses.json</file>
     </qresource>
 </RCC>

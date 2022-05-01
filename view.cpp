@@ -41,11 +41,11 @@ using namespace std;
 void View::setToolBar()
 {
     // chartSelector->setPlaceholderText("Choose a chart"); // non disponibile in qt 9 rip
-    chartSelector->addItem(QIcon(":/res/line-chart.png"), "Line Chart");
-    chartSelector->addItem(QIcon(":/res/bar-chart.png"), "Bar Chart");
-    chartSelector->addItem(QIcon(":/res/pie-chart.png"), "Pie Chart");
-    chartSelector->addItem(QIcon(":/res/polar-chart.png"), "Polar Chart");
-    chartSelector->addItem(QIcon(":/res/scatter-chart.png"), "Scatter Chart");
+    chartSelector->addItem(QIcon(":/res/icons/line-chart.png"), "Line Chart");
+    chartSelector->addItem(QIcon(":/res/icons/bar-chart.png"), "Bar Chart");
+    chartSelector->addItem(QIcon(":/res/icons/pie-chart.png"), "Pie Chart");
+    chartSelector->addItem(QIcon(":/res/icons/polar-chart.png"), "Polar Chart");
+    chartSelector->addItem(QIcon(":/res/icons/scatter-chart.png"), "Scatter Chart");
 
     //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
@@ -77,9 +77,10 @@ void View::setMenus()
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
     samples = fileMenu->addMenu(tr("&Open Sample"));
-        samples->setIcon(QIcon(":res/samples.png"));
-        samples->addAction(cryptoSample);
+        samples->setIcon(QIcon(":res/icons/samples.png"));
         samples->addAction(coronaSample);
+        samples->addAction(cryptoSample);
+        samples->addAction(expensesSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -125,23 +126,24 @@ void View::checkWelcome(){
 View::View(QWidget *parent)
     : QWidget(parent), firstStart(true), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
       menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu), samples(new QMenu),
-      newTab(new QAction(QIcon(":/res/new-file.png"), "New project", this)),
-      openModel(new QAction(QIcon(":/res/open-file.png"), "Open project", this)),
-      saveModeltoJson(new QAction(QIcon(":/res/save-json.png"), "Save as Json", this)),
-      saveModeltoXml(new QAction(QIcon(":/res/save-xml.png"), "Save as Xml", this)),
-      exportChart(new QAction(QIcon(":/res/export-chart.png"), "Export chart", this)),
-      renameHeaders(new QAction(QIcon(":/res/rename-headers.png"), "Rename headers", this)),
-      renameTab(new QAction(QIcon(":/res/rename-tab.png"), "Rename project", this)),
-      insertRow(new QAction(QIcon(":/res/insert-row.png"), "Insert row", this)),
-      removeRow(new QAction(QIcon(":/res/remove-row.png"), "Remove row", this)),
-      insertColumn(new QAction(QIcon(":/res/insert-column.png"), "Insert column", this)),
-      removeColumn(new QAction(QIcon(":/res/remove-column.png"), "Remove column", this)),
+      newTab(new QAction(QIcon(":/res/icons/new-file.png"), "New project", this)),
+      openModel(new QAction(QIcon(":/res/icons/open-file.png"), "Open project", this)),
+      saveModeltoJson(new QAction(QIcon(":/res/icons/save-json.png"), "Save as Json", this)),
+      saveModeltoXml(new QAction(QIcon(":/res/icons/save-xml.png"), "Save as Xml", this)),
+      exportChart(new QAction(QIcon(":/res/icons/export-chart.png"), "Export chart", this)),
+      renameHeaders(new QAction(QIcon(":/res/icons/rename-headers.png"), "Rename headers", this)),
+      renameTab(new QAction(QIcon(":/res/icons/rename-tab.png"), "Rename project", this)),
+      insertRow(new QAction(QIcon(":/res/icons/insert-row.png"), "Insert row", this)),
+      removeRow(new QAction(QIcon(":/res/icons/remove-row.png"), "Remove row", this)),
+      insertColumn(new QAction(QIcon(":/res/icons/insert-column.png"), "Insert column", this)),
+      removeColumn(new QAction(QIcon(":/res/icons/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
-      exitApp(new QAction(QIcon(":/res/exit-app.png"), "Exit", this)),
-      coronaSample(new QAction(QIcon(":/res/corona.png"), "Corona Deaths",this)),
-      cryptoSample(new QAction(QIcon(":/res/crypto.png"), "Crypto Stats",this)),
-      help(new QAction(QIcon(":/res/help.png"), "User guide", this)),
-      about(new QAction(QIcon(":/res/about.png"), "About...", this))
+      exitApp(new QAction(QIcon(":/res/icons/exit-app.png"), "Exit", this)),
+      coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
+      cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
+      expensesSample(new QAction(QIcon(":/res/icons/crypto.png"), "Yearly expenses",this)),
+      help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
+      about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
 
 {
     tabView->setTabsClosable(true);
@@ -185,6 +187,7 @@ View::View(QWidget *parent)
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
     connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
+    connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
 
 
     setToolBar();
@@ -211,7 +214,7 @@ Scene *View::createNewTab(QString tabName,DataTableModel *model)
 {
     checkWelcome();
     Scene *scene;
-    if(model){
+    if (model) {
         scene = new Scene(model, new Chart(model));
         tabView->addTab(scene, tabName);
         tabView->setCurrentIndex(tabView->currentIndex() + 1);
@@ -637,10 +640,10 @@ void View::importFile(){
             QMessageBox format;
             QPixmap image;
             if(import.endsWith(".json")){
-                image= QPixmap(":/res/jsonformat.png");
+                image= QPixmap(":/res/help/jsonformat.png");
             }
             else if(import.endsWith(".xml")){
-                image = QPixmap(":/res/xmlformat.png");
+                image = QPixmap(":/res/help/xmlformat.png");
             }
             error.setIcon(QMessageBox::Critical);
             error.setText("Error found while parsing");
@@ -720,7 +723,7 @@ void View::aboutDialog() {
 }
 
 void View::openCoronaSample(){
-    QFile file(":/res/CovidDeaths2020_FocusOnEu.json");
+    QFile file(":/res/samples/covid_deaths_2020_focus_on_eu.json");
     QString filename("Covid Deaths");
     JsonParser parser;
     try{
@@ -732,13 +735,25 @@ void View::openCoronaSample(){
 }
 
 void View::openCryptoSample(){
-    QFile file(":/res/Crypto.json");
+    QFile file(":/res/samples/crypto.json");
     QString filename("Crypto");
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
         chartSelector->setCurrentIndex(0);
         changeCurrentChart(0);
+    }
+    catch(bool) {};
+}
+
+void View::openExpensesSample(){
+    QFile file(":/res/samples/yearly_expenses.json");
+    QString filename("Yearly Expenses");
+    JsonParser parser;
+    try{
+        createNewTab(filename,parser.load(file));
+        chartSelector->setCurrentIndex(2);
+        changeCurrentChart(2);
     }
     catch(bool) {};
 }

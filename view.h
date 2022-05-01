@@ -51,6 +51,7 @@ private:
 
     QAction *coronaSample;
     QAction *cryptoSample;
+    QAction *expensesSample;
 
 
     QAction *help;
@@ -102,6 +103,7 @@ public slots:
     void aboutDialog();
     void openCoronaSample();
     void openCryptoSample();
+    void openExpensesSample();
 };
 
 #endif // VIEW_H
