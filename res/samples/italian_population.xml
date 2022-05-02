@@ -1,0 +1,25 @@
+<Doc>
+    <Columns> 1960, 1980, 2000, 2020 </Columns>
+    <Rows>
+        <Lombardia> 6302005, 8823023, 9556042, 9966992 </Lombardia>
+        <Lazio> 4305060, 5285936, 5699659, 5720796 </Lazio>
+        <Campania> 420345, 450421, 5235692, 5679759 </Campania>
+        <Veneto> 3569029, 4105942, 440929, 4628481, 4852453 </Veneto>
+        <Sicilia> 3294022, 3552393, 4013921, 48440876 </Sicilia>
+        <Emilia-Romagna> 3459953, 3694834, 4093204, 4445549 </Emilia-Romagna>
+        <Piemonte> 3300459, 3891269, 4002648, 4273210 </Piemonte>
+        <Puglia> 3201856, 3406590, 3817371, 3921632 </Puglia>
+        <Toscana> 2902671, 3399125, 3487752, 3688333 </Toscana>
+        <Calabria> 1032305, 1235585, 1583291, 1896245 </Calabria>
+        <Sardegna> 1002667, 1220684, 1368421, 1598235 </Sardegna>
+        <Liguria> 1002314, 1235246, 1381924, 1509805 </Liguria>
+        <Marche> 1020455, 1149244, 1323955, 1501406 </Marche>
+        <Abruzzo> 1000533, 1023050, 1124472, 1285250 </Abruzzo>
+        <Friuli-Venezia_Giulia> 860583, 1003029, 1100585, 1198752 </Friuli-Venezia_Giulia>
+        <Trentino_Alto-Adige> 782300, 902134, 999242, 10781640 </Trentino_Alto-Adige>
+        <Umbria> 320556, 520031, 685703, 856023 </Umbria>
+        <Basilicata> 126649, 345012, 458595, 547485 </Basilicata>
+        <Molise> 123498, 145969, 223959, 296436 </Molise>
+        <Val_d_Aosta> 70942, 92412, 110034, 129894 </Val_d_Aosta>
+    </Rows>
+</Doc>

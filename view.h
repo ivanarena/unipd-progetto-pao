@@ -52,7 +52,7 @@ private:
     QAction *coronaSample;
     QAction *cryptoSample;
     QAction *expensesSample;
-
+    QAction *populationSample;
 
     QAction *help;
     QAction *about;
@@ -104,6 +104,7 @@ public slots:
     void openCoronaSample();
     void openCryptoSample();
     void openExpensesSample();
+    void openPopulationSample();
 };
 
 #endif // VIEW_H

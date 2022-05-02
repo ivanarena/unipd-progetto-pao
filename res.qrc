@@ -22,14 +22,15 @@
         <file>res/icons/samples.png</file>
         <file>res/icons/export-chart.png</file>
         <file>res/icons/crypto.png</file>
-      
-      
+        <file>res/icons/expenses.png</file>
+        <file>res/icons/population.png</file>
+            
         <file>res/help/jsonformat.png</file>
         <file>res/help/xmlformat.png</file>
-
 
         <file>res/samples/covid_deaths_2020_focus_on_eu.json</file>
         <file>res/samples/crypto.json</file>
         <file>res/samples/yearly_expenses.json</file>
+        <file>res/samples/italian_population.xml</file>
     </qresource>
 </RCC>

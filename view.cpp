@@ -81,6 +81,7 @@ void View::setMenus()
         samples->addAction(coronaSample);
         samples->addAction(cryptoSample);
         samples->addAction(expensesSample);
+        samples->addAction(populationSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -141,7 +142,8 @@ View::View(QWidget *parent)
       exitApp(new QAction(QIcon(":/res/icons/exit-app.png"), "Exit", this)),
       coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
       cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
-      expensesSample(new QAction(QIcon(":/res/icons/crypto.png"), "Yearly expenses",this)),
+      expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
+      populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
 
@@ -185,9 +187,11 @@ View::View(QWidget *parent)
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
+
     connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
-    connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
+    connect(expensesSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
+    connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));
 
 
     setToolBar();
@@ -724,7 +728,7 @@ void View::aboutDialog() {
 
 void View::openCoronaSample(){
     QFile file(":/res/samples/covid_deaths_2020_focus_on_eu.json");
-    QString filename("Covid Deaths");
+    QString filename("COVID-19 deaths in 2020");
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
@@ -748,7 +752,7 @@ void View::openCryptoSample(){
 
 void View::openExpensesSample(){
     QFile file(":/res/samples/yearly_expenses.json");
-    QString filename("Yearly Expenses");
+    QString filename("Yearly expenses");
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
@@ -757,6 +761,19 @@ void View::openExpensesSample(){
     }
     catch(bool) {};
 }
+
+void View::openPopulationSample(){
+    QFile file(":/res/samples/italian_population.xml");
+    QString filename("Italian population over the decades");
+    JsonParser parser;
+    try{
+        createNewTab(filename,parser.load(file));
+        chartSelector->setCurrentIndex(4);
+        changeCurrentChart(4);
+    }
+    catch(bool) {};
+}
+
 
 View::~View()
 {
