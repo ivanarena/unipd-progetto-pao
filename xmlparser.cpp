@@ -41,12 +41,14 @@ DataTableModel* XmlParser::load(QFile& file) const{
         values.push_back(*new vector<double>);
         int colCheck=0;
         for(auto it = l_rowValues.begin(); it!=l_rowValues.end(); ++it, ++colCheck) {
-            QString temp(*it);
-            if(!DataTableModel::is_number((temp.replace("-","")).toStdString())) throw true;
+
+            QString numCheck = *it;
+            string negCheck = (numCheck.replace("-","")).toStdString();
+            string decCheck = (numCheck.replace(".","")).toStdString();
+            if(!DataTableModel::is_number(negCheck) && !DataTableModel::is_number(decCheck)) throw true;
             if(*it=="") throw true;
              values[i].push_back((*it).toDouble());
         }
-        cout<<colCheck<<"  "<<columnCount<<endl;
         if(colCheck!=columnCount)
             throw true;
     }

@@ -36,8 +36,13 @@ DataTableModel* JsonParser::load(QFile& file) const {
         values.push_back(*(new vector<double>));
         checkcol=0;
         for(auto vit = row_Array.begin(); vit!= row_Array.end(); ++vit){
-            if(!DataTableModel::is_number(((*vit).toString().replace("-","")).toStdString())) throw true;
-            values[row_Count].push_back((*vit).toDouble());
+
+            QString numCheck = vit->toString();
+            string negCheck = (numCheck.replace("-","")).toStdString();
+            string decCheck = (numCheck.replace(".","")).toStdString();
+            if(!DataTableModel::is_number(negCheck) && !DataTableModel::is_number(decCheck)) throw true;
+
+            values[row_Count].push_back(vit->toDouble());
             checkcol++;
         }
         if(checkcol!=col_Count) throw true;
