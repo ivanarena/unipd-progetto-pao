@@ -26,10 +26,12 @@ void ScatterChart::mapData()
 
 void ScatterChart::updateChartView()
 {
-    //setAnimationOptions(QChart::NoAnimation);
+    double min = model->min();
+    if (min >= 0)
+        YAxis->setRange(0, model->max()*1.3);
+    else
+        YAxis->setRange(min, model->max()*1.3);
     XAxis->setRange(-0.5, model->columnCount()-0.5); // set max and min
-    //YAxis->applyNiceNumbers();
-    YAxis->setRange(model->min()-0.5, model->max()+0.5);
 }
 
 ScatterChart::ScatterChart(DataTableModel *c_model)
