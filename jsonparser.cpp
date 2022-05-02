@@ -38,6 +38,10 @@ DataTableModel* JsonParser::load(QFile& file) const {
         for(auto vit = row_Array.begin(); vit!= row_Array.end(); ++vit){
 
             QString numCheck = vit->toString();
+            numCheck.replace(" ","");
+            int nDots =0, nMin=0;
+            for(auto c = numCheck.begin(); c!= numCheck.end(); ++c) {if(*c == ".") nDots++; else if(*c=="-") nMin++; }
+            if(nDots>1 || nMin>1) throw true;
             string negCheck = (numCheck.replace("-","")).toStdString();
             string decCheck = (numCheck.replace(".","")).toStdString();
             if(!DataTableModel::is_number(negCheck) && !DataTableModel::is_number(decCheck)) throw true;

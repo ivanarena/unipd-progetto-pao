@@ -43,9 +43,14 @@ DataTableModel* XmlParser::load(QFile& file) const{
         for(auto it = l_rowValues.begin(); it!=l_rowValues.end(); ++it, ++colCheck) {
 
             QString numCheck = *it;
+            numCheck.replace(" ","");
+            int nDots =0, nMin=0;
+            for(auto c = numCheck.begin(); c!= numCheck.end(); ++c) {if(*c == ".") nDots++; else if(*c=="-") nMin++; }
+            if(nDots>1 || nMin>1) throw true;
             string negCheck = (numCheck.replace("-","")).toStdString();
             string decCheck = (numCheck.replace(".","")).toStdString();
             if(!DataTableModel::is_number(negCheck) && !DataTableModel::is_number(decCheck)) throw true;
+
             if(*it=="") throw true;
              values[i].push_back((*it).toDouble());
         }
