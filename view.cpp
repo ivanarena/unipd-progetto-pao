@@ -611,7 +611,7 @@ void View::removeColumnTriggered()
 
 void View::importFile(){
 
-    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),currentDirectory, tr("Json files (*.json);;XML files (*.xml)"));
+    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),currentDirectory, tr("JSON files (*.json);;XML files (*.xml)"));
     QFile file(import);
     if(import != ""){
 
