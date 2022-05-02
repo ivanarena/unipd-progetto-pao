@@ -25,7 +25,7 @@ void PolarChart::mapData()
 void PolarChart::updateChartView()
 {
     //setAnimationOptions(QChart::NoAnimation);
-    XAxis->setRange(0, model->columnCount()-1); // set max and min
+    XAxis->setRange(0, model->columnCount()); // set max and min
     //YAxis->applyNiceNumbers();
     YAxis->setRange(model->min(), model->max());
 }
