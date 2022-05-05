@@ -59,7 +59,6 @@ private:
 
     Controller controller;
 
-    void insertRowCol(DataTableModel*);
 
     bool firstStart;
     QString currentDirectory = "/home";
@@ -97,6 +96,7 @@ public slots:
     void removeRowTriggered();
     void insertColumnTriggered();
     void removeColumnTriggered();
+    void insertRowCol(DataTableModel*);
 
     void helpDialog();
     void aboutDialog();
