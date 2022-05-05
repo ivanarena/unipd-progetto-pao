@@ -78,15 +78,6 @@ Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const // rende mod
 
 bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role) // modifica effettivamente le celle
 {
-    /*try{
-        if(!is_number(value.toString().toStdString())) throw new modelError();
-    }
-
-    catch(Error* e){
-        e->show();
-        delete e;
-        return false;
-    }*/
 
     if (index.isValid() && role == Qt::EditRole)
     {
@@ -198,8 +189,6 @@ double DataTableModel::min()
     else return 0;
 }
 
-
-/******** CONTINUA A BUILDARE *********/
 
 vector<vector<double>> DataTableModel::getData() const
 {

@@ -100,7 +100,6 @@ void View::setMenus()
     editMenu->addAction(removeColumn);
     editMenu->addSeparator();
 
-    // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
     aboutMenu->addAction(help);
     aboutMenu->addAction(about);
@@ -293,7 +292,6 @@ void View::renameHeadersDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
-    //form.setMaximumSize(QSize(600, 800));
     form.setSizeConstraint(QLayout::SetMinAndMaxSize);
     form.setRowWrapPolicy(QFormLayout::DontWrapRows);
     form.setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
@@ -536,7 +534,7 @@ void View::removeRowTriggered()
     try
     {
         controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries(); // TOFIX: ERRORE QUANDO SI PROVA A RIMUOVERE ULTIMA RIGA RIMASTA
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
     }
     catch (const QString &errorMessage)
     {
