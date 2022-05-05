@@ -67,8 +67,7 @@ private:
 public:
     View(QWidget *parent = nullptr);
     ~View();
-    QChart *createLineChart(DataTableModel *model);
-    QChart *createPieChart(DataTableModel *model);
+
 
     void setToolBar();
     void setMenus();
