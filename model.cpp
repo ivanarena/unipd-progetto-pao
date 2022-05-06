@@ -25,10 +25,10 @@ DataTableModel::DataTableModel(int c_rows, int c_cols, QObject* parent) : QAbstr
 
 
     vector<double> firstRow;
-    for (int i = 0; i < m_columnCount; i++) firstRow.push_back(i);
+    for (int i = 0; i < m_columnCount; i++) firstRow.push_back(0);
     m_data.push_back(firstRow);
 
-    for (int i = 1; i < m_rowCount; i++) m_data.push_back(vector<double>(m_columnCount, i+1));
+    for (int i = 1; i < m_rowCount; i++) m_data.push_back(vector<double>(m_columnCount, 0));
 }
 
 DataTableModel::DataTableModel(QObject* parent, int row, int col, const vector<vector<double>>& values, const vector<QVariant>& columnHeaders, const vector<QVariant>& rowHeaders)
