@@ -717,7 +717,7 @@ void View::helpDialog() {
 }
 
 void View::aboutDialog() {
-    QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++";
+    QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++.";
     QMessageBox::information(this, "About this", text);
 }
 
