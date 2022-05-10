@@ -760,7 +760,7 @@ void View::openExpensesSample(){
 void View::openPopulationSample(){
     QFile file(":/res/samples/italian_population.xml");
     QString filename("Italian population over the decades");
-    JsonParser parser;
+    XmlParser parser;
     try{
         createNewTab(filename,parser.load(file));
         chartSelector->setCurrentIndex(4);
