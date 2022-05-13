@@ -57,6 +57,11 @@ void ScatterChart::insertSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
+    if(state==inconsistent){
+        checkState();
+        return;
+    }
+
     vector<vector<double>> data = model->getData();
     QScatterSeries *series = new QScatterSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
@@ -80,6 +85,9 @@ void ScatterChart::removeSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
+    checkState();
+    if(state==inconsistent) return;
+
     if (ScatterSeries.back())
         QChart::removeSeries(dynamic_cast<QScatterSeries *>(ScatterSeries.back()));
     else return;
@@ -94,6 +102,11 @@ void ScatterChart::removeSeries()
 void ScatterChart::insertSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
+
+    if(state==inconsistent){
+        checkState();
+        return;
+    }
 
     vector<vector<double>> data = model->getData();
     int i = 0;
@@ -111,6 +124,9 @@ void ScatterChart::insertSeriesValue()
 void ScatterChart::removeSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
+
+    checkState();
+    if(state==inconsistent) return;
 
     for (auto it = ScatterSeries.begin(); it != ScatterSeries.end(); it++)
         (*it)->remove(model->columnCount());
@@ -141,3 +157,41 @@ void ScatterChart::updateSeriesName(Qt::Orientation orientation, int first, int 
     else
         XAxis->replaceLabel(XAxis->categoriesLabels().at(first), model->getColumnsHeaders().at(last).toString());
 }
+
+void ScatterChart::clearChart(){
+    for(auto it : ScatterSeries){
+        it->clear();
+        delete it;
+    }
+    ScatterSeries.clear();
+    delete XAxis;
+    delete YAxis;
+}
+
+void ScatterChart::checkState(){
+    bool empty = model->rowCount()<1 || model->columnCount()<1;
+    if((state==inconsistent && empty) || (state == consistent && !empty)) return;
+    else if(empty){
+        state=inconsistent;
+        clearChart();
+    }
+    else{
+        XAxis = new QCategoryAxis;
+        YAxis = new QValueAxis;
+        for (int i = 0; i < model->columnCount(); i++)
+            XAxis->append(model->getColumnsHeaders().at(i).toString(), i);
+        XAxis->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
+
+        addAxis(XAxis, Qt::AlignBottom);
+        addAxis(YAxis, Qt::AlignLeft);
+
+
+        ScatterChart::mapData();
+        state=consistent;
+    }
+}
+
+ScatterChart::~ScatterChart(){
+    clearChart();
+}
+

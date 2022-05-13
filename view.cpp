@@ -76,12 +76,13 @@ void View::setMenus()
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
-    samples = fileMenu->addMenu(tr("&Open Sample"));
-        samples->setIcon(QIcon(":res/icons/samples.png"));
+    fileMenu->addAction(openSample);
+    /*samples = fileMenu->addMenu(tr("&Open Sample"));
+        /*samples->setIcon(QIcon(":res/icons/samples.png"));
         samples->addAction(coronaSample);
         samples->addAction(cryptoSample);
         samples->addAction(expensesSample);
-        samples->addAction(populationSample);
+        samples->addAction(populationSample);*/
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -100,6 +101,7 @@ void View::setMenus()
     editMenu->addAction(removeColumn);
     editMenu->addSeparator();
 
+    // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
     aboutMenu->addAction(help);
     aboutMenu->addAction(about);
@@ -139,10 +141,11 @@ View::View(QWidget *parent)
       removeColumn(new QAction(QIcon(":/res/icons/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
       exitApp(new QAction(QIcon(":/res/icons/exit-app.png"), "Exit", this)),
-      coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
+      /*coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
       cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
       expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
-      populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
+      populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),*/
+      openSample(new QAction(QIcon(":/res/icons/samples.png"),"OpenSample",this)),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
 
@@ -186,12 +189,13 @@ View::View(QWidget *parent)
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
+    connect(openSample, SIGNAL(triggered()), this, SLOT(importSample()));
 
-    connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
+
+   /* connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
     connect(expensesSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
-    connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));
-
+    connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));*/
 
     setToolBar();
     setMenus();
@@ -264,7 +268,7 @@ void View::newTabDialog()
     if (rows && cols) {
       DataTableModel *model = new DataTableModel(rows, cols, nullptr);
       createNewTab(tabName, model);
-      if (rows < 10 && cols < 10) renameHeadersDialog();
+      renameHeadersDialog();
     } else
       dialog.reject();
     }
@@ -292,6 +296,7 @@ void View::renameHeadersDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
+    //form.setMaximumSize(QSize(600, 800));
     form.setSizeConstraint(QLayout::SetMinAndMaxSize);
     form.setRowWrapPolicy(QFormLayout::DontWrapRows);
     form.setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
@@ -342,6 +347,9 @@ void View::renameHeadersDialog()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
+    // TODO: con tante righe/colonne sta roba diventa gigantesca e ingestibile
+
+    // TODO: PREVENT SAME HEADERS NAME IN THE SAME ORIENTATION -- Kinda risolto ma se vuoi tipo shiftarli di uno è un problemino
     if (dialog.exec() == QDialog::Accepted) {
 
         for (unsigned int i = 0; i < rowsHeadersInputs.size(); i++)
@@ -382,6 +390,7 @@ void View::setChartSelectorIndex(int tabIndex){
     else if(typeid(*current_chart) == typeid(PolarChart)) chartIndex=3;
     else if(typeid(*current_chart) == typeid(ScatterChart)) chartIndex=4;
     chartSelector->setCurrentIndex(chartIndex);
+    delete current_chart;
 }
 
 void View::saveChartToPng() {
@@ -531,7 +540,7 @@ void View::removeRowTriggered()
     try
     {
         controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
-        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries(); // TOFIX: ERRORE QUANDO SI PROVA A RIMUOVERE ULTIMA RIGA RIMASTA
     }
     catch (const QString &errorMessage)
     {
@@ -717,18 +726,18 @@ void View::helpDialog() {
 }
 
 void View::aboutDialog() {
-    QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++.";
+    QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++";
     QMessageBox::information(this, "About this", text);
 }
-
+/*
 void View::openCoronaSample(){
     QFile file(":/res/samples/covid_deaths_2020_focus_on_eu.json");
     QString filename("COVID-19 deaths in 2020");
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
-        chartSelector->setCurrentIndex(1);
-        changeCurrentChart(1);
+        chartSelector->setCurrentIndex(0);
+        changeCurrentChart(0);
     }
     catch(bool) {};
 }
@@ -739,8 +748,8 @@ void View::openCryptoSample(){
     JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
-        chartSelector->setCurrentIndex(0);
-        changeCurrentChart(0);
+        chartSelector->setCurrentIndex(1);
+        changeCurrentChart(1);
     }
     catch(bool) {};
 }
@@ -760,7 +769,7 @@ void View::openExpensesSample(){
 void View::openPopulationSample(){
     QFile file(":/res/samples/italian_population.xml");
     QString filename("Italian population over the decades");
-    XmlParser parser;
+    JsonParser parser;
     try{
         createNewTab(filename,parser.load(file));
         chartSelector->setCurrentIndex(4);
@@ -769,6 +778,40 @@ void View::openPopulationSample(){
     catch(bool) {};
 }
 
+*/
+
+void View::importSample(){
+
+    QString directory("../unipd-progetto-pao-main/res/samples");
+    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),directory, tr("JSON files (*.json);;XML files (*.xml)"));
+    QFile file(import);
+    if(import != ""){
+
+        QFileInfo fileInfo(file.fileName());
+        QString filename(fileInfo.fileName());
+        QString  temp(import);
+
+        Parser* parser;
+
+        if(import.endsWith(".xml")){
+            parser=new XmlParser();
+            filename.replace(".xml","");
+        }
+        if(import.endsWith(".json")){
+            parser=new JsonParser();
+            filename.replace(".json","");
+
+        }
+        try{
+        DataTableModel* model = parser->load(file);
+        delete parser;
+        createNewTab(filename,model);
+        tabView->setCurrentIndex(tabView->currentIndex() + 1);
+        chartSelector->setCurrentIndex(-1);
+        }
+        catch(bool){};
+    }
+}
 
 View::~View()
 {

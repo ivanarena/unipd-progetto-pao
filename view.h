@@ -49,16 +49,19 @@ private:
     QAction *exportChart;
     QAction *exitApp;
 
+    QAction* openSample;
+    /*
     QAction *coronaSample;
     QAction *cryptoSample;
     QAction *expensesSample;
-    QAction *populationSample;
+    QAction *populationSample;*/
 
     QAction *help;
     QAction *about;
 
     Controller controller;
 
+    void insertRowCol(DataTableModel*);
 
     bool firstStart;
     QString currentDirectory = "/home";
@@ -66,7 +69,8 @@ private:
 public:
     View(QWidget *parent = nullptr);
     ~View();
-
+    QChart *createLineChart(DataTableModel *model);
+    QChart *createPieChart(DataTableModel *model);
 
     void setToolBar();
     void setMenus();
@@ -96,14 +100,14 @@ public slots:
     void removeRowTriggered();
     void insertColumnTriggered();
     void removeColumnTriggered();
-    void insertRowCol(DataTableModel*);
 
     void helpDialog();
     void aboutDialog();
-    void openCoronaSample();
+    /*void openCoronaSample();
     void openCryptoSample();
     void openExpensesSample();
-    void openPopulationSample();
+    void openPopulationSample();*/
+    void importSample();
 };
 
 #endif // VIEW_H

@@ -53,6 +53,11 @@ void BarChart::insertSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
+    if(state==inconsistent){
+        checkState();
+        return;
+    }
+
     vector<vector<double>> data = model->getData();
     const QString label = model->getRowsHeaders().at(model->rowCount() - 1).toString();
     QBarSet *set = new QBarSet(label);
@@ -70,6 +75,9 @@ void BarChart::removeSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
+    checkState();
+    if(state==inconsistent) return;
+
     m_series->remove(dynamic_cast<QBarSet *>(m_sets.back()));
     m_sets.pop_back();
 
@@ -79,6 +87,11 @@ void BarChart::removeSeries()
 void BarChart::insertSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
+
+    if(state==inconsistent){
+        checkState();
+        return;
+    }
 
     vector<vector<double>> data = model->getData();
     int i = 0;
@@ -95,6 +108,9 @@ void BarChart::insertSeriesValue()
 void BarChart::removeSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
+
+    checkState();
+    if(state==inconsistent) return;
 
     for (auto it = m_sets.begin(); it < m_sets.end(); it++)
         (*it)->remove(model->columnCount());
@@ -120,4 +136,36 @@ void BarChart::updateSeriesName(Qt::Orientation orientation, int first, int last
         m_sets.at(first)->setLabel(model->getRowsHeaders().at(last).toString());
     else
         XAxis->replace(XAxis->categories().at(first), model->getColumnsHeaders().at(last).toString());
+}
+
+void BarChart::clearChart(){
+    m_sets.clear();
+    m_series->clear();
+    delete XAxis;
+    delete YAxis;
+}
+
+void BarChart::checkState(){
+    bool empty = model->rowCount()<1 || model->columnCount()<1;
+    if((state==inconsistent && empty) || (state == consistent && !empty)) return;
+    else if(empty){
+        state=inconsistent;
+        clearChart();
+    }
+    else {
+        XAxis= new QBarCategoryAxis;
+        YAxis=new QValueAxis;
+        for (int i = 0; i < model->columnCount(); i++)
+            XAxis->append(model->getColumnsHeaders().at(i).toString());
+
+        addAxis(XAxis, Qt::AlignBottom);
+        addAxis(YAxis, Qt::AlignLeft);
+
+        BarChart::mapData();
+        state=consistent;
+    }
+}
+
+BarChart::~BarChart(){
+    clearChart();
 }

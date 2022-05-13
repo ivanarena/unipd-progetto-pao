@@ -1,6 +1,7 @@
 #include <QModelIndex>
 #include "chart.h"
-
+#include <iostream>
+using namespace std;
 
 Chart::Chart(DataTableModel* m): model(m)
 {
@@ -19,8 +20,21 @@ void Chart::removeSeriesValue() {}
 void Chart::replaceValue(QModelIndex, QModelIndex) {}
 void Chart::updateSeriesName(Qt::Orientation, int, int) {}
 
+
 Chart::~Chart()
 {
 
 }
 
+void Chart::clearChart() {}
+
+void Chart::checkState(){
+    if(model->rowCount()<1 || model->columnCount()<1){
+        state=inconsistent;
+        clearChart();
+    }
+    else if(state==inconsistent){
+        mapData();
+        state=consistent;
+    }
+}

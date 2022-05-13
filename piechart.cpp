@@ -144,31 +144,15 @@ bool PieChart::hasNegative() const{
     return false;
 }
 
-void PieChart::clearPie(){
-    mainSeries->clear();
-    for(auto slice : mainSlices) slice->extseries()->clear();
+void PieChart::clearChart(){
+    for(auto slice : mainSlices){
+        slice->extseries()->slices().clear();
+        slice->extseries()->clear();
+    }
     mainSlices.clear();
+    mainSeries->clear();
     maxSlice = nullptr;
     colors.clear();
-}
-
-void PieChart::checkErrors(){
-    bool empty = isEmpty();
-    bool negative = hasNegative();
-
-    if(empty || negative){
-        state=inconsistent;
-        clearPie();
-        if(empty) throw QString("PieChart cannot be empty");
-        if(negative) throw QString("PieChart cannot have negative values");
-    }
-
-    else if(state!=consistent) state = variating;
-    if(state == variating){
-        PieChart::mapData();
-        state=consistent;
-        throw bool(true);
-    }
 }
 
 void PieChart::mapData(){
@@ -186,6 +170,26 @@ void PieChart::mapData(){
 }
 
 
+void PieChart::checkState(){
+    bool zero = isEmpty();
+    bool negative = hasNegative();
+    bool empty = model->columnCount()<1 || model->rowCount() <1;
+    if((state==inconsistent && empty) || (state == consistent && !empty && !zero && !negative)) return;
+    else if(empty || zero || negative){
+        state=inconsistent;
+        PieChart::clearChart();
+        if(empty) throw bool(true);
+        else if(zero) throw QString("PieChart cannot be empty");
+        else if(negative) throw QString("PieChart cannot have negative values");
+    }
+
+    else{
+        PieChart::mapData();
+        state=consistent;
+    }
+}
+
+
 PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
 
     mainSeries = new QPieSeries();
@@ -195,18 +199,24 @@ PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
     setAnimationOptions(QChart::NoAnimation);
     legend()->setVisible(false);
 
-    try {checkErrors();}
+    try {
+        PieChart::checkState();
+        if(state == consistent) PieChart::mapData();
+    }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) {return; }
-    PieChart::mapData();
 }
 
 
 void PieChart::insertSeries(){
-    try {checkErrors();}
+    try {
+        if(state==inconsistent){
+            checkState();
+            return;
+        }
+    }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) { return; }
-
     vector<double> values = model->getData()[model->rowCount()-1];
     vector<QVariant> columnHeaders = model->getColumnsHeaders();
     const QString label = (model->getRowsHeaders()[model->rowCount()-1]).toString();
@@ -219,31 +229,32 @@ void PieChart::insertSeries(){
 }
 
 void PieChart::removeSeries(){
-    try {checkErrors();}
+    try {
+        checkState();
+        if(state==inconsistent) return;
+    }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) {return; }
 
-    if(mainSeries->count()>1){
-        mainSlices.back()->extseries()->clear();
-        mainSlices.pop_back();
-        mainSeries->remove(mainSeries->slices().back());
-        updateChartView();
-    }
-    else clearPie();
+    mainSlices.back()->extseries()->clear();
+    mainSlices.pop_back();
+    mainSeries->remove(mainSeries->slices().back());
+    updateChartView();
+
 }
 
 void PieChart::insertSeriesValue(){
 
-    try {checkErrors();}
+    try {
+        if(state==inconsistent){
+            checkState();
+            return;
+        }
+    }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) { return; }
 
-    if(model->columnCount()==1 && model->rowCount()>0){
-        PieChart::mapData();
-        return;
-    }
-
-    else for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
+    for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
             auto ext = (*it)->extseries();
             vector<vector<double>> data = model->getData();
             if(model->rowCount()>0) ext->append(new QPieSlice(model->getColumnsHeaders()[model->columnCount()-1].toString(),model->getData()[model->rowCount()-1][model->columnCount()-1]));
@@ -254,10 +265,13 @@ void PieChart::insertSeriesValue(){
 
 
 void PieChart::removeSeriesValue(){
-    try {checkErrors();}
+    try {
+        checkState();
+        if(state==inconsistent) return;
+
+    }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) {return; }
-    if(mainSeries->count()==0) return;
     for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
         QPieSeries* serie = (*it)->extseries();
         if(serie && !(serie->slices().isEmpty())) serie->remove(serie->slices().back());
@@ -267,7 +281,7 @@ void PieChart::removeSeriesValue(){
 
 
 void PieChart::replaceValue(QModelIndex i, QModelIndex j){
-    try {checkErrors();}
+    try {checkState();}
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
     catch(bool) {return; }
     mainSlices[i.row()]->extseries()->slices()[j.column()]->setValue(model->getData()[i.row()][j.column()]);
@@ -282,4 +296,8 @@ void PieChart::updateSeriesName(Qt::Orientation orientation, int first, int last
     }
     else for(auto slice : mainSlices) slice->extseries()->slices()[last]->setLabel(model->getColumnsHeaders()[last].toString());
     updateChartView();
+}
+
+PieChart::~PieChart(){
+    PieChart::clearChart();
 }

@@ -14,7 +14,6 @@
 #include <time.h>
 
 class MainSlice;
-enum consistency{consistent, inconsistent, variating};
 
 class PieChart : public Chart
 {
@@ -26,7 +25,6 @@ private:
     MainSlice* maxSlice;
 
     vector<QColor> colors;
-    consistency state = consistent;
 
     void insertToPie(QPieSeries*, QColor);
 
@@ -35,11 +33,11 @@ private:
     bool colorYetUsed(const QColor&) const;
     QColor createRandomColor();
     void setExtSeries(QPieSeries*, QColor, QFont);
-    void clearPie();
-    void checkErrors();
+    void checkState() override;
 
 public:
     PieChart(DataTableModel *c_model);
+    ~PieChart();
 
     virtual void mapData() override;
     virtual void updateChartView() override;
@@ -47,6 +45,7 @@ public:
     virtual void removeSeries() override;
     virtual void insertSeriesValue() override; // add column
     virtual void removeSeriesValue() override;
+    void clearChart() override;
     bool isEmpty() const;
     bool hasNegative() const;
 
