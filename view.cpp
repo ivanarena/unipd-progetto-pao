@@ -271,6 +271,7 @@ void View::newTabDialog()
       renameHeadersDialog();
     } else
       dialog.reject();
+      QMessageBox::critical(this,"Error","A new project must have at least 1 row and 1 column");
     }
 }
 
@@ -390,7 +391,6 @@ void View::setChartSelectorIndex(int tabIndex){
     else if(typeid(*current_chart) == typeid(PolarChart)) chartIndex=3;
     else if(typeid(*current_chart) == typeid(ScatterChart)) chartIndex=4;
     chartSelector->setCurrentIndex(chartIndex);
-    delete current_chart;
 }
 
 void View::saveChartToPng() {
@@ -537,9 +537,11 @@ void View::insertRowTriggered()
 void View::removeRowTriggered()
 {
     if(tabView->count()==0) return;
+    DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
+    if(model->rowCount()==1) return;
     try
     {
-        controller.removeRowReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+        controller.removeRowReceived(model);
         dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries(); // TOFIX: ERRORE QUANDO SI PROVA A RIMUOVERE ULTIMA RIGA RIMASTA
     }
     catch (const QString &errorMessage)
@@ -602,9 +604,11 @@ void View::insertColumnTriggered()
 void View::removeColumnTriggered()
 {
     if(tabView->count()==0) return;
+    DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
+    if( model->columnCount()==1) return;
     try
     {
-        controller.removeColumnReceived(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel());
+        controller.removeColumnReceived(model);
         dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeriesValue();
     }
     catch (const QString &errorMessage)

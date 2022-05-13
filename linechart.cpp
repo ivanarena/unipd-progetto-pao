@@ -204,5 +204,5 @@ void LineChart::checkState(){
 }
 
 LineChart::~LineChart(){
-    clearChart();
+    LineChart::clearChart();
 }

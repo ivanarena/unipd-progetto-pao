@@ -156,6 +156,7 @@ void PieChart::clearChart(){
 }
 
 void PieChart::mapData(){
+    colors.clear();
     vector<vector<double>> values = model->getData();
     vector<QVariant> rowHeaders = model-> getRowsHeaders();
     vector<QVariant> columnHeaders = model->getColumnsHeaders();
@@ -179,7 +180,7 @@ void PieChart::checkState(){
         state=inconsistent;
         PieChart::clearChart();
         if(empty) throw bool(true);
-        else if(zero) throw QString("PieChart cannot be empty");
+        else if(zero) throw QString("PieChart cannot be completely empty");
         else if(negative) throw QString("PieChart cannot have negative values");
     }
 

@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-Chart::Chart(DataTableModel* m): model(m)
+Chart::Chart(DataTableModel* m): model(m), state(consistent)
 {
     connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
     connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
