@@ -101,7 +101,6 @@ void View::setMenus()
     editMenu->addAction(removeColumn);
     editMenu->addSeparator();
 
-    // TODO: implementare un menù about
     aboutMenu = menuBar->addMenu(tr("&About"));
     aboutMenu->addAction(help);
     aboutMenu->addAction(about);
@@ -353,9 +352,6 @@ void View::renameHeadersDialog()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-    // TODO: con tante righe/colonne sta roba diventa gigantesca e ingestibile
-
-    // TODO: PREVENT SAME HEADERS NAME IN THE SAME ORIENTATION -- Kinda risolto ma se vuoi tipo shiftarli di uno è un problemino
     if (dialog.exec() == QDialog::Accepted) {
 
         for (unsigned int i = 0; i < rowsHeadersInputs.size(); i++)
