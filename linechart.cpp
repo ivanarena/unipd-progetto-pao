@@ -41,7 +41,10 @@ void LineChart::updateChartView()
     //setAnimationOptions(QChart::NoAnimation);
     XAxis->setRange(0, model->columnCount()-1 > 0 ? model->columnCount()-1 : model->columnCount()); // set max and min
     //YAxis->applyNiceNumbers();
-    YAxis->setRange(model->min(), model->max());
+    double min = model->min();
+    double max = model->max();
+    if (min < max) YAxis->setRange(model->min(), model->max());
+    else YAxis->setRange(model->min(), model->min()+1);
 }
 
 LineChart::LineChart(DataTableModel *c_model)
@@ -138,7 +141,6 @@ void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
     vector<vector<double>> data = model->getData();
     const QPointF oldPoint = m_series[i.row()]->at(j.column());
     const QPointF newPoint = QPointF(oldPoint.x(), data.at(i.row()).at(j.column()));
-    setAnimationOptions(QChart::SeriesAnimations);
     m_series[i.row()]->replace(oldPoint.x(), oldPoint.y(), newPoint.x(), newPoint.y());
     updateChartView();
 }

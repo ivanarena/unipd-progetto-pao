@@ -14,7 +14,8 @@ void Controller::insertRowReceived(DataTableModel *model, const QString& label, 
 
 void Controller::removeRowReceived(DataTableModel *model)
 {
-    model->removeRow();
+    if (model->rowCount() <= 1) throw QString("You need at least one row.");
+    else model->removeRow();
 }
 
 void Controller::insertColumnReceived(DataTableModel *model, const QString& label, double d_value)
@@ -24,7 +25,8 @@ void Controller::insertColumnReceived(DataTableModel *model, const QString& labe
 
 void Controller::removeColumnReceived(DataTableModel *model)
 {
-    model->removeColumn();
+    if (model->columnCount() <= 1) throw QString("You need at least one column.");
+    else model->removeColumn();
 }
 
 void Controller::insertRowAndColumnReceived(DataTableModel *model, const QString& rowLabel, const QString& colLabel, double d_value)

@@ -76,7 +76,7 @@ void View::setMenus()
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
-    samples = fileMenu->addMenu(tr("&Open Sample"));
+    samples = fileMenu->addMenu(tr("&Open sample"));
         samples->setIcon(QIcon(":res/icons/samples.png"));
         samples->addAction(coronaSample);
         samples->addAction(cryptoSample);
@@ -129,8 +129,8 @@ View::View(QWidget *parent)
     : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar), menuBar(new QMenuBar),
       fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu), samples(new QMenu), newTab(new QAction(QIcon(":/res/icons/new-file.png"), "New project", this)),
       openModel(new QAction(QIcon(":/res/icons/open-file.png"), "Open project", this)),
-      saveModeltoJson(new QAction(QIcon(":/res/icons/save-json.png"), "Save as Json", this)),
-      saveModeltoXml(new QAction(QIcon(":/res/icons/save-xml.png"), "Save as Xml", this)),
+      saveModeltoJson(new QAction(QIcon(":/res/icons/save-json.png"), "Save as JSON", this)),
+      saveModeltoXml(new QAction(QIcon(":/res/icons/save-xml.png"), "Save as XML", this)),
       renameHeaders(new QAction(QIcon(":/res/icons/rename-headers.png"), "Rename headers", this)),
       renameTab(new QAction(QIcon(":/res/icons/rename-tab.png"), "Rename project", this)),
       insertRow(new QAction(QIcon(":/res/icons/insert-row.png"), "Insert row", this)),
@@ -145,9 +145,9 @@ View::View(QWidget *parent)
       expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
       populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
       triangleSample(new QAction(QIcon(":/res/icons/triangle.png"), "Triangle",this)),
-      firstStart(true),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
-      about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
+      about(new QAction(QIcon(":/res/icons/about.png"), "About...", this)),
+      firstStart(true)
 
 {
     tabView->setTabsClosable(true);
@@ -232,46 +232,48 @@ Scene *View::createNewTab(QString tabName,DataTableModel *model)
 
 void View::newTabDialog()
 {
-  QDialog dialog(this);
-  QFormLayout form(&dialog);
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
 
-  QString tabLabel = QString("Project name");
-  QLineEdit *tabInput = new QLineEdit(&dialog);
-  QString rowsLabel = QString("Rows number");
-  QLineEdit *rowsInput = new QLineEdit(&dialog);
-  QString colsLabel = QString("Columns number");
-  QLineEdit *colsInput = new QLineEdit(&dialog);
+    QString tabLabel = QString("Project name");
+    QLineEdit *tabInput = new QLineEdit(&dialog);
+    QString rowsLabel = QString("Rows number");
+    QLineEdit *rowsInput = new QLineEdit(&dialog);
+    QString colsLabel = QString("Columns number");
+    QLineEdit *colsInput = new QLineEdit(&dialog);
 
-  QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                              Qt::Horizontal, &dialog);
 
-  form.addRow(new QLabel("Create new project"));
-  form.addRow(new QLabel());
-  form.addRow(tabLabel, tabInput);
-  form.addRow(new QLabel());
-  form.addRow(rowsLabel, rowsInput);
-  form.addRow(colsLabel, colsInput);
-  form.addRow(new QLabel());
-  form.addRow(&buttonBox);
+    form.addRow(new QLabel("Create new project"));
+    form.addRow(new QLabel());
+    form.addRow(tabLabel, tabInput);
+    form.addRow(new QLabel());
+    form.addRow(rowsLabel, rowsInput);
+    form.addRow(colsLabel, colsInput);
+    form.addRow(new QLabel());
+    form.addRow(&buttonBox);
 
-  QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-  QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-  int rows, cols;
-  QString tabName;
-  bool safe;
+    int rows, cols;
+    QString tabName;
+    bool safe;
+    bool done;
 
-  if (dialog.exec() == QDialog::Accepted) {
+    if (dialog.exec() == QDialog::Accepted) {
     rows = rowsInput->text().toInt(&safe, 10);
     cols = colsInput->text().toInt(&safe, 10);
     tabName = tabInput->text();
-    if (rows && cols) {
-      DataTableModel *model = new DataTableModel(rows, cols, nullptr);
-      createNewTab(tabName, model);
-      renameHeadersDialog();
-    } else
-      dialog.reject();
-      QMessageBox::critical(this,"Error","A new project must have at least 1 row and 1 column");
+        if (rows && cols) {
+            DataTableModel *model = new DataTableModel(rows, cols, nullptr);
+            createNewTab(tabName, model);
+            if (done && (rows < 10 && cols < 10)) renameHeadersDialog();
+        } else {
+            dialog.reject();
+            QMessageBox::critical(this,"Error","A new project must have at least 1 row and 1 column");
+        }
     }
 }
 
@@ -293,7 +295,10 @@ void View::closeTab(const int& index)
 
 void View::renameHeadersDialog()
 {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
@@ -422,7 +427,10 @@ void View::renameTabDoubleClick(int tabIndex) {
 }
 
 void View::renameTabFromButton() {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     QInputDialog dialog;
     dialog.setInputMode(QInputDialog::TextInput);
     dialog.setLabelText("Rename current project");
@@ -485,7 +493,10 @@ void View::insertRowCol(DataTableModel* model){
 
 void View::insertRowTriggered()
 {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
     if (model->rowCount()==0 && model->columnCount()==0)
     {
@@ -536,13 +547,15 @@ void View::insertRowTriggered()
 
 void View::removeRowTriggered()
 {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if(model->rowCount()<=1) return;
     try
     {
         controller.removeRowReceived(model);
-        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries(); // TOFIX: ERRORE QUANDO SI PROVA A RIMUOVERE ULTIMA RIGA RIMASTA
+        dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->removeSeries();
     }
     catch (const QString &errorMessage)
     {
@@ -554,7 +567,10 @@ void View::removeRowTriggered()
 
 void View::insertColumnTriggered()
 {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
     if(model->rowCount()==0 && model->columnCount()==0){
         insertRowCol(model);
@@ -603,9 +619,11 @@ void View::insertColumnTriggered()
 
 void View::removeColumnTriggered()
 {
-    if(tabView->count()==0) return;
+    if(tabView->count() == 0) {
+        QMessageBox::critical(this, "Error", "There is no tab open. You should create a new project first.");
+        return;
+    }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if( model->columnCount()<=1) return;
     try
     {
         controller.removeColumnReceived(model);

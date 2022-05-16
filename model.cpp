@@ -78,15 +78,6 @@ Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const // rende mod
 
 bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role) // modifica effettivamente le celle
 {
-    /*try{
-        if(!is_number(value.toString().toStdString())) throw new modelError();
-    }
-
-    catch(Error* e){
-        e->show();
-        delete e;
-        return false;
-    }*/
 
     if (index.isValid() && role == Qt::EditRole)
     {
@@ -126,15 +117,11 @@ void DataTableModel::insertRow(const QString& label, double d_value)
 
 void DataTableModel::removeRow()
 {
-    if (m_rowCount)
-    {
-        beginResetModel();
-        m_rowsHeaderData.pop_back();
-        m_rowCount--;
-        m_data.pop_back();
-        endResetModel();
-    }
-    else throw QString("There are no more rows to remove.");
+    beginResetModel();
+    m_rowsHeaderData.pop_back();
+    m_rowCount--;
+    m_data.pop_back();
+    endResetModel();
 }
 
 
@@ -150,16 +137,12 @@ void DataTableModel::insertColumn(const QString& label , double d_value)
 
 void DataTableModel::removeColumn()
 {
-    if (m_columnCount)
-    {
-        beginResetModel();
-        m_columnsHeaderData.pop_back();
-        m_columnCount--;
-        for (int i = 0; i < m_rowCount; i++)
-                m_data.at(i).pop_back();
-        endResetModel();
-    }
-    else throw QString("There are no more columns to remove.");
+    beginResetModel();
+    m_columnsHeaderData.pop_back();
+    m_columnCount--;
+    for (int i = 0; i < m_rowCount; i++)
+            m_data.at(i).pop_back();
+    endResetModel();
 }
 
 void DataTableModel::insertRowAndColumn(const QString& rowLabel, const QString& columnLabel, double d_value)
