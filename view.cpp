@@ -82,6 +82,7 @@ void View::setMenus()
         samples->addAction(cryptoSample);
         samples->addAction(expensesSample);
         samples->addAction(populationSample);
+        samples->addAction(triangleSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -143,6 +144,7 @@ View::View(QWidget *parent)
       cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
       expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
       populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
+      triangleSample(new QAction(QIcon(":/res/icons/triangle.png"), "Triangle",this)),
       firstStart(true),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
@@ -193,6 +195,7 @@ View::View(QWidget *parent)
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
     connect(expensesSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
     connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));
+    connect(triangleSample, SIGNAL(triggered()), this, SLOT(openTriangleSample()));
 
     setToolBar();
     setMenus();
@@ -770,7 +773,19 @@ void View::openExpensesSample(){
 void View::openPopulationSample(){
     QFile file(":/res/samples/italian_population.xml");
     QString filename("Italian population over the decades");
-    JsonParser parser;
+    XmlParser parser;
+    try{
+        createNewTab(filename,parser.load(file));
+        chartSelector->setCurrentIndex(3);
+        changeCurrentChart(3);
+    }
+    catch(bool) {};
+}
+
+void View::openTriangleSample(){
+    QFile file(":/res/samples/triangle.xml");
+    QString filename("Triangle");
+    XmlParser parser;
     try{
         createNewTab(filename,parser.load(file));
         chartSelector->setCurrentIndex(4);

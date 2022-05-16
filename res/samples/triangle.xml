@@ -1,0 +1,7 @@
+<!DOCTYPE xml>
+<Doc>
+    <Columns>col1,col2,col3</Columns>
+    <Rows>
+        <row1>1,4,1</row1>
+    </Rows>
+</Doc>

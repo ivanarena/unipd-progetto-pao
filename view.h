@@ -53,6 +53,7 @@ private:
     QAction *cryptoSample;
     QAction *expensesSample;
     QAction *populationSample;
+    QAction *triangleSample;
 
     QAction *help;
     QAction *about;
@@ -105,6 +106,7 @@ public slots:
     void openCryptoSample();
     void openExpensesSample();
     void openPopulationSample();
+    void openTriangleSample();
 };
 
 #endif // VIEW_H
