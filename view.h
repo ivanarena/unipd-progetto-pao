@@ -49,12 +49,10 @@ private:
     QAction *exportChart;
     QAction *exitApp;
 
-    QAction* openSample;
-    /*
     QAction *coronaSample;
     QAction *cryptoSample;
     QAction *expensesSample;
-    QAction *populationSample;*/
+    QAction *populationSample;
 
     QAction *help;
     QAction *about;
@@ -103,11 +101,10 @@ public slots:
 
     void helpDialog();
     void aboutDialog();
-    /*void openCoronaSample();
+    void openCoronaSample();
     void openCryptoSample();
     void openExpensesSample();
-    void openPopulationSample();*/
-    void importSample();
+    void openPopulationSample();
 };
 
 #endif // VIEW_H

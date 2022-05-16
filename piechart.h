@@ -15,6 +15,8 @@
 
 class MainSlice;
 
+enum consistency{consistent, inconsistent};
+
 class PieChart : public Chart
 {
     Q_OBJECT
@@ -22,7 +24,8 @@ class PieChart : public Chart
 private:
     QPieSeries* mainSeries;
     vector<MainSlice*> mainSlices;
-    MainSlice* maxSlice;
+    MainSlice* maxSlice = nullptr;
+    consistency state = consistent;
 
     vector<QColor> colors;
 
@@ -33,7 +36,7 @@ private:
     bool colorYetUsed(const QColor&) const;
     QColor createRandomColor();
     void setExtSeries(QPieSeries*, QColor, QFont);
-    void checkState() override;
+    void checkState();
 
 public:
     PieChart(DataTableModel *c_model);

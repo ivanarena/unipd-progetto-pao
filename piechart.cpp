@@ -55,23 +55,15 @@ void PieChart::setMaxSlice(){
             maxPerc = (*it)->percentage();
         }
     }
-    if(!maxSlice){
+    if(maxSlice == max) return;
+
+    else {
+        if(maxSlice)  maxSlice->extseries()->setLabelsVisible(false);
         maxSlice = max;
         QPieSeries* maxSeries = maxSlice->extseries();
-        maxSeries->setLabelsVisible(true);
-        maxSeries->setLabelsPosition(QPieSlice::LabelOutside);
-    }
-    else if(maxSlice!=max){
-        QPieSeries* maxSeries = maxSlice->extseries();
-        maxSeries->setLabelsVisible(false);
-        maxSlice = max;
-        maxSeries = maxSlice->extseries();
         maxSeries->setLabelsVisible();
         maxSeries->setLabelsPosition(QPieSlice::LabelOutside);
-    }
-    else{
-        QPieSeries* maxSeries = maxSlice->extseries();
-        maxSeries->setLabelsVisible(true);
+
     }
 }
 
@@ -95,6 +87,7 @@ void PieChart::updateChartView(){
 
     for(auto slice : mainSlices){
         slice->setValue(slice->extseries()->sum());
+        slice->setLabelVisible(true);
     }
     setAngles();
     setMaxSlice();
@@ -119,7 +112,7 @@ void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
     mainSeries->append(mainSlice);
 
     mainSlice->setBrush(color);
-    mainSlice->setLabelVisible();
+    mainSlice->setLabelVisible(true);
     mainSlice->setLabelColor(Qt::white);
     mainSlice->setLabelPosition(QPieSlice::LabelInsideNormal);
     mainSlice->setLabelFont(font);
@@ -156,7 +149,6 @@ void PieChart::clearChart(){
 }
 
 void PieChart::mapData(){
-    colors.clear();
     vector<vector<double>> values = model->getData();
     vector<QVariant> rowHeaders = model-> getRowsHeaders();
     vector<QVariant> columnHeaders = model->getColumnsHeaders();
@@ -174,13 +166,11 @@ void PieChart::mapData(){
 void PieChart::checkState(){
     bool zero = isEmpty();
     bool negative = hasNegative();
-    bool empty = model->columnCount()<1 || model->rowCount() <1;
-    if((state==inconsistent && empty) || (state == consistent && !empty && !zero && !negative)) return;
-    else if(empty || zero || negative){
+    if(state == consistent && !zero && !negative) return;
+    else if(zero || negative){
         state=inconsistent;
         PieChart::clearChart();
-        if(empty) throw bool(true);
-        else if(zero) throw QString("PieChart cannot be completely empty");
+        if(zero) throw QString("PieChart cannot be completely empty");
         else if(negative) throw QString("PieChart cannot have negative values");
     }
 
@@ -205,7 +195,6 @@ PieChart::PieChart(DataTableModel *p_model): Chart(p_model) {
         if(state == consistent) PieChart::mapData();
     }
     catch(QString message) {QMessageBox::critical(nullptr,"Error",message); return; }
-    catch(bool) {return; }
 }
 
 

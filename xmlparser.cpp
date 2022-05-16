@@ -57,7 +57,7 @@ DataTableModel* XmlParser::load(QFile& file) const{
         if(colCheck!=columnCount)
             throw true;
     }
-
+    if(rowCount<1 || columnCount<1) throw true;
     return new DataTableModel(nullptr, rowCount, columnCount, values, columnsHeader, rowsHeaders);
 }
 

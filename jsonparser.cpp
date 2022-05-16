@@ -54,6 +54,7 @@ DataTableModel* JsonParser::load(QFile& file) const {
     }
 
     file.close();
+        if(row_Count<1 || col_Count<1) throw true;
     return new DataTableModel(nullptr, row_Count, col_Count, values, columnsHeaders , rowsHeaders);
 }
 

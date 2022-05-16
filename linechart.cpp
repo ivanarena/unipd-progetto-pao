@@ -67,11 +67,6 @@ void LineChart::insertSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
-    if(state==inconsistent){
-        checkState();
-        return;
-    }
-
     vector<vector<double>> data = model->getData();
     QLineSeries *series = new QLineSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
@@ -94,8 +89,6 @@ void LineChart::removeSeries()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
-    checkState();
-    if(state==inconsistent) return;
 
     if (m_series.back())
         QChart::removeSeries(dynamic_cast<QLineSeries *>(m_series.back()));
@@ -113,11 +106,6 @@ void LineChart::insertSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
-    if(state==inconsistent){
-        checkState();
-        return;
-    }
-
     vector<vector<double>> data = model->getData();
     int i = 0;
     for (auto it = m_series.begin(); it != m_series.end(); it++)
@@ -134,9 +122,6 @@ void LineChart::insertSeriesValue()
 void LineChart::removeSeriesValue()
 {
     setAnimationOptions(QChart::SeriesAnimations);
-
-    checkState();
-    if(state==inconsistent) return;
 
     for (auto it = m_series.begin(); it != m_series.end(); it++)
         (*it)->remove(model->columnCount());
@@ -178,29 +163,6 @@ void LineChart::clearChart(){
     m_series.clear();
     delete XAxis;
     delete YAxis;
-}
-
-void LineChart::checkState(){
-    bool empty = model->rowCount()<1 || model->columnCount()<1;
-    if((state==inconsistent && empty) || (state == consistent && !empty)) return;
-    else if(empty){
-        state=inconsistent;
-        clearChart();
-    }
-    else {
-        XAxis = new QCategoryAxis;
-        YAxis = new QValueAxis;
-        for (int i = 0; i < model->columnCount(); i++)
-            XAxis->append(model->getColumnsHeaders().at(i).toString(), i);
-        XAxis->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
-
-        addAxis(XAxis, Qt::AlignBottom);
-        addAxis(YAxis, Qt::AlignLeft);
-
-
-        LineChart::mapData();
-        state = consistent;
-    }
 }
 
 LineChart::~LineChart(){

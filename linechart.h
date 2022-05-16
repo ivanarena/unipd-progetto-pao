@@ -30,7 +30,6 @@ public:
     virtual void removeSeries() override;
     virtual void insertSeriesValue() override; // add column
     virtual void removeSeriesValue() override;
-    void checkState() override;
     void clearChart() override;
 
 public slots:

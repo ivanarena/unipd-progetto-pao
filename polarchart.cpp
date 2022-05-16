@@ -57,11 +57,6 @@ void PolarChart::insertSeries()
     QSplineSeries *series = new QSplineSeries;
     series->setName(model->getRowsHeaders().at(model->rowCount() - 1).toString());
 
-    if(state==inconsistent){
-        checkState();
-        return;
-    }
-
     for (int j = 0; j < model->columnCount(); j++)
     {
         series->append(QPointF(j, data[model->rowCount() - 1].at(j)));
@@ -80,9 +75,6 @@ void PolarChart::removeSeries()
 {
     QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
-    checkState();
-    if(state==inconsistent) return;
-
     if(!SplineSeries.empty()) {
         delete SplineSeries.back();
         SplineSeries.pop_back();
@@ -96,10 +88,6 @@ void PolarChart::insertSeriesValue()
 {
     QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
-    if(state==inconsistent){
-        checkState();
-        return;
-    }
 
     vector<vector<double>> data = model->getData();
     int i = 0;
@@ -118,8 +106,6 @@ void PolarChart::removeSeriesValue()
 {
     //QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
-    checkState();
-    if(state==inconsistent) return;
 
     for (auto it = SplineSeries.begin(); it != SplineSeries.end(); it++)
         (*it)->remove(model->columnCount());
@@ -161,28 +147,6 @@ void PolarChart::clearChart(){
     delete YAxis;
 }
 
-void PolarChart::checkState(){
-    bool empty = model->rowCount()<1 || model->columnCount()<1;
-    if((state==inconsistent && empty) || (state == consistent && !empty)) return;
-    else if(empty){
-        state=inconsistent;
-        clearChart();
-    }
-    else{
-        XAxis = new QCategoryAxis;
-        YAxis = new QValueAxis;
-        for (int i = 0; i < model->columnCount(); i++)
-            XAxis->append(model->getColumnsHeaders().at(i).toString(), i);
-        XAxis->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
-
-        QPolarChart::addAxis(XAxis, QPolarChart::PolarOrientationAngular);
-        QPolarChart::addAxis(YAxis, QPolarChart::PolarOrientationRadial);
-
-
-        PolarChart::mapData();
-        state=consistent;
-    }
-}
 
 PolarChart::~PolarChart(){
     clearChart();

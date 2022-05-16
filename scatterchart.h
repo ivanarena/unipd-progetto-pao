@@ -23,7 +23,6 @@ public:
     void insertSeriesValue() override; // usalo quando aggiungi colonne
     void removeSeriesValue() override; // '''' rimuovi ''
     void clearChart() override;
-    void checkState() override;
 public slots:
     virtual void replaceValue(QModelIndex, QModelIndex) override;
     virtual void updateSeriesName(Qt::Orientation, int, int) override;

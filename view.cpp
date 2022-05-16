@@ -76,13 +76,12 @@ void View::setMenus()
     fileMenu = menuBar->addMenu(tr("&File"));
     fileMenu->addAction(newTab);
     fileMenu->addAction(openModel);
-    fileMenu->addAction(openSample);
-    /*samples = fileMenu->addMenu(tr("&Open Sample"));
-        /*samples->setIcon(QIcon(":res/icons/samples.png"));
+    samples = fileMenu->addMenu(tr("&Open Sample"));
+        samples->setIcon(QIcon(":res/icons/samples.png"));
         samples->addAction(coronaSample);
         samples->addAction(cryptoSample);
         samples->addAction(expensesSample);
-        samples->addAction(populationSample);*/
+        samples->addAction(populationSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -126,13 +125,11 @@ void View::checkWelcome(){
 //============================== COSTRUTTORE ===========================================
 
 View::View(QWidget *parent)
-    : QWidget(parent), firstStart(true), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar),
-      menuBar(new QMenuBar), fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu), samples(new QMenu),
-      newTab(new QAction(QIcon(":/res/icons/new-file.png"), "New project", this)),
+    : QWidget(parent), mainLayout(new QGridLayout), tabView(new QTabWidget), toolBar(new QToolBar), menuBar(new QMenuBar),
+      fileMenu(new QMenu), editMenu(new QMenu), aboutMenu(new QMenu), samples(new QMenu), newTab(new QAction(QIcon(":/res/icons/new-file.png"), "New project", this)),
       openModel(new QAction(QIcon(":/res/icons/open-file.png"), "Open project", this)),
       saveModeltoJson(new QAction(QIcon(":/res/icons/save-json.png"), "Save as Json", this)),
       saveModeltoXml(new QAction(QIcon(":/res/icons/save-xml.png"), "Save as Xml", this)),
-      exportChart(new QAction(QIcon(":/res/icons/export-chart.png"), "Export chart", this)),
       renameHeaders(new QAction(QIcon(":/res/icons/rename-headers.png"), "Rename headers", this)),
       renameTab(new QAction(QIcon(":/res/icons/rename-tab.png"), "Rename project", this)),
       insertRow(new QAction(QIcon(":/res/icons/insert-row.png"), "Insert row", this)),
@@ -140,12 +137,13 @@ View::View(QWidget *parent)
       insertColumn(new QAction(QIcon(":/res/icons/insert-column.png"), "Insert column", this)),
       removeColumn(new QAction(QIcon(":/res/icons/remove-column.png"), "Remove column", this)),
       chartSelector(new QComboBox),
+      exportChart(new QAction(QIcon(":/res/icons/export-chart.png"), "Export chart", this)),
       exitApp(new QAction(QIcon(":/res/icons/exit-app.png"), "Exit", this)),
-      /*coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
+      coronaSample(new QAction(QIcon(":/res/icons/corona.png"), "COVID-19 deaths",this)),
       cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
       expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
-      populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),*/
-      openSample(new QAction(QIcon(":/res/icons/samples.png"),"OpenSample",this)),
+      populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
+      firstStart(true),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/icons/about.png"), "About...", this))
 
@@ -189,13 +187,12 @@ View::View(QWidget *parent)
     connect(exitApp, SIGNAL(triggered()), this, SLOT(close()));
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     connect(about, SIGNAL(triggered()), this, SLOT(aboutDialog()));
-    connect(openSample, SIGNAL(triggered()), this, SLOT(importSample()));
 
 
-   /* connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
+    connect(coronaSample, SIGNAL(triggered()), this, SLOT(openCoronaSample()));
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
     connect(expensesSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
-    connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));*/
+    connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));
 
     setToolBar();
     setMenus();
@@ -538,7 +535,7 @@ void View::removeRowTriggered()
 {
     if(tabView->count()==0) return;
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if(model->rowCount()==1) return;
+    if(model->rowCount()<=1) return;
     try
     {
         controller.removeRowReceived(model);
@@ -605,7 +602,7 @@ void View::removeColumnTriggered()
 {
     if(tabView->count()==0) return;
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if( model->columnCount()==1) return;
+    if( model->columnCount()<=1) return;
     try
     {
         controller.removeColumnReceived(model);
@@ -733,7 +730,7 @@ void View::aboutDialog() {
     QString text = "Designed and developed by Ivan A. Arena and Lorenzo Pasqualotto using Qt 5.9.9 and C++";
     QMessageBox::information(this, "About this", text);
 }
-/*
+
 void View::openCoronaSample(){
     QFile file(":/res/samples/covid_deaths_2020_focus_on_eu.json");
     QString filename("COVID-19 deaths in 2020");
@@ -780,41 +777,6 @@ void View::openPopulationSample(){
         changeCurrentChart(4);
     }
     catch(bool) {};
-}
-
-*/
-
-void View::importSample(){
-
-    QString directory("../unipd-progetto-pao-main/res/samples");
-    QString import = QFileDialog::getOpenFileName(nullptr, tr("Select a Document"),directory, tr("JSON files (*.json);;XML files (*.xml)"));
-    QFile file(import);
-    if(import != ""){
-
-        QFileInfo fileInfo(file.fileName());
-        QString filename(fileInfo.fileName());
-        QString  temp(import);
-
-        Parser* parser;
-
-        if(import.endsWith(".xml")){
-            parser=new XmlParser();
-            filename.replace(".xml","");
-        }
-        if(import.endsWith(".json")){
-            parser=new JsonParser();
-            filename.replace(".json","");
-
-        }
-        try{
-        DataTableModel* model = parser->load(file);
-        delete parser;
-        createNewTab(filename,model);
-        tabView->setCurrentIndex(tabView->currentIndex() + 1);
-        chartSelector->setCurrentIndex(-1);
-        }
-        catch(bool){};
-    }
 }
 
 View::~View()

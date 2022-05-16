@@ -7,7 +7,6 @@
 #include "model.h"
 
 using namespace QtCharts;
-enum consistency{consistent, inconsistent};
 
 class Chart :public QChart
 {
@@ -22,12 +21,10 @@ public:
     virtual void insertSeriesValue(); // usalo quando aggiungi colonne
     virtual void removeSeriesValue(); // '''' rimuovi ''
     virtual void clearChart();
-    virtual void checkState();
 
     virtual ~Chart();
 protected:
     DataTableModel* model;
-    consistency state = consistent;
 public slots:
     virtual void replaceValue(QModelIndex, QModelIndex);
     virtual void updateSeriesName(Qt::Orientation, int, int);
