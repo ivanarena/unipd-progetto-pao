@@ -82,7 +82,7 @@ void View::setMenus()
         samples->addAction(cryptoSample);
         samples->addAction(expensesSample);
         samples->addAction(populationSample);
-        samples->addAction(triangleSample);
+        samples->addAction(deathsSample);
     fileMenu->addSeparator();
     fileMenu->addAction(saveModeltoJson);
     fileMenu->addAction(saveModeltoXml);
@@ -143,7 +143,7 @@ View::View(QWidget *parent)
       cryptoSample(new QAction(QIcon(":/res/icons/crypto.png"), "Crypto stats",this)),
       expensesSample(new QAction(QIcon(":/res/icons/expenses.png"), "Yearly expenses",this)),
       populationSample(new QAction(QIcon(":/res/icons/population.png"), "Italian population",this)),
-      triangleSample(new QAction(QIcon(":/res/icons/triangle.png"), "Triangle",this)),
+      deathsSample(new QAction(QIcon(":/res/icons/deaths.png"), "Deaths by cause",this)),
       help(new QAction(QIcon(":/res/icons/help.png"), "User guide", this)),
       about(new QAction(QIcon(":/res/icons/about.png"), "About...", this)),
       firstStart(true)
@@ -194,7 +194,7 @@ View::View(QWidget *parent)
     connect(cryptoSample, SIGNAL(triggered()), this, SLOT(openCryptoSample()));
     connect(expensesSample, SIGNAL(triggered()), this, SLOT(openExpensesSample()));
     connect(populationSample, SIGNAL(triggered()), this, SLOT(openPopulationSample()));
-    connect(triangleSample, SIGNAL(triggered()), this, SLOT(openTriangleSample()));
+    connect(deathsSample, SIGNAL(triggered()), this, SLOT(openDeathsSample()));
 
     setToolBar();
     setMenus();
@@ -796,9 +796,9 @@ void View::openPopulationSample(){
     catch(bool) {};
 }
 
-void View::openTriangleSample(){
-    QFile file(":/res/samples/triangle.xml");
-    QString filename("Triangle");
+void View::openDeathsSample(){
+    QFile file(":/res/samples/deaths.xml");
+    QString filename("Deaths by cause");
     XmlParser parser;
     try{
         createNewTab(filename,parser.load(file));

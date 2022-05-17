@@ -1,0 +1,7 @@
+<!DOCTYPE xml>
+<Doc>
+    <Columns>Cardiovascular diseases, Cancers,Respiratory diseases,Digestive diseases,Neonatal disorders,Dementia, Diabetes,Suicide,Homicide</Columns>
+    <Rows>
+        <Deaths>18100000,10080000,3970000,2560000,1880000,1620000,1550000,759028,415180</Deaths>
+    </Rows>
+</Doc>
