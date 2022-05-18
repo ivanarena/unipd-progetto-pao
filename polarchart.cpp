@@ -24,9 +24,7 @@ void PolarChart::mapData()
 
 void PolarChart::updateChartView()
 {
-    //setAnimationOptions(QChart::NoAnimation);
-    XAxis->setRange(0, model->columnCount()); // set max and min
-    //YAxis->applyNiceNumbers();
+    XAxis->setRange(0, model->columnCount());
     YAxis->setRange(model->min(), model->max());
 }
 
@@ -104,7 +102,7 @@ void PolarChart::insertSeriesValue()
 
 void PolarChart::removeSeriesValue()
 {
-    //QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
+    QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
 
     for (auto it = SplineSeries.begin(); it != SplineSeries.end(); it++)
@@ -115,7 +113,7 @@ void PolarChart::removeSeriesValue()
     updateChartView();
 }
 
-void PolarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
+void PolarChart::replaceValue(QModelIndex i, QModelIndex j)
 {
     QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 
@@ -127,7 +125,7 @@ void PolarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
     updateChartView();
 }
 
-void PolarChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void PolarChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
 {
     QPolarChart::setAnimationOptions(QChart::SeriesAnimations);
 

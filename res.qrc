@@ -30,7 +30,8 @@
         <file>res/samples/crypto.json</file>
         <file>res/samples/yearly_expenses.json</file>
         <file>res/samples/italian_population.xml</file>
-        <file>res/samples/triangle.xml</file>
+        <file>res/samples/deaths.xml</file>
         <file>res/icons/triangle.png</file>
+        <file>res/icons/deaths.png</file>
     </qresource>
 </RCC>

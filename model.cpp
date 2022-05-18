@@ -39,13 +39,13 @@ DataTableModel::DataTableModel(const DataTableModel& model)
 
 int DataTableModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent) // parent non è usato -- evita compilazioni inutili
+    Q_UNUSED(parent)
     return m_rowCount;
 }
 
 int DataTableModel::columnCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent) // parent non è usato -- evita compilazioni inutili
+    Q_UNUSED(parent)
     return m_columnCount;
 }
 
@@ -53,12 +53,12 @@ QVariant DataTableModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        return m_data[index.row()].at(index.column()); // gets x,y
+        return m_data[index.row()].at(index.column());
     }
     return QVariant();
 }
 
-QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, int role) const // edit header data
+QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole)
         return QVariant();
@@ -71,12 +71,12 @@ QVariant DataTableModel::headerData(int section, Qt::Orientation orientation, in
     }
 }
 
-Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const // rende modificabili le celle
+Qt::ItemFlags DataTableModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
-bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role) // modifica effettivamente le celle
+bool DataTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
 
     if (index.isValid() && role == Qt::EditRole)
@@ -182,7 +182,6 @@ double DataTableModel::min()
 }
 
 
-/******** CONTINUA A BUILDARE *********/
 
 vector<vector<double>> DataTableModel::getData() const
 {

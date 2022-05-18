@@ -38,9 +38,7 @@ void LineChart::mapData()
 
 void LineChart::updateChartView()
 {
-    //setAnimationOptions(QChart::NoAnimation);
-    XAxis->setRange(0, model->columnCount()-1 > 0 ? model->columnCount()-1 : model->columnCount()); // set max and min
-    //YAxis->applyNiceNumbers();
+    XAxis->setRange(0, model->columnCount()-1 > 0 ? model->columnCount()-1 : model->columnCount());
     double min = model->min();
     double max = model->max();
     if (min < max) YAxis->setRange(model->min(), model->max());
@@ -134,7 +132,7 @@ void LineChart::removeSeriesValue()
     updateChartView();
 }
 
-void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
+void LineChart::replaceValue(QModelIndex i, QModelIndex j)
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
@@ -145,7 +143,7 @@ void LineChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
     updateChartView();
 }
 
-void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void LineChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
 {
     setAnimationOptions(QChart::SeriesAnimations);
 

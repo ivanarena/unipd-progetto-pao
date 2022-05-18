@@ -35,19 +35,27 @@
 #include "scatterchart.h"
 #include "error.h"
 #include "xmlparser.h"
+#include <map>
+#include <algorithm>
 using namespace std;
+
+template<typename T>
+bool unique(vector<T> const &vec){
+    map<T, int> freq;
+    for (T const &i: vec) freq[i]++;
+    for (auto const &pair: freq)if (pair.second > 1) return false;
+    return true;
+}
 
 
 void View::setToolBar()
 {
-    // chartSelector->setPlaceholderText("Choose a chart"); // non disponibile in qt 9 rip
     chartSelector->addItem(QIcon(":/res/icons/line-chart.png"), "Line Chart");
     chartSelector->addItem(QIcon(":/res/icons/bar-chart.png"), "Bar Chart");
     chartSelector->addItem(QIcon(":/res/icons/pie-chart.png"), "Pie Chart");
     chartSelector->addItem(QIcon(":/res/icons/polar-chart.png"), "Polar Chart");
     chartSelector->addItem(QIcon(":/res/icons/scatter-chart.png"), "Scatter Chart");
 
-    //toolBar->setOrientation(Qt::Vertical);
     toolBar->addSeparator();
     toolBar->addAction(newTab);
     toolBar->addAction(openModel);
@@ -283,14 +291,14 @@ void View::closeTab(const int& index)
     }
 
     QWidget* tabItem = tabView->widget(index);
-    // Removes the tab at position index from this stack of widgets.
-    // The page widget itself is not deleted.
     tabView->removeTab(index);
 
     delete(tabItem);
     tabItem = nullptr;
     if(tabView->count()<=0) chartSelector->setCurrentIndex(-1);
 }
+
+
 
 void View::renameHeadersDialog()
 {
@@ -301,7 +309,6 @@ void View::renameHeadersDialog()
     QDialog dialog(this);
     QFormLayout form(&dialog);
 
-    //form.setMaximumSize(QSize(600, 800));
     form.setSizeConstraint(QLayout::SetMinAndMaxSize);
     form.setRowWrapPolicy(QFormLayout::DontWrapRows);
     form.setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
@@ -360,9 +367,14 @@ void View::renameHeadersDialog()
             if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Vertical, newHeader);
         }
 
-        for (unsigned int i = 0; i < columnsHeadersInputs.size(); i++)
+        vector<QString> colHeads;
+        for(auto col : columnsHeadersInputs) if(col->text()!="") colHeads.push_back(col->text());
+        if(!unique(colHeads)) {
+            QMessageBox::critical(this, "Error", "Found column headers with same name.");
+            return;
+        }
+        for (auto newHeader : colHeads)
         {
-            QVariant newHeader = columnsHeadersInputs[i]->text();
             if (newHeader != "" && std::find(columnsHeaders.begin(), columnsHeaders.end(), newHeader) == columnsHeaders.end())
                 static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, newHeader);
             else if (newHeader == "") {
@@ -441,51 +453,6 @@ void View::renameTabFromButton() {
     }
 }
 
-void View::insertRowCol(DataTableModel* model){
-    QDialog dialog(this);
-    QFormLayout form(&dialog);
-
-    QString rowLabel = QString("Row Header");
-    QLineEdit *rowInput = new QLineEdit(&dialog);
-    QString colLabel = QString("Column Header");
-    QLineEdit *colInput = new QLineEdit(&dialog);
-    QString Value = QString("Value");
-    QLineEdit *valueInput = new QLineEdit(&dialog);
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                               Qt::Horizontal, &dialog);
-
-    form.addRow(new QLabel("New Model"));
-    form.addRow(new QLabel());
-    form.addRow(rowLabel, rowInput);
-    form.addRow(new QLabel());
-    form.addRow(colLabel,colInput);
-    form.addRow(new QLabel());
-    form.addRow(Value, valueInput);
-    form.addRow(new QLabel());
-    form.addRow(&buttonBox);
-
-    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-
-    double value;
-    QString rowHeader;
-    QString colHeader;
-
-    if (dialog.exec() == QDialog::Accepted) {
-        value = valueInput->text().toDouble();
-        rowHeader = rowInput->text();
-        colHeader = colInput->text();
-        if (!valueInput->text().isEmpty() && !rowHeader.isEmpty() && !colHeader.isEmpty())
-        {
-            controller.insertRowAndColumnReceived(model, rowHeader, colHeader, value);
-            Chart* chart = dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart());
-            chart->insertSeries();
-            chart->insertSeriesValue();
-        }
-        else dialog.reject();
-    }
-}
 
 void View::insertRowTriggered()
 {
@@ -494,11 +461,7 @@ void View::insertRowTriggered()
         return;
     }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if (model->rowCount()==0 && model->columnCount()==0)
-    {
-        insertRowCol(model);
-        return;
-    } else if (model->columnCount() == 0) {
+    if (model->columnCount() == 0) {
         QMessageBox::critical(this, "Error", "There are no columns in your model. You need to add a column first.");
         insertColumnTriggered();
     }
@@ -568,10 +531,8 @@ void View::insertColumnTriggered()
         return;
     }
     DataTableModel* model = static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel();
-    if(model->rowCount()==0 && model->columnCount()==0){
-        insertRowCol(model);
-        return;
-    } else if (model->rowCount() == 0) {
+
+    if (model->rowCount() == 0) {
         QMessageBox::critical(this, "Error", "There are no rows in your model. You need to add a row first.");
         insertRowTriggered();
     }
@@ -605,7 +566,10 @@ void View::insertColumnTriggered()
         rowHeader = columnInput->text();
         if (!valueInput->text().isEmpty() && !rowHeader.isEmpty())
         {
-
+            for(auto col : model->getColumnsHeaders()) if(col == rowHeader) {
+                QMessageBox::critical(this,"Error","Found column headers with same name.");
+                return;
+            }
             controller.insertColumnReceived(model,rowHeader,d_value);
             dynamic_cast<Chart *>(static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getChart())->insertSeriesValue();
         }

@@ -17,11 +17,11 @@ public:
     ~ScatterChart();
 
     void mapData() override;
-    void insertSeries() override; // usalo quando aggiungi righe
-    void removeSeries() override; // '''' rimuovi ''
+    void insertSeries() override;
+    void removeSeries() override;
     void updateChartView() override;
-    void insertSeriesValue() override; // usalo quando aggiungi colonne
-    void removeSeriesValue() override; // '''' rimuovi ''
+    void insertSeriesValue() override;
+    void removeSeriesValue() override;
     void clearChart() override;
 public slots:
     virtual void replaceValue(QModelIndex, QModelIndex) override;

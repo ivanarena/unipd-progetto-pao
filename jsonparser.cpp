@@ -3,7 +3,6 @@
 #include <QList>
 #include <QVariant>
 
-#include <iostream>
 
 DataTableModel* JsonParser::load(QFile& file) const {
     file.open(QIODevice::ReadOnly);

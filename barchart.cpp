@@ -114,7 +114,7 @@ void BarChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
     updateChartView();
 }
 
-void BarChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void BarChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
 {
     setAnimationOptions(QChart::SeriesAnimations);
 

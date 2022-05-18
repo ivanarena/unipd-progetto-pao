@@ -27,15 +27,11 @@ private:
     MainSlice* maxSlice = nullptr;
     consistency state = consistent;
 
-    vector<QColor> colors;
-
-    void insertToPie(QPieSeries*, QColor);
+    void insertToPie(QPieSeries*);
 
     void setMaxSlice();
     void setAngles();
-    bool colorYetUsed(const QColor&) const;
-    QColor createRandomColor();
-    void setExtSeries(QPieSeries*, QColor, QFont);
+    void setExtSeries(QPieSeries*, QFont);
     void checkState();
 
 public:
@@ -44,9 +40,9 @@ public:
 
     virtual void mapData() override;
     virtual void updateChartView() override;
-    virtual void insertSeries() override; // add row
+    virtual void insertSeries() override;
     virtual void removeSeries() override;
-    virtual void insertSeriesValue() override; // add column
+    virtual void insertSeriesValue() override;
     virtual void removeSeriesValue() override;
     void clearChart() override;
     bool isEmpty() const;
@@ -75,6 +71,7 @@ public:
 
 public Q_SLOTS:
     void updateLabel();
+    void updateColor();
 };
 
 #endif // PIECHART_H

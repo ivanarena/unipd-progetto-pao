@@ -31,7 +31,7 @@ void ScatterChart::updateChartView()
         YAxis->setRange(0, model->max()*1.3);
     else
         YAxis->setRange(min, model->max()*1.3);
-    XAxis->setRange(-0.5, model->columnCount()-0.5); // set max and min
+    XAxis->setRange(-0.5, model->columnCount()-0.5);
 }
 
 ScatterChart::ScatterChart(DataTableModel *c_model)
@@ -120,7 +120,7 @@ void ScatterChart::removeSeriesValue()
     updateChartView();
 }
 
-void ScatterChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
+void ScatterChart::replaceValue(QModelIndex i, QModelIndex j)
 {
     setAnimationOptions(QChart::SeriesAnimations);
 
@@ -132,7 +132,7 @@ void ScatterChart::replaceValue(QModelIndex i, QModelIndex j) // i == j
     updateChartView();
 }
 
-void ScatterChart::updateSeriesName(Qt::Orientation orientation, int first, int last) // first == last
+void ScatterChart::updateSeriesName(Qt::Orientation orientation, int first, int last)
 {
     setAnimationOptions(QChart::SeriesAnimations);
 

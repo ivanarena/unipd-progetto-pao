@@ -7,6 +7,7 @@ MainSlice::MainSlice(QPieSeries *Series, QObject *parent)
       mSeries(Series)
 {
     connect(this, &MainSlice::percentageChanged, this, &MainSlice::updateLabel);
+    connect(this, &MainSlice::brushChanged, this , &MainSlice::updateColor);
 }
 
 
@@ -30,6 +31,12 @@ void MainSlice::updateLabel()
 {
     this->setLabel(QString("%1 %2%").arg(mName).arg(percentage() * 100, 0, 'f', 2));
 }
+
+
+void MainSlice::updateColor(){
+    for(auto slice : mSeries->slices())  slice->setColor(this->color());
+}
+
 
 QPieSeries* MainSlice::extseries() const{
     return mSeries;
@@ -67,24 +74,7 @@ void PieChart::setMaxSlice(){
     }
 }
 
-bool PieChart::colorYetUsed(const QColor& color) const{
-    for(auto it = colors.begin(); it!=colors.end(); ++it){
-        if(*it == color) return true;
-    }
-    return false;
-}
-
-
-QColor PieChart::createRandomColor(){
-    srand(time(NULL));
-    QColor color = QColor(rand()%255,rand()%255,rand()%255);
-    while(colorYetUsed(color) || color.lightness()>200 ) color = QColor(rand()%255,rand()%255,rand()%255);
-    colors.push_back(color);
-    return color;
-}
-
 void PieChart::updateChartView(){
-
     for(auto slice : mainSlices){
         slice->setValue(slice->extseries()->sum());
         slice->setLabelVisible(true);
@@ -93,16 +83,14 @@ void PieChart::updateChartView(){
     setMaxSlice();
 }
 
-void PieChart::setExtSeries(QPieSeries * serie, QColor color, QFont font){
+void PieChart::setExtSeries(QPieSeries * serie, QFont font){
     const auto slices = serie->slices();
     for (QPieSlice *slice : slices) {
-        color = color.lighter(105);
-        slice->setBrush(color);
         slice->setLabelFont(font);
     }
 }
 
-void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
+void PieChart::insertToPie(QPieSeries* externalSeries){
     QFont font("Arial", 8);
 
 
@@ -111,7 +99,7 @@ void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
     mainSlice->setValue(externalSeries->sum());
     mainSeries->append(mainSlice);
 
-    mainSlice->setBrush(color);
+
     mainSlice->setLabelVisible(true);
     mainSlice->setLabelColor(Qt::white);
     mainSlice->setLabelPosition(QPieSlice::LabelInsideNormal);
@@ -120,9 +108,10 @@ void PieChart::insertToPie(QPieSeries* externalSeries, QColor color){
 
     externalSeries->setPieSize(0.7);
     externalSeries->setHoleSize(0.6);
-    setExtSeries(externalSeries, color, font);
-
     QChart::addSeries(externalSeries);
+
+    setExtSeries(externalSeries, font);
+
 
     PieChart::updateChartView();
 }
@@ -145,7 +134,6 @@ void PieChart::clearChart(){
     mainSlices.clear();
     mainSeries->clear();
     maxSlice = nullptr;
-    colors.clear();
 }
 
 void PieChart::mapData(){
@@ -158,7 +146,7 @@ void PieChart::mapData(){
         for(int column_i = 0; column_i < model->columnCount(); ++column_i){
             serie->append(columnHeaders[column_i].toString(),values[row_i][column_i]);
         }
-        insertToPie(serie, createRandomColor());
+        insertToPie(serie);
     }
 }
 
@@ -215,7 +203,7 @@ void PieChart::insertSeries(){
     for(int column_i = 0; column_i < model->columnCount(); ++column_i){
         serie->append(columnHeaders[column_i].toString(),values[column_i]);
     }
-    insertToPie(serie,createRandomColor());
+    insertToPie(serie);
 }
 
 void PieChart::removeSeries(){
@@ -247,8 +235,10 @@ void PieChart::insertSeriesValue(){
     for(auto it = mainSlices.begin(); it!= mainSlices.end(); ++it){
             auto ext = (*it)->extseries();
             vector<vector<double>> data = model->getData();
-            if(model->rowCount()>0) ext->append(new QPieSlice(model->getColumnsHeaders()[model->columnCount()-1].toString(),model->getData()[model->rowCount()-1][model->columnCount()-1]));
-            setExtSeries(ext, (*it)->color(), QFont("Arial",8));
+            QPieSlice* newSlice = new QPieSlice(model->getColumnsHeaders()[model->columnCount()-1].toString(),model->getData()[model->rowCount()-1][model->columnCount()-1]);
+            newSlice->setColor((*it)->color());
+            if(model->rowCount()>0) ext->append(newSlice);
+            setExtSeries(ext, QFont("Arial",8));
             updateChartView();
          }
 }

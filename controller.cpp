@@ -29,8 +29,3 @@ void Controller::removeColumnReceived(DataTableModel *model)
     else model->removeColumn();
 }
 
-void Controller::insertRowAndColumnReceived(DataTableModel *model, const QString& rowLabel, const QString& colLabel, double d_value)
-{
-    model->insertRowAndColumn(rowLabel, colLabel, d_value);
-}
-

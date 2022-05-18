@@ -26,9 +26,9 @@ public:
 
     virtual void mapData() override;
     virtual void updateChartView() override;
-    virtual void insertSeries() override; // add row
+    virtual void insertSeries() override;
     virtual void removeSeries() override;
-    virtual void insertSeriesValue() override; // add column
+    virtual void insertSeriesValue() override;
     virtual void removeSeriesValue() override;
     void clearChart() override;
 

@@ -15,11 +15,11 @@ public:
     Chart(DataTableModel* m);
 
     virtual void mapData();
-    virtual void insertSeries(); // usalo quando aggiungi righe
-    virtual void removeSeries(); // '''' rimuovi ''
+    virtual void insertSeries();
+    virtual void removeSeries();
     virtual void updateChartView();
-    virtual void insertSeriesValue(); // usalo quando aggiungi colonne
-    virtual void removeSeriesValue(); // '''' rimuovi ''
+    virtual void insertSeriesValue();
+    virtual void removeSeriesValue();
     virtual void clearChart();
 
     virtual ~Chart();

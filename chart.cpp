@@ -7,7 +7,6 @@ Chart::Chart(DataTableModel* m): model(m)
 {
     connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(replaceValue(QModelIndex,QModelIndex)));
     connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateSeriesName(Qt::Orientation,int,int)));
-    //setAnimationOptions(QChart::NoAnimation);
 }
 
 void Chart::mapData() {}

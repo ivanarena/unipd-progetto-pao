@@ -13,18 +13,17 @@ class DataTableModel : public QAbstractTableModel
     Q_OBJECT
 public:
 
-    //friend void JsonParser::save(DataTableModel*, QFile&) const;
     explicit DataTableModel();
-    explicit DataTableModel(int c_rows, int c_cols, QObject *parent); // overwrite necessario per definizione
+    explicit DataTableModel(int c_rows, int c_cols, QObject *parent);
     explicit DataTableModel(QObject *parent, int, int, const vector<vector<double>>&, const vector<QVariant>&, const vector<QVariant>&);
     DataTableModel(const DataTableModel& model);
 
     bool isEmpty() const;
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
-    int columnCount(const QModelIndex &parent = QModelIndex()) const; // overwrite necessario per definizione
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const; // overwrite necessario per definizione
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -35,7 +34,7 @@ public:
     void removeRow();
     void insertColumn(const QString&, double);
     void removeColumn();
-    void insertRowAndColumn(const QString&, const QString&, double); // only if 0 rows 0 cols
+    void insertRowAndColumn(const QString&, const QString&, double);
 
     double max();
     double min();

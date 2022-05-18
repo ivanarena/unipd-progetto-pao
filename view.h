@@ -60,8 +60,6 @@ private:
 
     Controller controller;
 
-    void insertRowCol(DataTableModel*);
-
     bool firstStart;
     QString currentDirectory = "/home";
 
