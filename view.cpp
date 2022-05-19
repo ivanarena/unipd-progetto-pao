@@ -39,15 +39,6 @@
 #include <algorithm>
 using namespace std;
 
-template<typename T>
-bool unique(vector<T> const &vec){
-    map<T, int> freq;
-    for (T const &i: vec) freq[i]++;
-    for (auto const &pair: freq)if (pair.second > 1) return false;
-    return true;
-}
-
-
 void View::setToolBar()
 {
     chartSelector->addItem(QIcon(":/res/icons/line-chart.png"), "Line Chart");
@@ -369,7 +360,7 @@ void View::renameHeadersDialog()
 
         vector<QString> colHeads;
         for(auto col : columnsHeadersInputs) if(col->text()!="") colHeads.push_back(col->text());
-        if(!unique(colHeads)) {
+        if(!Parser::unique(colHeads)) {
             QMessageBox::critical(this, "Error", "Found column headers with same name.");
             return;
         }

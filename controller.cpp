@@ -29,3 +29,4 @@ void Controller::removeColumnReceived(DataTableModel *model)
     else model->removeColumn();
 }
 
+

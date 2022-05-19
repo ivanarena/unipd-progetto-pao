@@ -53,7 +53,7 @@ DataTableModel* JsonParser::load(QFile& file) const {
     }
 
     file.close();
-        if(row_Count<1 || col_Count<1) throw true;
+        if(row_Count<1 || col_Count<1 || !Parser::unique(columnsHeaders)) throw true;
     return new DataTableModel(nullptr, row_Count, col_Count, values, columnsHeaders , rowsHeaders);
 }
 

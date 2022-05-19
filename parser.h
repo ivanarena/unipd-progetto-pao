@@ -2,8 +2,6 @@
 #define PARSER_H
 
 #include "controller.h"
-
-
 #include <QFile>
 #include <QString>
 #include <QJsonArray>
@@ -20,6 +18,8 @@ public:
     virtual DataTableModel* load(QFile&) const = 0;
     virtual void save(DataTableModel*, QFile&) const = 0;
     virtual ~Parser() = default;
+    template<typename T>
+    static bool unique(vector<T> const&);
 };
 
 #endif
