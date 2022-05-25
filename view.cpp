@@ -358,35 +358,24 @@ void View::renameHeadersDialog()
             if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Vertical, newHeader);
         }
 
-        map<QString,int> colHeads;
-        vector<QVariant> checkUnique=static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getColumnsHeaders();
+
+        vector<QVariant> colHeads=static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getColumnsHeaders();
         i=0;
         for(auto col : columnsHeadersInputs){
-            if(col->text()==""){
-                i++;
-            }
-            else{
-                const QString & checking = col->text();
-                if(colHeads.insert(pair<QString,int>(checking,i)).second){
-                    int j = 0;
-                    for(auto it = checkUnique.begin(); it!=checkUnique.end(); it++){
-                        if(j==i){
-                            checkUnique.insert(it,checking);
-                            break;
-                        }
-                        j++;
-                    }
-                }
-                i++;
-            }
+            if(col->text()!="") colHeads[i]=col->text();
+            i++;
          }
-        if(!Parser::unique(checkUnique)){
+        if(!Parser::unique(colHeads)){
             QMessageBox::critical(this, "Error", "Found column headers with same name.");
             dialog.reject();
             return;
         }
         else {
-            for(auto inserting : colHeads) static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(inserting.second, Qt::Horizontal, inserting.first);
+            i=0;
+            for(auto inserting : colHeads){
+                static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, inserting);
+                i++;
+            }
         }
     }
     else dialog.reject();
