@@ -1,7 +1,6 @@
 #include "parser.h"
 #include "model.h"
 
-
 template<typename T>
 bool Parser::unique(vector<T> const &vec){
     map<T, int> freq;
@@ -12,3 +11,4 @@ bool Parser::unique(vector<T> const &vec){
 
 template bool Parser::unique(vector<QString> const &);
 template bool Parser::unique(vector<QVariant> const &);
+

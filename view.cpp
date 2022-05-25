@@ -358,25 +358,36 @@ void View::renameHeadersDialog()
             if (newHeader != "") static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Vertical, newHeader);
         }
 
-        vector<QString> colHeads;
-        for(auto col : columnsHeadersInputs) if(col->text()!="") colHeads.push_back(col->text());
-        if(!Parser::unique(colHeads)) {
+        map<QString,int> colHeads;
+        vector<QVariant> checkUnique=static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->getColumnsHeaders();
+        i=0;
+        for(auto col : columnsHeadersInputs){
+            if(col->text()==""){
+                i++;
+            }
+            else{
+                const QString & checking = col->text();
+                if(colHeads.insert(pair<QString,int>(checking,i)).second){
+                    int j = 0;
+                    for(auto it = checkUnique.begin(); it!=checkUnique.end(); it++){
+                        if(j==i){
+                            checkUnique.insert(it,checking);
+                            break;
+                        }
+                        j++;
+                    }
+                }
+                i++;
+            }
+         }
+        if(!Parser::unique(checkUnique)){
             QMessageBox::critical(this, "Error", "Found column headers with same name.");
+            dialog.reject();
             return;
         }
-        for (auto newHeader : colHeads)
-        {
-            if (newHeader != "" && std::find(columnsHeaders.begin(), columnsHeaders.end(), newHeader) == columnsHeaders.end())
-                static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(i, Qt::Horizontal, newHeader);
-            else if (newHeader == "") {
-                continue;
-            } else {
-                QMessageBox::critical(this, "Error", "Found column headers with same name.");
-                break;
-            }
+        else {
+            for(auto inserting : colHeads) static_cast<Scene *>(tabView->widget(tabView->currentIndex()))->getModel()->setHeaderData(inserting.second, Qt::Horizontal, inserting.first);
         }
-
-
     }
     else dialog.reject();
 }
