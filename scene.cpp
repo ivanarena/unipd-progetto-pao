@@ -11,7 +11,9 @@ Scene::Scene(DataTableModel *c_model, QChart *c_chart, QWidget *parent)
       model(c_model), table(new QTableView), chart(c_chart), chartView(new QChartView(c_chart))
 {
     table->setModel(model);
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->setHorizontalScrollBar(new QScrollBar(Qt::Horizontal, this));
+    table->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     chartView->setMinimumSize(640, 480);
